@@ -8,7 +8,8 @@ use Livewire\Volt\Component;
 
 new class extends Component
 {
-    public string $name = '';
+    public string $userID = '';
+    public string $fullName = '';
     public string $email = '';
 
     /**
@@ -16,7 +17,8 @@ new class extends Component
      */
     public function mount(): void
     {
-        $this->name = Auth::user()->name;
+        $this->userID = Auth::user()->userID;
+        $this->fullName = Auth::user()->fullName;
         $this->email = Auth::user()->email;
     }
 
@@ -28,8 +30,9 @@ new class extends Component
         $user = Auth::user();
 
         $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            'userID' => ['required', 'string', 'max:255', Rule::unique(User::class)->ignore($user->userID, 'userID')],
+            'fullName' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->userID, 'userID')],
         ]);
 
         $user->fill($validated);
@@ -40,7 +43,7 @@ new class extends Component
 
         $user->save();
 
-        $this->dispatch('profile-updated', name: $user->name);
+        $this->dispatch('profile-updated', name: $user->fullName);
     }
 
     /**
@@ -74,6 +77,11 @@ new class extends Component
     </header>
 
     <form wire:submit="updateProfileInformation" class="mt-6 space-y-6">
+        <div>
+            <x-input-label for="userID" :value="__('Username')" />
+            <x-text-input wire:model="userID" id="userID" name="userID" type="text" class="mt-1 block w-full" required autocomplete="username" />
+            <x-input-error class="mt-2" :messages="$errors->get('userID')" />
+        </div>
         <div>
             <x-input-label for="name" :value="__('Name')" />
             <x-text-input wire:model="name" id="name" name="name" type="text" class="mt-1 block w-full" required autofocus autocomplete="name" />
