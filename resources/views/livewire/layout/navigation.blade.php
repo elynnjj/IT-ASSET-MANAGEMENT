@@ -34,8 +34,40 @@ new class extends Component
                         {{ __('Dashboard') }}
                     </x-nav-link>
                     @if (auth()->user()->role === 'ITDept')
+                        <x-nav-link :href="route('itdept.manage-assets.index')" :active="request()->routeIs('itdept.manage-assets.*')" wire:navigate>
+                            {{ __('Manage Assets') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('itdept.repairs-maintenance')" :active="request()->routeIs('itdept.repairs-maintenance')" wire:navigate>
+                            {{ __('Repairs & Maintenance') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('itdept.it-requests')" :active="request()->routeIs('itdept.it-requests')" wire:navigate>
+                            {{ __('IT Requests') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('itdept.asset-disposal')" :active="request()->routeIs('itdept.asset-disposal')" wire:navigate>
+                            {{ __('Asset Disposal') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('itdept.reports')" :active="request()->routeIs('itdept.reports')" wire:navigate>
+                            {{ __('Reports') }}
+                        </x-nav-link>
                         <x-nav-link :href="route('itdept.manage-users.index')" :active="request()->routeIs('itdept.manage-users.*')" wire:navigate>
                             {{ __('Manage Users') }}
+                        </x-nav-link>
+                    @elseif (auth()->user()->role === 'Employee')
+                        <x-nav-link :href="route('employee.submit-it-request')" :active="request()->routeIs('employee.submit-it-request')" wire:navigate>
+                            {{ __('Submit IT Request') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('employee.my-requests')" :active="request()->routeIs('employee.my-requests')" wire:navigate>
+                            {{ __('My Requests') }}
+                        </x-nav-link>
+                    @elseif (auth()->user()->role === 'HOD')
+                        <x-nav-link :href="route('hod.approval-request')" :active="request()->routeIs('hod.approval-request')" wire:navigate>
+                            {{ __('Approval Request') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('hod.submit-it-request')" :active="request()->routeIs('hod.submit-it-request')" wire:navigate>
+                            {{ __('Submit IT Request') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('hod.my-requests')" :active="request()->routeIs('hod.my-requests')" wire:navigate>
+                            {{ __('My Requests') }}
                         </x-nav-link>
                     @endif
                 </div>
@@ -90,8 +122,40 @@ new class extends Component
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
             @if (auth()->user()->role === 'ITDept')
+                <x-responsive-nav-link :href="route('itdept.manage-assets.index')" :active="request()->routeIs('itdept.manage-assets.*')" wire:navigate>
+                    {{ __('Manage Assets') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('itdept.repairs-maintenance')" :active="request()->routeIs('itdept.repairs-maintenance')" wire:navigate>
+                    {{ __('Repairs & Maintenance') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('itdept.it-requests')" :active="request()->routeIs('itdept.it-requests')" wire:navigate>
+                    {{ __('IT Requests') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('itdept.asset-disposal')" :active="request()->routeIs('itdept.asset-disposal')" wire:navigate>
+                    {{ __('Asset Disposal') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('itdept.reports')" :active="request()->routeIs('itdept.reports')" wire:navigate>
+                    {{ __('Reports') }}
+                </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('itdept.manage-users.index')" :active="request()->routeIs('itdept.manage-users.*')" wire:navigate>
                     {{ __('Manage Users') }}
+                </x-responsive-nav-link>
+            @elseif (auth()->user()->role === 'Employee')
+                <x-responsive-nav-link :href="route('employee.submit-it-request')" :active="request()->routeIs('employee.submit-it-request')" wire:navigate>
+                    {{ __('Submit IT Request') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('employee.my-requests')" :active="request()->routeIs('employee.my-requests')" wire:navigate>
+                    {{ __('My Requests') }}
+                </x-responsive-nav-link>
+            @elseif (auth()->user()->role === 'HOD')
+                <x-responsive-nav-link :href="route('hod.approval-request')" :active="request()->routeIs('hod.approval-request')" wire:navigate>
+                    {{ __('Approval Request') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('hod.submit-it-request')" :active="request()->routeIs('hod.submit-it-request')" wire:navigate>
+                    {{ __('Submit IT Request') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('hod.my-requests')" :active="request()->routeIs('hod.my-requests')" wire:navigate>
+                    {{ __('My Requests') }}
                 </x-responsive-nav-link>
             @endif
         </div>

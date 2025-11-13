@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ITDept\ManageUserController;
+use App\Http\Controllers\ITDept\ManageAssetController;
 
 Route::redirect('/', '/login');
 
@@ -29,6 +30,7 @@ Route::view('profile', 'profile')
 require __DIR__.'/auth.php';
 
 Route::middleware(['auth', 'verified', 'itdept'])->group(function () {
+    // Manage Users routes
     Route::prefix('itdept/manage-users')->name('itdept.manage-users.')->group(function () {
 		Route::get('/', [ManageUserController::class, 'index'])->name('index');
 		Route::get('/create', [ManageUserController::class, 'create'])->name('create');
@@ -40,4 +42,62 @@ Route::middleware(['auth', 'verified', 'itdept'])->group(function () {
 		Route::delete('/{userID}', [ManageUserController::class, 'destroy'])->name('destroy');
 		Route::patch('/{userID}/deactivate', [ManageUserController::class, 'deactivate'])->name('deactivate');
 	});
+
+    // Manage Assets routes
+    Route::prefix('itdept/manage-assets')->name('itdept.manage-assets.')->group(function () {
+		Route::get('/', [ManageAssetController::class, 'index'])->name('index');
+		Route::get('/create', [ManageAssetController::class, 'create'])->name('create');
+		Route::post('/', [ManageAssetController::class, 'store'])->name('store');
+		Route::get('/template', [ManageAssetController::class, 'downloadTemplate'])->name('template');
+		Route::post('/import', [ManageAssetController::class, 'importCsv'])->name('import');
+		Route::get('/upload-invoice', [ManageAssetController::class, 'uploadInvoiceForm'])->name('upload-invoice');
+		Route::post('/upload-invoice', [ManageAssetController::class, 'storeInvoice'])->name('store-invoice');
+		Route::get('/api/assets-by-type', [ManageAssetController::class, 'getAssetsByType'])->name('api.assets-by-type');
+		Route::get('/{assetID}', [ManageAssetController::class, 'show'])->name('show');
+		Route::get('/{assetID}/edit', [ManageAssetController::class, 'edit'])->name('edit');
+		Route::put('/{assetID}', [ManageAssetController::class, 'update'])->name('update');
+		Route::delete('/{assetID}', [ManageAssetController::class, 'destroy'])->name('destroy');
+	});
+
+    Route::get('/itdept/repairs-maintenance', function () {
+        return view('ITDept.repairsAndMaintenance');
+    })->name('itdept.repairs-maintenance');
+
+    Route::get('/itdept/it-requests', function () {
+        return view('ITDept.ITRequests');
+    })->name('itdept.it-requests');
+
+    Route::get('/itdept/asset-disposal', function () {
+        return view('ITDept.assetDisposal');
+    })->name('itdept.asset-disposal');
+
+    Route::get('/itdept/reports', function () {
+        return view('ITDept.reports');
+    })->name('itdept.reports');
+});
+
+// Employee routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/employee/submit-it-request', function () {
+        return view('Employee.submitITRequests');
+    })->name('employee.submit-it-request');
+
+    Route::get('/employee/my-requests', function () {
+        return view('Employee.myRequest');
+    })->name('employee.my-requests');
+});
+
+// HOD routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/hod/approval-request', function () {
+        return view('HOD.approvalRequest');
+    })->name('hod.approval-request');
+
+    Route::get('/hod/submit-it-request', function () {
+        return view('HOD.submitITRequests');
+    })->name('hod.submit-it-request');
+
+    Route::get('/hod/my-requests', function () {
+        return view('HOD.myRequest');
+    })->name('hod.my-requests');
 });

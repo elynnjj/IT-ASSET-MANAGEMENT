@@ -37,7 +37,7 @@
 
 						<div>
 							<x-input-label for="department" :value="__('Department')" />
-							<select id="department" name="department" class="mt-1 block w-full" required>
+							<select id="department" name="department" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
 								<option value="HR & Admin">HR & Admin</option>
 								<option value="Account">Account</option>
 								<option value="Service">Service</option>
@@ -70,18 +70,24 @@
 						</div>
 					</form>
 
-					<div class="mt-10">
-						<h3 class="text-lg font-semibold mb-4">{{ __('Add users in bulk') }}</h3>
-						<div class="flex items-center justify-between mb-4">
-							<a href="{{ route('itdept.manage-users.template') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md">{{ __('Download template') }}</a>
-						</div>
-						<form action="{{ route('itdept.manage-users.import') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-							@csrf
-							<input type="file" name="file" accept=".csv" required />
-							<div>
-								<x-primary-button>{{ __('Add users') }}</x-primary-button>
+					<div class="mt-10" x-data="{ showBulkUpload: false }">
+						<button type="button" @click="showBulkUpload = !showBulkUpload" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+							{{ __('Add User In Bulk') }}
+						</button>
+
+						<div x-show="showBulkUpload" x-transition class="mt-6">
+							<h3 class="text-lg font-semibold mb-4">{{ __('Add users in bulk') }}</h3>
+							<div class="flex items-center justify-between mb-4">
+								<a href="{{ route('itdept.manage-users.template') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">{{ __('Download template') }}</a>
 							</div>
-						</form>
+							<form action="{{ route('itdept.manage-users.import') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+								@csrf
+								<input type="file" name="file" accept=".csv" required />
+								<div>
+									<x-primary-button>{{ __('Add users') }}</x-primary-button>
+								</div>
+							</form>
+						</div>
 					</div>
 				</div>
 			</div>
