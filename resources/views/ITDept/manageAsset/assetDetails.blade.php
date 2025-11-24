@@ -6,99 +6,250 @@
 	</x-slot>
 
 	<div class="py-12">
-		<div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-			<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-				<div class="p-6 text-gray-900 dark:text-gray-100">
-					<div class="mb-6">
-						<a href="{{ route('itdept.manage-assets.index', ['assetType' => $asset->assetType]) }}" class="text-sky-600 hover:text-sky-800 dark:text-sky-400 dark:hover:text-sky-300">
-							← Back to Asset List
-						</a>
-					</div>
+		<div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+			{{-- Breadcrumb --}}
+			<div class="mb-6">
+				<a href="{{ route('itdept.manage-assets.index', ['assetType' => $asset->assetType]) }}" 
+				   style="color: #4BA9C2;"
+				   class="hover:opacity-80">
+					← Assets
+				</a>
+				<span class="text-gray-600 dark:text-gray-400"> > </span>
+				<span class="text-gray-600 dark:text-gray-400">{{ $asset->assetID }}</span>
+			</div>
 
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-						{{-- Basic Information --}}
-						<div class="space-y-4">
-							<h3 class="text-lg font-semibold mb-4 border-b border-gray-300 dark:border-gray-700 pb-2">
-								{{ __('Basic Information') }}
-							</h3>
-							
-							<div>
-								<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Asset ID') }}</label>
-								<p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $asset->assetID }}</p>
+			{{-- Top Section: Asset Details --}}
+			<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
+				<div class="p-6">
+					<div class="flex justify-between items-start">
+						<div class="flex-1">
+							{{-- Title and Service Tag --}}
+							<div class="mb-6">
+								<div class="flex items-baseline">
+									<b><h1 class="text-xl font-bold" style="color: #4BA9C2;">{{ $asset->assetID }}</h1></b>
+									@if($asset->serialNum)
+										<span class="text-gray-600 dark:text-gray-400 text-xs ml-3">Service Tag: {{ $asset->serialNum }}</span>
+									@endif
+								</div>
 							</div>
 
-							<div>
-								<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Asset Type') }}</label>
-								<p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $asset->assetType }}</p>
-							</div>
+							{{-- Asset Information Grid with Boxes --}}
+							<div class="flex-1">
+								<div class="grid grid-cols-2 gap-4">
+									{{-- Line 1: Model and OS Version --}}
+									<div class="border border-gray-200 dark:border-gray-700 rounded-md p-3 bg-gray-50 dark:bg-gray-900/50">
+										<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Model') }}</label>
+										<p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ $asset->model ?? '-' }}</p>
+									</div>
 
-							<div>
-								<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Serial Number') }}</label>
-								<p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $asset->serialNum ?? '-' }}</p>
-							</div>
+									<div class="border border-gray-200 dark:border-gray-700 rounded-md p-3 bg-gray-50 dark:bg-gray-900/50">
+										<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('OS Version') }}</label>
+										<p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ $asset->osVer ?? '-' }}</p>
+									</div>
 
-							<div>
-								<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Model') }}</label>
-								<p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $asset->model ?? '-' }}</p>
-							</div>
+									{{-- Line 2: RAM and Purchase Date --}}
+									<div class="border border-gray-200 dark:border-gray-700 rounded-md p-3 bg-gray-50 dark:bg-gray-900/50">
+										<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('RAM') }}</label>
+										<p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ $asset->ram ?? '-' }}</p>
+									</div>
 
-							<div>
-								<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Status') }}</label>
-								<p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $asset->status ?? '-' }}</p>
-							</div>
+									<div class="border border-gray-200 dark:border-gray-700 rounded-md p-3 bg-gray-50 dark:bg-gray-900/50">
+										<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Purchase Date') }}</label>
+										<p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ $asset->purchaseDate ? $asset->purchaseDate->format('d/m/Y') : '-' }}</p>
+									</div>
 
-							<div>
-								<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Purchase Date') }}</label>
-								<p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $asset->purchaseDate ? $asset->purchaseDate->format('Y-m-d') : '-' }}</p>
+									{{-- Line 3: Storage and Current User --}}
+									<div class="border border-gray-200 dark:border-gray-700 rounded-md p-3 bg-gray-50 dark:bg-gray-900/50">
+										<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Storage') }}</label>
+										<p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ $asset->storage ?? '-' }}</p>
+									</div>
+
+									<div class="border border-gray-200 dark:border-gray-700 rounded-md p-3 bg-gray-50 dark:bg-gray-900/50">
+										<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Current User') }}</label>
+										<p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+											@if($currentAssignment)
+												{{ $currentAssignment->user->fullName }}
+											@else
+												With IT
+											@endif
+										</p>
+									</div>
+
+									{{-- Line 4: Processor and Status --}}
+									<div class="border border-gray-200 dark:border-gray-700 rounded-md p-3 bg-gray-50 dark:bg-gray-900/50">
+										<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Processor') }}</label>
+										<p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ $asset->processor ?? '-' }}</p>
+									</div>
+
+									<div class="border border-gray-200 dark:border-gray-700 rounded-md p-3 bg-gray-50 dark:bg-gray-900/50">
+										<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Status') }}</label>
+										<p class="text-sm">
+											<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+												{{ $asset->status === 'Available' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
+												{{ $asset->status ?? 'Available' }}
+											</span>
+										</p>
+									</div>
+
+									{{-- Line 5: Installed Software (Full Width) --}}
+									<div class="col-span-2 border border-gray-200 dark:border-gray-700 rounded-md p-3 bg-gray-50 dark:bg-gray-900/50">
+										<div class="flex items-center justify-between mb-1">
+											<label class="block text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('Installed Software') }}</label>
+											<a href="{{ route('itdept.manage-assets.installed-software', $asset->assetID) }}" 
+											   class="inline-flex items-center justify-center w-5 h-5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+											   title="{{ __('Add/Edit Installed Software') }}">
+												<svg class="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+												</svg>
+											</a>
+										</div>
+										<p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ $asset->installedSoftware ?? '-' }}</p>
+									</div>
+								</div>
 							</div>
 						</div>
 
-						{{-- Technical Specifications --}}
-						<div class="space-y-4">
-							<h3 class="text-lg font-semibold mb-4 border-b border-gray-300 dark:border-gray-700 pb-2">
-								{{ __('Technical Specifications') }}
-							</h3>
-
-							<div>
-								<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('RAM') }}</label>
-								<p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $asset->ram ?? '-' }}</p>
-							</div>
-
-							<div>
-								<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Storage') }}</label>
-								<p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $asset->storage ?? '-' }}</p>
-							</div>
-
-							<div>
-								<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('OS Version') }}</label>
-								<p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $asset->osVer ?? '-' }}</p>
-							</div>
-
-							<div>
-								<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Processor') }}</label>
-								<p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $asset->processor ?? '-' }}</p>
-							</div>
-
-							<div>
-								<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Installed Software') }}</label>
-								<p class="mt-1 text-sm text-gray-900 dark:text-gray-100 whitespace-pre-line">{{ $asset->installedSoftware ?? '-' }}</p>
-							</div>
-
-							@if($asset->invoice)
-							<div>
-								<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Invoice') }}</label>
-								<p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $asset->invoice->invoiceID }} - {{ $asset->invoice->fileName }}</p>
-							</div>
+						{{-- Action Buttons - Vertically Stacked on Right --}}
+						<div class="flex flex-col" style="gap: 12px; margin-left: 24px; margin-top: 0; margin-bottom: 0; margin-right: 0;">
+							{{-- Check-Out Button --}}
+							@if($asset->status !== 'Checked Out')
+							<a href="{{ route('itdept.manage-assets.checkout', $asset->assetID) }}" 
+							   class="inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90"
+							   style="background-color: #4BA9C2; margin: 0;"
+							   onmouseover="this.style.backgroundColor='#3a8ba5'"
+							   onmouseout="this.style.backgroundColor='#4BA9C2'">
+								{{ __('Check-Out') }}
+							</a>
+							@else
+							<button type="button" disabled
+								class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest cursor-not-allowed opacity-50"
+								style="background-color: #B2B2B2; margin: 0;">
+								{{ __('Check-Out') }}
+							</button>
 							@endif
+
+							{{-- Check-In Button --}}
+							@if($asset->status === 'Checked Out' && $currentAssignment)
+							<form action="{{ route('itdept.manage-assets.checkin', $asset->assetID) }}" method="POST" class="inline w-full" style="margin: 0;">
+								@csrf
+								@method('PATCH')
+								<button type="submit" 
+									class="inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90 w-full"
+									style="background-color: #4BA9C2; margin: 0;"
+									onmouseover="this.style.backgroundColor='#3a8ba5'"
+									onmouseout="this.style.backgroundColor='#4BA9C2'">
+									{{ __('Check-In') }}
+								</button>
+							</form>
+							@else
+							<button type="button" disabled
+								class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest cursor-not-allowed opacity-50 w-full"
+								style="background-color: #B2B2B2; margin: 0;">
+								{{ __('Check-In') }}
+							</button>
+							@endif
+
+							{{-- Invoice Button --}}
+							@if($asset->invoice)
+							<a href="{{ route('itdept.manage-assets.invoice.download', $asset->invoice->invoiceID) }}" 
+							   target="_blank"
+							   class="inline-flex items-center justify-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none transition ease-in-out duration-150"
+							   style="margin: 0;">
+								{{ __('Invoice') }}
+							</a>
+							@else
+							<button type="button" disabled
+								class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest cursor-not-allowed opacity-50"
+								style="background-color: #B2B2B2; margin: 0;">
+								{{ __('Invoice') }}
+							</button>
+							@endif
+
+							{{-- Dispose Asset Button --}}
+							<button type="button" 
+								class="inline-flex items-center justify-center px-4 py-2 bg-red-600 dark:bg-red-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-600 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none transition ease-in-out duration-150"
+								style="margin: 0;">
+								{{ __('Dispose Asset') }}
+							</button>
 						</div>
 					</div>
+				</div>
+			</div>
 
-					{{-- Action Buttons --}}
-					<div class="mt-8 flex items-center justify-end space-x-4">
-						<a href="{{ route('itdept.manage-assets.edit', $asset->assetID) }}" 
-						   class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-							{{ __('Edit Asset') }}
-						</a>
+			{{-- Bottom Section: Tabs --}}
+			<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg" x-data="{ activeTab: 'previousUsers' }">
+				{{-- Tab Navigation --}}
+				<div class="border-b border-gray-200 dark:border-gray-700">
+					<nav class="flex -mb-px">
+						<button @click="activeTab = 'previousUsers'" 
+							:class="activeTab === 'previousUsers' ? 'border-b-2 font-medium' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+							:style="activeTab === 'previousUsers' ? 'border-color: #4BA9C2; color: #4BA9C2;' : ''"
+							class="whitespace-nowrap py-4 px-6 text-sm transition">
+							{{ __('Previous Users') }}
+						</button>
+						<button @click="activeTab = 'itRequestHistory'" 
+							:class="activeTab === 'itRequestHistory' ? 'border-b-2 font-medium' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+							:style="activeTab === 'itRequestHistory' ? 'border-color: #4BA9C2; color: #4BA9C2;' : ''"
+							class="whitespace-nowrap py-4 px-6 text-sm transition">
+							{{ __('IT Request History') }}
+						</button>
+						<button @click="activeTab = 'maintenanceHistory'" 
+							:class="activeTab === 'maintenanceHistory' ? 'border-b-2 font-medium' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+							:style="activeTab === 'maintenanceHistory' ? 'border-color: #4BA9C2; color: #4BA9C2;' : ''"
+							class="whitespace-nowrap py-4 px-6 text-sm transition">
+							{{ __('Maintenance History') }}
+						</button>
+					</nav>
+				</div>
+
+				{{-- Tab Content --}}
+				<div class="p-6">
+					{{-- Previous Users Tab --}}
+					<div x-show="activeTab === 'previousUsers'" x-transition>
+						@if($previousAssignments->count() > 0)
+						<div class="overflow-x-auto">
+							<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+								<thead class="bg-gray-50 dark:bg-gray-700">
+									<tr>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Previous Users') }}</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Department') }}</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Date Check-Out From IT') }}</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Date Check-In to IT') }}</th>
+									</tr>
+								</thead>
+								<tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+									@foreach($previousAssignments as $assignment)
+									<tr>
+										<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+											{{ $assignment->user->fullName }}
+										</td>
+										<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+											{{ $assignment->user->department ?? '-' }}
+										</td>
+										<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+											{{ $assignment->checkoutDate->format('d/m/Y') }}
+										</td>
+										<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+											{{ $assignment->checkinDate->format('d/m/Y') }}
+										</td>
+									</tr>
+									@endforeach
+								</tbody>
+							</table>
+						</div>
+						@else
+						<p class="text-gray-500 dark:text-gray-400 text-center py-8">{{ __('No previous users found.') }}</p>
+						@endif
+					</div>
+
+					{{-- IT Request History Tab --}}
+					<div x-show="activeTab === 'itRequestHistory'" x-transition style="display: none;">
+						<p class="text-gray-500 dark:text-gray-400 text-center py-8">{{ __('IT Request History will be displayed here.') }}</p>
+					</div>
+
+					{{-- Maintenance History Tab --}}
+					<div x-show="activeTab === 'maintenanceHistory'" x-transition style="display: none;">
+						<p class="text-gray-500 dark:text-gray-400 text-center py-8">{{ __('Maintenance History will be displayed here.') }}</p>
 					</div>
 				</div>
 			</div>

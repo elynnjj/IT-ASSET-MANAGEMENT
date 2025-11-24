@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Asset extends Model
 {
@@ -38,5 +39,15 @@ class Asset extends Model
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class, 'invoiceID', 'invoiceID');
+    }
+
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(AssignAsset::class, 'assetID', 'assetID');
+    }
+
+    public function currentAssignment(): ?AssignAsset
+    {
+        return $this->assignments()->whereNull('checkinDate')->latest('checkoutDate')->first();
     }
 }

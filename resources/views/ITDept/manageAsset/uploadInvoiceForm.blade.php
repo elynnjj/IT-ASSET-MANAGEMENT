@@ -25,12 +25,6 @@
 							</h3>
 
 							<div>
-								<x-input-label for="invoiceID" :value="__('Invoice ID')" />
-								<x-text-input id="invoiceID" name="invoiceID" type="text" class="mt-1 block w-full" required />
-								<x-input-error :messages="$errors->get('invoiceID')" class="mt-2" />
-							</div>
-
-							<div>
 								<x-input-label for="invoiceFile" :value="__('Invoice File')" />
 								<input type="file" id="invoiceFile" name="invoiceFile" accept=".pdf,.jpg,.jpeg,.png" 
 									class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400

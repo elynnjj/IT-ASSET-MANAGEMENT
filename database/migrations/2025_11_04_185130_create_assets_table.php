@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('processor')->nullable();
             $table->string('status')->nullable();
             $table->text('installedSoftware')->nullable();
-            $table->string('invoiceID')->nullable();
+            $table->unsignedBigInteger('invoiceID')->nullable();
             $table->timestamps();
 
             $table->foreign('invoiceID')->references('invoiceID')->on('invoices')->onDelete('set null');

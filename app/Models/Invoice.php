@@ -8,15 +8,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Invoice extends Model
 {
     protected $fillable = [
-        'invoiceID',
         'fileName',
+        'filePath',
     ];
 
     protected $primaryKey = 'invoiceID';
 
-    public $incrementing = false;
+    public $incrementing = true;
 
-    protected $keyType = 'string';
+    protected $keyType = 'int';
 
     public function assets(): HasMany
     {
