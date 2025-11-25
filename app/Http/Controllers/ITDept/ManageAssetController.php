@@ -31,6 +31,9 @@ class ManageAssetController extends Controller
 		}
 
 		$query = Asset::query()
+			->with(['assignments' => function ($q) {
+				$q->whereNull('checkinDate')->with('user');
+			}])
 			->when($assetType, function ($q) use ($assetType) {
 				$q->where('assetType', $assetType);
 			})
@@ -202,7 +205,7 @@ class ManageAssetController extends Controller
 		$asset = Asset::where('assetID', $assetID)->firstOrFail();
 
 		$validated = $request->validate([
-			'assetType' => ['required', 'in:Laptop,Desktop'],
+			'assetType' => ['nullable', 'in:Laptop,Desktop'],
 			'serialNum' => ['nullable', 'string', 'max:255'],
 			'model' => ['nullable', 'string', 'max:255'],
 			'ram' => ['nullable', 'string', 'max:255'],
@@ -210,14 +213,16 @@ class ManageAssetController extends Controller
 			'purchaseDate' => ['nullable', 'date'],
 			'osVer' => ['nullable', 'in:Windows 10,Windows 11'],
 			'processor' => ['nullable', 'string', 'max:255'],
-			'status' => ['nullable', 'string', 'max:255'],
-			'installedSoftware' => ['nullable', 'string'],
-			'invoiceID' => ['nullable', 'integer', 'exists:invoices,invoiceID'],
 		]);
+
+		// Use existing assetType if not provided
+		if (!isset($validated['assetType'])) {
+			$validated['assetType'] = $asset->assetType;
+		}
 
 		$asset->update($validated);
 
-		return redirect()->route('itdept.manage-assets.index', ['assetType' => $validated['assetType']])
+		return redirect()->route('itdept.manage-assets.index', ['assetType' => $asset->assetType])
 			->with('status', 'Asset updated');
 	}
 

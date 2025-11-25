@@ -6,13 +6,31 @@
 	</x-slot>
 
 	<div class="py-12">
-		<div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+		<div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+			{{-- Breadcrumb --}}
+			<div class="mb-6">
+				<a href="{{ route('itdept.manage-assets.index', ['assetType' => $asset->assetType]) }}" 
+				   style="color: #4BA9C2;"
+				   class="hover:opacity-80">
+					← Assets
+				</a>
+				<span class="text-gray-600 dark:text-gray-400"> > </span>
+				<a href="{{ route('itdept.manage-assets.show', $asset->assetID) }}" 
+				   style="color: #4BA9C2;"
+				   class="hover:opacity-80">
+					{{ $asset->assetID }}
+				</a>
+				<span class="text-gray-600 dark:text-gray-400"> > </span>
+				<span class="text-gray-600 dark:text-gray-400">{{ __('Check-Out Asset') }}</span>
+			</div>
+
+			{{-- Main Content Card --}}
 			<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
 				<div class="p-6 text-gray-900 dark:text-gray-100">
+
+					{{-- Title --}}
 					<div class="mb-6">
-						<a href="{{ route('itdept.manage-assets.show', $asset->assetID) }}" class="text-sky-600 hover:text-sky-800 dark:text-sky-400 dark:hover:text-sky-300">
-							← Back to Asset Details
-						</a>
+						<h1 class="text-xl font-semibold">{{ __('Check-Out Asset') }}</h1>
 					</div>
 
 					{{-- Asset Information --}}
@@ -30,7 +48,7 @@
 						</div>
 					</div>
 
-					<form action="{{ route('itdept.manage-assets.checkout.store', $asset->assetID) }}" method="POST" class="space-y-4" 
+					<form action="{{ route('itdept.manage-assets.checkout.store', $asset->assetID) }}" method="POST" 
 						x-data="{ 
 							selectedDepartment: '', 
 							users: @js($users->toArray()),
@@ -105,47 +123,60 @@
 							</div>
 						</div>
 
-						<div>
-							<x-input-label for="department" :value="__('Department')" />
-							<select id="department" 
-								x-model="selectedDepartment"
-								x-on:change="$refs.userSelect.value = ''; selectedUserID = '';"
-								class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-								<option value="">All Departments</option>
-								@php($departments = ['HR & Admin','Account','Service','Project','Supply Chain','Sales','Proposal'])
-								@foreach ($departments as $dept)
-									<option value="{{ $dept }}">{{ $dept }}</option>
-								@endforeach
-							</select>
+						{{-- Check-Out Information Section --}}
+						<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+							<h3 class="text-lg font-semibold mb-4">{{ __('Check-Out Asset To:') }}</h3>
+							<div class="space-y-5">
+								<div>
+									<x-input-label for="department" :value="__('Department')" />
+									<select id="department" 
+										x-model="selectedDepartment"
+										x-on:change="$refs.userSelect.value = ''; selectedUserID = '';"
+										class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+										<option value="">All Departments</option>
+										@php($departments = ['HR & Admin','Account','Service','Project','Supply Chain','Sales','Proposal'])
+										@foreach ($departments as $dept)
+											<option value="{{ $dept }}">{{ $dept }}</option>
+										@endforeach
+									</select>
+								</div>
+
+								<div>
+									<x-input-label for="userID" :value="__('Assign To User')" />
+									<select id="userID" name="userID" 
+										x-ref="userSelect"
+										x-model="selectedUserID"
+										x-on:change="checkUserAssignment($event.target.value)"
+										class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
+										<option value="">Select User</option>
+										<template x-for="user in users.filter(u => !selectedDepartment || u.department === selectedDepartment)" :key="user.userID">
+											<option :value="user.userID" x-text="user.fullName + ' (' + user.userID + ')'"></option>
+										</template>
+									</select>
+									<x-input-error :messages="$errors->get('userID')" class="mt-2" />
+								</div>
+
+								<div>
+									<x-input-label for="checkoutDate" :value="__('Checkout Date')" />
+									<x-text-input id="checkoutDate" name="checkoutDate" type="date" class="mt-1 block w-full" value="{{ old('checkoutDate', Carbon\Carbon::now()->format('Y-m-d')) }}" required />
+									<x-input-error :messages="$errors->get('checkoutDate')" class="mt-2" />
+								</div>
+							</div>
 						</div>
 
-						<div>
-							<x-input-label for="userID" :value="__('Assign To User')" />
-							<select id="userID" name="userID" 
-								x-ref="userSelect"
-								x-model="selectedUserID"
-								x-on:change="checkUserAssignment($event.target.value)"
-								class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" required>
-								<option value="">Select User</option>
-								<template x-for="user in users.filter(u => !selectedDepartment || u.department === selectedDepartment)" :key="user.userID">
-									<option :value="user.userID" x-text="user.fullName + ' (' + user.userID + ')'"></option>
-								</template>
-							</select>
-							<x-input-error :messages="$errors->get('userID')" class="mt-2" />
-						</div>
-
-						<div>
-							<x-input-label for="checkoutDate" :value="__('Checkout Date')" />
-							<x-text-input id="checkoutDate" name="checkoutDate" type="date" class="mt-1 block w-full" value="{{ old('checkoutDate', Carbon\Carbon::now()->format('Y-m-d')) }}" required />
-							<x-input-error :messages="$errors->get('checkoutDate')" class="mt-2" />
-						</div>
-
-						<div class="flex items-center justify-end space-x-4">
+						<div class="flex items-center justify-end space-x-6 mt-6">
 							<a href="{{ route('itdept.manage-assets.show', $asset->assetID) }}" 
-							   class="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-600 transition">
+							   class="inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90"
+							   style="background-color: #797979;"
+							   onmouseover="this.style.backgroundColor='#666666'"
+							   onmouseout="this.style.backgroundColor='#797979'">
 								{{ __('Cancel') }}
 							</a>
-							<button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+							<button type="submit" 
+								class="inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90"
+								style="background-color: #4BA9C2;"
+								onmouseover="this.style.backgroundColor='#3a8ba5'"
+								onmouseout="this.style.backgroundColor='#4BA9C2'">
 								{{ __('Check-Out Asset') }}
 							</button>
 						</div>

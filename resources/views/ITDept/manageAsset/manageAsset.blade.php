@@ -11,15 +11,17 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
                     {{-- View Laptops / Desktops --}}
-                    <div class="flex border-b border-sky-400 mb-6">
+                    <div class="flex border-b mb-6" style="border-color: #4BA9C2;">
                         <a href="{{ route('itdept.manage-assets.index', ['assetType' => 'Laptop']) }}"
                            class="flex-1 text-center py-2 font-medium 
-                           {{ $assetType === 'Laptop' ? 'text-sky-600 border-b-2 border-sky-400' : 'text-gray-600' }}">
+                           {{ $assetType === 'Laptop' ? 'border-b-2' : '' }}"
+                           style="{{ $assetType === 'Laptop' ? 'color: #4BA9C2; border-bottom-color: #4BA9C2;' : 'color: #6B7280;' }}">
                             {{ __('Laptops') }}
                         </a>
                         <a href="{{ route('itdept.manage-assets.index', ['assetType' => 'Desktop']) }}"
                            class="flex-1 text-center py-2 font-medium 
-                           {{ $assetType === 'Desktop' ? 'text-sky-600 border-b-2 border-sky-400' : 'text-gray-600' }}">
+                           {{ $assetType === 'Desktop' ? 'border-b-2' : '' }}"
+                           style="{{ $assetType === 'Desktop' ? 'color: #4BA9C2; border-bottom-color: #4BA9C2;' : 'color: #6B7280;' }}">
                             {{ __('Desktops') }}
                         </a>
                     </div>
@@ -43,13 +45,25 @@
 
 								{{-- Upload Invoice button --}}
 								<a href="{{ route('itdept.manage-assets.upload-invoice') }}" 
-								class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+								class="inline-flex items-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90"
+								style="background-color: #4BA9C2;"
+								onmouseover="this.style.backgroundColor='#3a8ba5'"
+								onmouseout="this.style.backgroundColor='#4BA9C2'">
+									<svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+									</svg>
 									{{ __('Upload Invoice') }}
 								</a>
 
 								{{-- Add Asset button inline with form --}}
 								<a href="{{ route('itdept.manage-assets.create') }}" 
-								class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 ml-auto">
+								class="inline-flex items-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90 ml-auto"
+								style="background-color: #4BA9C2;"
+								onmouseover="this.style.backgroundColor='#3a8ba5'"
+								onmouseout="this.style.backgroundColor='#4BA9C2'">
+									<svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+									</svg>
 									{{ __('Add New Asset') }}
 								</a>
 							</form>
@@ -71,12 +85,10 @@
 									['key' => 'assetID', 'label' => 'Asset ID'],
 									['key' => 'serialNum', 'label' => 'Serial Number'],
 									['key' => 'model', 'label' => 'Model'],
-									['key' => 'status', 'label' => 'Status'],
-									['key' => 'purchaseDate', 'label' => 'Purchase Date'],
 								])
 								<tr>
 									@foreach ($columns as $c)
-										<th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+										<th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
 											@php($isActive = ($sort ?? null) === $c['key'])
 											<a href="{{ request()->fullUrlWithQuery([
 												'sort' => $c['key'], 
@@ -94,30 +106,71 @@
 											</a>
 										</th>
 									@endforeach
-									<th class="px-6 py-3"></th>
+									<th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Current User') }}</th>
+									@php($statusActive = ($sort ?? null) === 'status')
+									<th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+										<a href="{{ request()->fullUrlWithQuery([
+											'sort' => 'status', 
+											'dir' => ($statusActive && ($dir ?? 'asc') === 'asc') ? 'desc' : 'asc'
+										]) }}" 
+										class="inline-flex items-center gap-1">
+											<span>{{ __('Status') }}</span>
+											<span class="text-xs">
+												@if ($statusActive)
+													{{ ($dir ?? 'asc') === 'asc' ? '▲' : '▼' }}
+												@else
+													▲▼
+												@endif
+											</span>
+										</a>
+									</th>
+									<th class="px-4 py-4 text-center text-sm font-semibold text-gray-700 dark:text-gray-200 w-auto">{{ __('Action') }}</th>
 								</tr>
 							</thead>
 							<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
 								@forelse ($assets as $asset)
-									<tr>
-										<td class="px-6 py-3">{{ $asset->assetID }}</td>
-										<td class="px-6 py-3">{{ $asset->serialNum ?? '-' }}</td>
-										<td class="px-6 py-3">{{ $asset->model ?? '-' }}</td>
-										<td class="px-6 py-3">{{ $asset->status ?? '-' }}</td>
-										<td class="px-6 py-3">{{ $asset->purchaseDate ? $asset->purchaseDate->format('Y-m-d') : '-' }}</td>
-										<td class="px-6 py-3 text-right space-x-2">
-											<a href="{{ route('itdept.manage-assets.show', $asset->assetID) }}" class="underline">{{ __('View Details') }}</a>
-											<a href="{{ route('itdept.manage-assets.edit', $asset->assetID) }}" class="underline">{{ __('Edit') }}</a>
-											<form action="{{ route('itdept.manage-assets.destroy', $asset->assetID) }}" method="POST" class="inline" onsubmit="return confirm('Delete this asset?');">
-												@csrf
-												@method('DELETE')
-												<button type="submit" class="underline text-red-600">{{ __('Delete') }}</button>
-											</form>
+									@php($currentAssignment = $asset->currentAssignment())
+									<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 {{ $loop->even ? 'bg-gray-50/50 dark:bg-gray-800/30' : 'bg-white dark:bg-gray-800' }}">
+										<td class="px-8 py-4">{{ $asset->assetID }}</td>
+										<td class="px-8 py-4">{{ $asset->serialNum ?? '-' }}</td>
+										<td class="px-8 py-4">{{ $asset->model ?? '-' }}</td>
+										<td class="px-8 py-4">
+											@if($currentAssignment)
+												{{ $currentAssignment->user->fullName }}
+											@else
+												With IT
+											@endif
+										</td>
+										<td class="px-8 py-4">
+											<span class="text-sm font-medium {{ $asset->status === 'Available' ? 'text-green-600' : 'text-red-600' }}">
+												{{ $asset->status ?? 'Available' }}
+											</span>
+										</td>
+										<td class="px-4 py-4">
+											<div class="flex items-center justify-center space-x-2">
+												<a href="{{ route('itdept.manage-assets.show', $asset->assetID) }}" 
+												   class="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold uppercase tracking-widest rounded-md border transition"
+												   style="border-color: #4BA9C2; color: #4BA9C2; background-color: white;"
+												   onmouseover="this.style.backgroundColor='#f0f9ff'"
+												   onmouseout="this.style.backgroundColor='white'">
+													{{ __('View Details') }}
+												</a>
+												<a href="{{ route('itdept.manage-assets.edit', $asset->assetID) }}" 
+												   class="inline-flex items-center justify-center px-4 py-2 rounded-md border transition"
+												   style="border-color: #4BA9C2; color: #4BA9C2; background-color: white;"
+												   onmouseover="this.style.backgroundColor='#f0f9ff'"
+												   onmouseout="this.style.backgroundColor='white'"
+												   title="{{ __('Edit') }}">
+													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+													</svg>
+												</a>
+											</div>
 										</td>
 									</tr>
 								@empty
 									<tr>
-										<td colspan="6" class="px-6 py-4 text-center text-gray-500">
+										<td colspan="6" class="px-8 py-6 text-center text-gray-500">
 											No assets found.
 										</td>
 									</tr>
