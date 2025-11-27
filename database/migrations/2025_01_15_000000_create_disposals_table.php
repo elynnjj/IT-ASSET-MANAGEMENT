@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('disposals', function (Blueprint $table) {
-            $table->string('disposeID')->primary();
-            $table->enum('dispStatus', ['pending', 'disposed'])->default('pending');
-            $table->date('dispDate')->nullable();
+            $table->id('disposeID');
+            $table->enum('dispStatus', ['Pending', 'Disposed'])->default('Pending');
+            $table->date('dispDate');
             $table->string('assetID');
             $table->timestamps();
 

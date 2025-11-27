@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Disposal extends Model
 {
     protected $fillable = [
-        'disposeID',
         'dispStatus',
         'dispDate',
         'assetID',
@@ -16,9 +15,9 @@ class Disposal extends Model
 
     protected $primaryKey = 'disposeID';
 
-    public $incrementing = false;
+    public $incrementing = true;
 
-    protected $keyType = 'string';
+    protected $keyType = 'int';
 
     protected function casts(): array
     {

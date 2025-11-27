@@ -33,6 +33,7 @@ class ManageAssetController
 			->with(['assignments' => function ($q) {
 				$q->whereNull('checkinDate')->with('user');
 			}])
+			->whereIn('status', ['Available', 'Checked Out']) // Only show active assets
 			->when($assetType, function ($q) use ($assetType) {
 				$q->where('assetType', $assetType);
 			})

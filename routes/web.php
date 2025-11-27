@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ManageUserController;
 use App\Http\Controllers\ManageAssetController;
+use App\Http\Controllers\DisposalController;
 use App\Http\Controllers\DashboardController;
 
 Route::redirect('/', '/login');
@@ -77,6 +78,7 @@ Route::middleware(['auth', 'verified', 'itdept'])->group(function () {
 		Route::get('/{assetID}/checkout', [ManageAssetController::class, 'checkoutForm'])->name('checkout');
 		Route::post('/{assetID}/checkout', [ManageAssetController::class, 'checkout'])->name('checkout.store');
 		Route::patch('/{assetID}/checkin', [ManageAssetController::class, 'checkin'])->name('checkin');
+		Route::patch('/{assetID}/dispose', [DisposalController::class, 'dispose'])->name('dispose');
 		Route::get('/{assetID}/installed-software', [ManageAssetController::class, 'installedSoftwareForm'])->name('installed-software');
 		Route::post('/{assetID}/installed-software', [ManageAssetController::class, 'storeInstalledSoftware'])->name('installed-software.store');
 		Route::get('/{assetID}', [ManageAssetController::class, 'show'])->name('show');
@@ -93,9 +95,8 @@ Route::middleware(['auth', 'verified', 'itdept'])->group(function () {
         return view('ITDept.ITRequests');
     })->name('itdept.it-requests');
 
-    Route::get('/itdept/asset-disposal', function () {
-        return view('ITDept.manageDisposal.assetDisposal');
-    })->name('itdept.asset-disposal');
+    Route::get('/itdept/asset-disposal', [DisposalController::class, 'index'])->name('itdept.asset-disposal');
+    Route::post('/itdept/asset-disposal/bulk-dispose', [DisposalController::class, 'bulkDispose'])->name('itdept.asset-disposal.bulk-dispose');
 
     Route::get('/itdept/reports', function () {
         return view('ITDept.reports');

@@ -50,4 +50,9 @@ class Asset extends Model
     {
         return $this->assignments()->whereNull('checkinDate')->latest('checkoutDate')->first();
     }
+
+    public function disposals(): HasMany
+    {
+        return $this->hasMany(Disposal::class, 'assetID', 'assetID');
+    }
 }
