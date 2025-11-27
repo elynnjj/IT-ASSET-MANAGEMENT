@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\ITDept;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\View\View;
 
-class ManageUserController extends Controller
+class ManageUserController
 {
 
 	public function index(Request $request): View
@@ -203,5 +202,4 @@ class ManageUserController extends Controller
 		return back()->with('status', "Imported: $created created, $skipped skipped (existing), $errors errors");
 	}
 }
-
 

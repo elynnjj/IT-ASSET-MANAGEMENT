@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ITDept\ManageUserController;
-use App\Http\Controllers\ITDept\ManageAssetController;
+use App\Http\Controllers\ManageUserController;
+use App\Http\Controllers\ManageAssetController;
+use App\Http\Controllers\DashboardController;
 
 Route::redirect('/', '/login');
 
@@ -14,7 +15,7 @@ Route::get('dashboard', function () {
     }
 
     return match ($user->role) {
-        'ITDept' => view('ITDept.dashboard'),
+        'ITDept' => app(DashboardController::class)->index(),
         'Employee' => view('Employee.dashboard'),
         'HOD' => view('HOD.dashboard'),
         default => view('dashboard'),
@@ -23,9 +24,28 @@ Route::get('dashboard', function () {
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-Route::view('profile', 'profile')
+// Profile routes - role-based
+Route::get('profile', function () {
+    $user = request()->user();
+
+    if (! $user) {
+        return redirect()->route('login');
+    }
+
+    return match ($user->role) {
+        'ITDept' => view('ITDept.manageUser.profile'),
+        'Employee' => view('Employee.manageUser.profile'),
+        'HOD' => view('HOD.manageUser.profile'),
+        default => view('profile'), // Backup profile page
+    };
+})
     ->middleware(['auth'])
     ->name('profile');
+
+// Backup profile route
+Route::view('profile-backup', 'profile')
+    ->middleware(['auth'])
+    ->name('profile.backup');
 
 require __DIR__.'/auth.php';
 
@@ -74,7 +94,7 @@ Route::middleware(['auth', 'verified', 'itdept'])->group(function () {
     })->name('itdept.it-requests');
 
     Route::get('/itdept/asset-disposal', function () {
-        return view('ITDept.assetDisposal');
+        return view('ITDept.manageDisposal.assetDisposal');
     })->name('itdept.asset-disposal');
 
     Route::get('/itdept/reports', function () {

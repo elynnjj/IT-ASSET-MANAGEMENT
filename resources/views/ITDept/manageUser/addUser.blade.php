@@ -156,7 +156,7 @@
 							<form action="{{ route('itdept.manage-users.import') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
 								@csrf
 								<div>
-									<x-input-label for="bulkFile" :value="__('File')" />
+									<x-input-label for="bulkFile" :value="__('New User File')" />
 									<input type="file" id="bulkFile" name="file" accept=".csv" 
 										class="mt-1 block w-full text-sm text-gray-900 dark:text-gray-300
 											border border-gray-300 dark:border-gray-700 rounded-md

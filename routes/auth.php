@@ -1,21 +1,37 @@
 <?php
 
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\ManageLoginController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::middleware('guest')->group(function () {
+    // Main login route (standalone, no Livewire)
+    Route::get('login', [ManageLoginController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [ManageLoginController::class, 'login'])->name('login.submit');
+    
+    // Backup login route (Livewire - kept for backup)
+    Volt::route('login-backup', 'pages.auth.login')
+        ->name('login.backup');
+
     Volt::route('register', 'pages.auth.register')
         ->name('register');
 
-    Volt::route('login', 'pages.auth.login')
-        ->name('login');
+    // Main forgot password route (standalone, no Livewire)
+    Route::get('forgot-password', [ManageLoginController::class, 'showForgotPasswordForm'])->name('password.request');
+    Route::post('forgot-password', [ManageLoginController::class, 'sendPasswordResetLink'])->name('password.email');
+    
+    // Backup forgot password route (Livewire - kept for backup)
+    Volt::route('forgot-password-backup', 'pages.auth.forgot-password')
+        ->name('password.request.backup');
 
-    Volt::route('forgot-password', 'pages.auth.forgot-password')
-        ->name('password.request');
-
-    Volt::route('reset-password/{token}', 'pages.auth.reset-password')
-        ->name('password.reset');
+    // Main reset password route (standalone, no Livewire)
+    Route::get('reset-password/{token}', [ManageLoginController::class, 'showResetPasswordForm'])->name('password.reset');
+    Route::post('reset-password', [ManageLoginController::class, 'resetPassword'])->name('password.update');
+    
+    // Backup reset password route (Livewire - kept for backup)
+    Volt::route('reset-password-backup/{token}', 'pages.auth.reset-password')
+        ->name('password.reset.backup');
 });
 
 Route::middleware('auth')->group(function () {

@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\ITDept;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\AssignAsset;
 use App\Models\Invoice;
@@ -15,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class ManageAssetController extends Controller
+class ManageAssetController
 {
 	public function index(Request $request): View
 	{
@@ -525,3 +524,4 @@ class ManageAssetController extends Controller
 			->with('status', 'Installed software updated successfully');
 	}
 }
+
