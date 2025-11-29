@@ -100,11 +100,27 @@ class ManageAssetController
 			->with('user')
 			->orderBy('checkoutDate', 'desc')
 			->get();
+
+		// Get all IT requests for this asset (excluding rejected requests)
+		$itRequests = \App\Models\ITRequest::where('assetID', $assetID)
+			->where('status', '!=', 'Rejected')
+			->with(['requester', 'approver'])
+			->orderBy('requestDate', 'desc')
+			->orderBy('requestID', 'desc')
+			->get();
+
+		// Get all maintenance records for this asset
+		$maintenances = \App\Models\Maintenance::where('assetID', $assetID)
+			->orderBy('mainDate', 'desc')
+			->orderBy('mainID', 'desc')
+			->get();
 		
 		return view('ITDept.manageAsset.assetDetails', [
 			'asset' => $asset,
 			'currentAssignment' => $currentAssignment,
 			'previousAssignments' => $previousAssignments,
+			'itRequests' => $itRequests,
+			'maintenances' => $maintenances,
 		]);
 	}
 

@@ -24,7 +24,7 @@ new class extends Component
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}" wire:navigate>
-                        <img src="{{ asset('images/exact.jpg') }}" alt="Exact Logo" class="block h-9 w-auto object-contain" />
+                        <img src="{{ asset('images/exact2.png') }}" alt="Exact Logo" class="block h-9 w-auto object-contain" />
                     </a>
                 </div>
 

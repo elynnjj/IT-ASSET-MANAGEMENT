@@ -16,13 +16,13 @@
 <body class="font-sans text-gray-900 antialiased">
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
         <div class="mb-4">
-            <img src="{{ asset('images/exact.jpg') }}" alt="Exact Logo" class="mx-auto" style="max-height: 60px; object-fit: contain;">
+            <img src="{{ asset('images/exact2.png') }}" alt="Exact Logo" class="mx-auto" style="max-height: 60px; object-fit: contain;">
         </div>
 
         <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
             <!-- Session Status -->
             @if (session('status'))
-                <div class="mb-4 text-sm text-green-600">
+                <div class="mb-4 text-sm text-green-600 dark:text-green-400">
                     {{ session('status') }}
                 </div>
             @endif
@@ -30,7 +30,7 @@
             <!-- Validation Errors -->
             @if ($errors->any())
                 <div class="mb-4">
-                    <div class="text-sm text-red-600">
+                    <div class="text-sm text-red-600 dark:text-red-400">
                         @foreach ($errors->all() as $error)
                             <p>{{ $error }}</p>
                         @endforeach
@@ -60,7 +60,7 @@
                         autocomplete="username"
                     >
                     @error('email')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -78,7 +78,7 @@
                         autocomplete="new-password"
                     >
                     @error('password')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -96,7 +96,7 @@
                         autocomplete="new-password"
                     >
                     @error('password_confirmation')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                 </div>
 

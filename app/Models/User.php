@@ -76,4 +76,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(AssignAsset::class, 'userID', 'userID');
     }
+
+    public function itRequests(): HasMany
+    {
+        return $this->hasMany(ITRequest::class, 'requesterID', 'userID');
+    }
+
+    public function itRequestsToApprove(): HasMany
+    {
+        return $this->hasMany(ITRequest::class, 'approverID', 'userID');
+    }
+
+    public function currentAssignedAsset(): ?AssignAsset
+    {
+        return $this->assignedAssets()->whereNull('checkinDate')->latest('checkoutDate')->first();
+    }
 }

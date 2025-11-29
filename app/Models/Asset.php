@@ -55,4 +55,14 @@ class Asset extends Model
     {
         return $this->hasMany(Disposal::class, 'assetID', 'assetID');
     }
+
+    public function itRequests(): HasMany
+    {
+        return $this->hasMany(ITRequest::class, 'assetID', 'assetID');
+    }
+
+    public function maintenances(): HasMany
+    {
+        return $this->hasMany(Maintenance::class, 'assetID', 'assetID');
+    }
 }

@@ -87,8 +87,10 @@
 										<div class="w-4 h-4 rounded-full" style="background-color: #90CAF9;"></div>
 									@elseif($status === 'Checked Out')
 										<div class="w-4 h-4 rounded-full" style="background-color: #1976D2;"></div>
-									@else
-										<div class="w-4 h-4 rounded-full" style="background-color: #FF9800;"></div>
+									@elseif($status === 'Pending Dispose')
+										<div class="w-4 h-4 rounded-full" style="background-color: #FFB3BA;"></div>
+									@elseif($status === 'Disposed')
+										<div class="w-4 h-4 rounded-full" style="background-color: #D32F2F;"></div>
 									@endif
 									<span class="text-sm text-gray-600 dark:text-gray-400">{{ $status }}: {{ $count }}</span>
 								</div>
@@ -118,6 +120,28 @@
 		</div>
 	</div>
 
+	{{-- Activity Details Modal --}}
+	<div id="activityModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+		<div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+			<div class="mt-3">
+				<div class="flex items-center justify-between mb-4">
+					<h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100" id="modalDate"></h3>
+					<button onclick="closeActivityModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+						</svg>
+					</button>
+				</div>
+				<div id="modalActivities" class="space-y-2 max-h-96 overflow-y-auto">
+					<!-- Activities will be inserted here -->
+				</div>
+			</div>
+		</div>
+	</div>
+			</div>
+		</div>
+	</div>
+
 	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
@@ -127,17 +151,19 @@
 				const assetStatusChart = new Chart(ctx.getContext('2d'), {
 					type: 'pie',
 					data: {
-						labels: ['Available', 'Checked Out', 'Disposed'],
+						labels: ['Available', 'Checked Out', 'Pending Dispose', 'Disposed'],
 						datasets: [{
 							data: [
 								{{ $statusData['Available'] ?? 0 }},
 								{{ $statusData['Checked Out'] ?? 0 }},
+								{{ $statusData['Pending Dispose'] ?? 0 }},
 								{{ $statusData['Disposed'] ?? 0 }}
 							],
 							backgroundColor: [
-								'#90CAF9', // Light blue
-								'#1976D2', // Dark blue
-								'#FF9800'  // Orange
+								'#90CAF9', // Light blue - Available
+								'#1976D2', // Dark blue - Checked Out
+								'#FFB3BA', // Light red - Pending Dispose
+								'#D32F2F'  // Darker red - Disposed
 							],
 							borderWidth: 0
 						}]
@@ -227,12 +253,17 @@
 								cellClasses += ' bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700';
 							}
 							
-							// Highlight cells with events
+							// Highlight cells with events and make them clickable
 							if (hasEvent && !isToday) {
-								cellClasses += ' bg-blue-50 dark:bg-blue-900/30';
+								cellClasses += ' bg-blue-50 dark:bg-blue-900/30 cursor-pointer';
+							} else if (hasEvent && isToday) {
+								cellClasses += ' cursor-pointer';
 							}
 							
-							calendarHTML += '<td class="' + cellClasses + '">';
+							// Add data attribute for date key if there are events
+							const dataAttr = hasEvent ? `data-date="${dateKey}"` : '';
+							
+							calendarHTML += '<td class="' + cellClasses + '" ' + dataAttr + '>';
 							
 							// Day number
 							let dayClasses = 'text-sm font-medium mb-1';
@@ -246,8 +277,9 @@
 							// Add event indicators
 							if (hasEvent) {
 								let eventHTML = '<div class="absolute bottom-2 left-1 right-1 flex gap-1 flex-wrap">';
-								dayEvents.forEach(function(eventType) {
+								dayEvents.forEach(function(event) {
 									let color = '#90CAF9'; // Default blue
+									const eventType = typeof event === 'object' ? event.type : event;
 									if (eventType === 'checkout') {
 										color = '#4BA9C2'; // Blue for checkout
 									} else if (eventType === 'checkin') {
@@ -270,9 +302,92 @@
 				
 				calendarHTML += '</tbody></table>';
 				calendarEl.innerHTML = calendarHTML;
+				
+				// Add click event listeners to cells with events
+				const cellsWithEvents = calendarEl.querySelectorAll('[data-date]');
+				cellsWithEvents.forEach(function(cell) {
+					cell.addEventListener('click', function() {
+						const dateKey = this.getAttribute('data-date');
+						const dayEvents = calendarEvents[dateKey] || [];
+						showActivityDetails(dateKey, dayEvents);
+					});
+				});
 			}
 			
 			renderCalendar();
+		});
+
+		// Function to show activity details modal
+		function showActivityDetails(date, events) {
+			const modal = document.getElementById('activityModal');
+			const modalDate = document.getElementById('modalDate');
+			const modalActivities = document.getElementById('modalActivities');
+			
+			// Format date for display
+			const dateObj = new Date(date + 'T00:00:00');
+			const options = { year: 'numeric', month: 'long', day: 'numeric' };
+			modalDate.textContent = dateObj.toLocaleDateString('en-US', options);
+			
+			// Clear previous activities
+			modalActivities.innerHTML = '';
+			
+			// Add each activity
+			if (events && events.length > 0) {
+				events.forEach(function(event) {
+					const activityDiv = document.createElement('div');
+					activityDiv.className = 'p-3 rounded-lg border border-gray-200 dark:border-gray-700 mb-2';
+					
+					let activityText = '';
+					let activityColor = '';
+					
+					if (typeof event === 'object' && event.type) {
+						const eventType = event.type;
+						const assetID = event.assetID || 'N/A';
+						
+						if (eventType === 'checkout') {
+							const userName = event.userName || 'N/A';
+							activityText = assetID + ' checked out to ' + userName;
+							activityColor = '#4BA9C2';
+							activityDiv.className += ' border-l-4';
+							activityDiv.style.borderLeftColor = activityColor;
+						} else if (eventType === 'checkin') {
+							activityText = assetID + ' checked in to IT';
+							activityColor = '#10B981';
+							activityDiv.className += ' border-l-4';
+							activityDiv.style.borderLeftColor = activityColor;
+						} else if (eventType === 'disposal') {
+							activityText = assetID + ' disposed';
+							activityColor = '#EF4444';
+							activityDiv.className += ' border-l-4';
+							activityDiv.style.borderLeftColor = activityColor;
+						}
+					} else {
+						// Fallback for old format
+						activityText = 'Activity: ' + (typeof event === 'object' ? JSON.stringify(event) : event);
+					}
+					
+					activityDiv.innerHTML = '<p class="text-sm text-gray-700 dark:text-gray-300">' + activityText + '</p>';
+					modalActivities.appendChild(activityDiv);
+				});
+			} else {
+				modalActivities.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">No activities on this date.</p>';
+			}
+			
+			// Show modal
+			modal.classList.remove('hidden');
+		}
+		
+		// Function to close activity details modal
+		function closeActivityModal() {
+			const modal = document.getElementById('activityModal');
+			modal.classList.add('hidden');
+		}
+		
+		// Close modal when clicking outside
+		document.getElementById('activityModal').addEventListener('click', function(e) {
+			if (e.target === this) {
+				closeActivityModal();
+			}
 		});
 	</script>
 </x-app-layout>

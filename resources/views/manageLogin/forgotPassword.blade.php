@@ -23,7 +23,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: white;
             padding: 2rem;
         }
         .forgot-password-image-section {
@@ -47,12 +46,11 @@
             transform: translateY(-50%);
             width: 20px;
             height: 20px;
-            color: #9CA3AF;
         }
         .input-field {
             width: 100%;
             padding: 12px 12px 12px 40px;
-            border: 1px solidrgba(229, 231, 235, 0.47);
+            border: 1px solid rgba(229, 231, 235, 0.47);
             border-radius: 6px;
             font-size: 14px;
         }
@@ -85,18 +83,18 @@
 <body class="font-sans antialiased">
     <div class="forgot-password-container">
         <!-- Left Section - Forgot Password Form -->
-        <div class="forgot-password-form-section">
+        <div class="forgot-password-form-section bg-white dark:bg-gray-800">
             <div class="forgot-password-form-container">
                 <!-- Logo -->
                 <div class="text-center mb-8">
-                    <img src="{{ asset('images/exact.jpg') }}" alt="Exact Logo" class="mx-auto mb-4" style="max-height: 80px; object-fit: contain;">
+                    <img src="{{ asset('images/exact2.png') }}" alt="Exact Logo" class="mx-auto mb-4" style="max-height: 80px; object-fit: contain;">
                     <div class="w-24 h-1 mx-auto mb-4" style="background-color: #4BA9C2;"></div>
-                    <p class="text-xs text-gray-600 uppercase tracking-wide mt-4">Enhancing Accuracy and Efficiency in IT Asset Management</p><br><br>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide mt-4">Enhancing Accuracy and Efficiency in IT Asset Management</p><br><br>
                 </div>
 
                 <!-- Session Status -->
                 @if (session('status'))
-                    <div class="mb-4 text-sm text-green-600">
+                    <div class="mb-4 text-sm text-green-600 dark:text-green-400">
                         {{ session('status') }}
                     </div>
                 @endif
@@ -104,7 +102,7 @@
                 <!-- Validation Errors -->
                 @if ($errors->any())
                     <div class="mb-4">
-                        <div class="text-sm text-red-600">
+                        <div class="text-sm text-red-600 dark:text-red-400">
                             @foreach ($errors->all() as $error)
                                 <p>{{ $error }}</p>
                             @endforeach
@@ -116,21 +114,21 @@
                 <form method="POST" action="{{ route('password.email') }}">
                     @csrf
 
-                    <div class="mb-4 text-sm text-gray-600">
+                    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
                         {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
                     </div>
 
                     <!-- Email Address -->
                     <div class="mb-6">
                         <div class="input-with-icon">
-                            <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="input-icon text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                             </svg>
                             <input 
                                 id="email" 
                                 type="email" 
                                 name="email" 
-                                class="input-field" 
+                                class="input-field bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600" 
                                 placeholder="Email" 
                                 value="{{ old('email') }}" 
                                 required 
@@ -139,7 +137,7 @@
                             >
                         </div>
                         @error('email')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
                     </div>
 

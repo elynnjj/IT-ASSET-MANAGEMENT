@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use App\Models\AssignAsset;
+use App\Models\Disposal;
 use App\Models\User;
 use Illuminate\View\View;
 
@@ -32,73 +33,96 @@ class DashboardController
         $totalActiveUsers = User::where('accStat', 'active')->count();
 
         // Asset Status for Pie Chart
-        $assetStatusCounts = Asset::selectRaw('COALESCE(status, "Available") as status, COUNT(*) as count')
-            ->groupBy('status')
-            ->pluck('count', 'status')
-            ->toArray();
-
-        // Ensure we have all statuses
-        $statusLabels = ['Available', 'Checked Out', 'Disposed'];
-        $statusData = [];
-        foreach ($statusLabels as $status) {
-            $statusData[$status] = $assetStatusCounts[$status] ?? 0;
+        // Get all assets with their disposal status
+        $allAssets = Asset::with('disposals')->get();
+        
+        // Initialize status counts
+        $statusData = [
+            'Available' => 0,
+            'Checked Out' => 0,
+            'Pending Dispose' => 0,
+            'Disposed' => 0,
+        ];
+        
+        foreach ($allAssets as $asset) {
+            // Check if asset has disposal records
+            $pendingDisposal = $asset->disposals()->where('dispStatus', 'pending')->exists();
+            $disposed = $asset->disposals()->where('dispStatus', 'disposed')->exists();
+            
+            if ($disposed) {
+                $statusData['Disposed']++;
+            } elseif ($pendingDisposal) {
+                $statusData['Pending Dispose']++;
+            } elseif ($asset->status === 'Checked Out' || $asset->assignments()->whereNull('checkinDate')->exists()) {
+                $statusData['Checked Out']++;
+            } else {
+                $statusData['Available']++;
+            }
         }
 
-        // Get calendar events for the current month
+        // Get calendar events for the current month with detailed information
         $currentMonth = now()->month;
         $currentYear = now()->year;
         
-        // Get checkout dates
-        $checkoutDates = AssignAsset::whereYear('checkoutDate', $currentYear)
+        // Get checkout events with asset and user details
+        $checkoutEvents = AssignAsset::with(['asset', 'user'])
+            ->whereYear('checkoutDate', $currentYear)
             ->whereMonth('checkoutDate', $currentMonth)
-            ->pluck('checkoutDate')
-            ->map(function ($date) {
-                return $date->format('Y-m-d');
-            })
-            ->toArray();
+            ->get();
         
-        // Get checkin dates
-        $checkinDates = AssignAsset::whereNotNull('checkinDate')
+        // Get checkin events with asset and user details
+        $checkinEvents = AssignAsset::with(['asset', 'user'])
+            ->whereNotNull('checkinDate')
             ->whereYear('checkinDate', $currentYear)
             ->whereMonth('checkinDate', $currentMonth)
-            ->pluck('checkinDate')
-            ->map(function ($date) {
-                return $date->format('Y-m-d');
-            })
-            ->toArray();
+            ->get();
         
-        // Get disposed assets (using updated_at when status is Disposed)
-        // Note: This assumes disposal happens when status is set to Disposed
-        $disposalDates = Asset::where('status', 'Disposed')
-            ->whereYear('updated_at', $currentYear)
-            ->whereMonth('updated_at', $currentMonth)
-            ->get()
-            ->map(function ($asset) {
-                return $asset->updated_at->format('Y-m-d');
-            })
-            ->toArray();
+        // Get disposal events with asset details
+        $disposalEvents = Disposal::with('asset')
+            ->whereYear('dispDate', $currentYear)
+            ->whereMonth('dispDate', $currentMonth)
+            ->get();
         
-        // Combine all events by date
+        // Combine all events by date with detailed information
         $calendarEvents = [];
-        foreach ($checkoutDates as $date) {
+        
+        foreach ($checkoutEvents as $event) {
+            $date = $event->checkoutDate->format('Y-m-d');
             if (!isset($calendarEvents[$date])) {
                 $calendarEvents[$date] = [];
             }
-            $calendarEvents[$date][] = 'checkout';
+            $calendarEvents[$date][] = [
+                'type' => 'checkout',
+                'assetID' => $event->asset->assetID ?? 'N/A',
+                'userName' => $event->user->fullName ?? 'N/A',
+            ];
         }
         
-        foreach ($checkinDates as $date) {
+        foreach ($checkinEvents as $event) {
+            $date = $event->checkinDate->format('Y-m-d');
             if (!isset($calendarEvents[$date])) {
                 $calendarEvents[$date] = [];
             }
-            $calendarEvents[$date][] = 'checkin';
+            $calendarEvents[$date][] = [
+                'type' => 'checkin',
+                'assetID' => $event->asset->assetID ?? 'N/A',
+                'userName' => $event->user->fullName ?? 'N/A',
+            ];
         }
         
-        foreach ($disposalDates as $date) {
+        foreach ($disposalEvents as $event) {
+            // Use dispDate if available, otherwise fall back to created_at
+            $date = $event->dispDate 
+                ? $event->dispDate->format('Y-m-d') 
+                : ($event->created_at ? $event->created_at->format('Y-m-d') : now()->format('Y-m-d'));
+            
             if (!isset($calendarEvents[$date])) {
                 $calendarEvents[$date] = [];
             }
-            $calendarEvents[$date][] = 'disposal';
+            $calendarEvents[$date][] = [
+                'type' => 'disposal',
+                'assetID' => $event->asset->assetID ?? 'N/A',
+            ];
         }
 
         return view('ITDept.dashboard', [

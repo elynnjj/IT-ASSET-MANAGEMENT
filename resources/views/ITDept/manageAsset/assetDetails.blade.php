@@ -260,12 +260,104 @@
 
 					{{-- IT Request History Tab --}}
 					<div x-show="activeTab === 'itRequestHistory'" x-transition style="display: none;">
-						<p class="text-gray-500 dark:text-gray-400 text-center py-8">{{ __('IT Request History will be displayed here.') }}</p>
+						@if($itRequests && $itRequests->count() > 0)
+						<div class="overflow-x-auto">
+							<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+								<thead class="bg-gray-50 dark:bg-gray-700">
+									<tr>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Request Date') }}</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Requester Name') }}</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Request Title') }}</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Request Description') }}</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Status') }}</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Action') }}</th>
+									</tr>
+								</thead>
+								<tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+									@foreach($itRequests as $itRequest)
+										<tr>
+											<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+												{{ \Carbon\Carbon::parse($itRequest->requestDate)->format('d/m/Y') }}
+											</td>
+											<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+												{{ $itRequest->requester ? $itRequest->requester->fullName : 'N/A' }}
+											</td>
+											<td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+												{{ $itRequest->title }}
+											</td>
+											<td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+												{{ $itRequest->requestDesc }}
+											</td>
+											<td class="px-6 py-4 whitespace-nowrap text-sm">
+												@php
+													$statusColors = [
+														'Pending' => 'text-yellow-600',
+														'Approved' => 'text-green-600',
+														'Rejected' => 'text-red-600',
+														'Pending IT' => 'text-yellow-600',
+														'Completed' => 'text-blue-600',
+													];
+													$statusColor = $statusColors[$itRequest->status] ?? 'text-gray-600';
+												@endphp
+												<span class="font-medium {{ $statusColor }}">
+													{{ $itRequest->status }}
+												</span>
+											</td>
+											<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+												<a href="{{ route('itdept.it-requests.show', $itRequest->requestID) }}" 
+													class="text-blue-600 dark:text-blue-400 hover:underline">
+													{{ __('View Details') }}
+												</a>
+											</td>
+										</tr>
+									@endforeach
+								</tbody>
+							</table>
+						</div>
+						@else
+						<p class="text-gray-500 dark:text-gray-400 text-center py-8">{{ __('No IT requests found for this asset.') }}</p>
+						@endif
 					</div>
 
 					{{-- Maintenance History Tab --}}
 					<div x-show="activeTab === 'maintenanceHistory'" x-transition style="display: none;">
-						<p class="text-gray-500 dark:text-gray-400 text-center py-8">{{ __('Maintenance History will be displayed here.') }}</p>
+						@if($maintenances && $maintenances->count() > 0)
+						<div class="overflow-x-auto">
+							<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+								<thead class="bg-gray-50 dark:bg-gray-700">
+									<tr>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Maintenance Date') }}</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Maintenance Details') }}</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{{ __('Related Request') }}</th>
+									</tr>
+								</thead>
+								<tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+									@foreach($maintenances as $maintenance)
+										<tr>
+											<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+												{{ \Carbon\Carbon::parse($maintenance->mainDate)->format('d/m/Y') }}
+											</td>
+											<td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+												{{ $maintenance->mainDesc }}
+											</td>
+											<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+												@if($maintenance->requestID)
+													<a href="{{ route('itdept.it-requests.show', $maintenance->requestID) }}" 
+														class="text-blue-600 dark:text-blue-400 hover:underline">
+														Request #{{ $maintenance->requestID }}
+													</a>
+												@else
+													<span class="text-gray-500 dark:text-gray-400">{{ __('Manual Maintenance') }}</span>
+												@endif
+											</td>
+										</tr>
+									@endforeach
+								</tbody>
+							</table>
+						</div>
+						@else
+						<p class="text-gray-500 dark:text-gray-400 text-center py-8">{{ __('No maintenance records found for this asset.') }}</p>
+						@endif
 					</div>
 				</div>
 			</div>

@@ -5,6 +5,7 @@ use App\Http\Controllers\ManageUserController;
 use App\Http\Controllers\ManageAssetController;
 use App\Http\Controllers\DisposalController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ITRequestsController;
 
 Route::redirect('/', '/login');
 
@@ -87,13 +88,14 @@ Route::middleware(['auth', 'verified', 'itdept'])->group(function () {
 		Route::delete('/{assetID}', [ManageAssetController::class, 'destroy'])->name('destroy');
 	});
 
-    Route::get('/itdept/repairs-maintenance', function () {
-        return view('ITDept.repairsAndMaintenance');
-    })->name('itdept.repairs-maintenance');
+    Route::get('/itdept/repairs-maintenance', [ITRequestsController::class, 'repairsAndMaintenance'])->name('itdept.repairs-maintenance');
+    Route::get('/itdept/new-maintenance', [ITRequestsController::class, 'createMaintenance'])->name('itdept.new-maintenance');
+    Route::post('/itdept/store-maintenance', [ITRequestsController::class, 'storeMaintenanceWithoutRequest'])->name('itdept.store-maintenance');
+    Route::get('/itdept/maintenance/assets-by-type', [ITRequestsController::class, 'getAssetsByTypeForMaintenance'])->name('itdept.maintenance.assets-by-type');
 
-    Route::get('/itdept/it-requests', function () {
-        return view('ITDept.ITRequests');
-    })->name('itdept.it-requests');
+    Route::get('/itdept/it-requests', [ITRequestsController::class, 'indexForITDept'])->name('itdept.it-requests');
+    Route::get('/itdept/it-requests/{requestID}', [ITRequestsController::class, 'showForITDept'])->name('itdept.it-requests.show');
+    Route::post('/itdept/it-requests/{requestID}/maintenance', [ITRequestsController::class, 'storeMaintenance'])->name('itdept.it-requests.maintenance');
 
     Route::get('/itdept/asset-disposal', [DisposalController::class, 'index'])->name('itdept.asset-disposal');
     Route::post('/itdept/asset-disposal/bulk-dispose', [DisposalController::class, 'bulkDispose'])->name('itdept.asset-disposal.bulk-dispose');
@@ -105,26 +107,22 @@ Route::middleware(['auth', 'verified', 'itdept'])->group(function () {
 
 // Employee routes
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/employee/submit-it-request', function () {
-        return view('Employee.submitITRequests');
-    })->name('employee.submit-it-request');
+    Route::get('/employee/submit-it-request', [ITRequestsController::class, 'createForEmployee'])->name('employee.submit-it-request');
+    Route::post('/employee/it-requests', [ITRequestsController::class, 'storeForEmployee'])->name('employee.it-requests.store');
 
-    Route::get('/employee/my-requests', function () {
-        return view('Employee.myRequest');
-    })->name('employee.my-requests');
+    Route::get('/employee/my-requests', [ITRequestsController::class, 'myRequestsForEmployee'])->name('employee.my-requests');
+    Route::delete('/employee/it-requests/{requestID}', [ITRequestsController::class, 'destroy'])->name('employee.it-requests.destroy');
 });
 
 // HOD routes
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/hod/approval-request', function () {
-        return view('HOD.approvalRequest');
-    })->name('hod.approval-request');
+    Route::get('/hod/approval-request', [ITRequestsController::class, 'approvalRequestForHOD'])->name('hod.approval-request');
+    Route::post('/hod/it-requests/{requestID}/approve', [ITRequestsController::class, 'approve'])->name('hod.it-requests.approve');
+    Route::post('/hod/it-requests/{requestID}/reject', [ITRequestsController::class, 'reject'])->name('hod.it-requests.reject');
 
-    Route::get('/hod/submit-it-request', function () {
-        return view('HOD.submitITRequests');
-    })->name('hod.submit-it-request');
+    Route::get('/hod/submit-it-request', [ITRequestsController::class, 'createForHOD'])->name('hod.submit-it-request');
+    Route::post('/hod/it-requests', [ITRequestsController::class, 'storeForHOD'])->name('hod.it-requests.store');
 
-    Route::get('/hod/my-requests', function () {
-        return view('HOD.myRequest');
-    })->name('hod.my-requests');
+    Route::get('/hod/my-requests', [ITRequestsController::class, 'myRequestsForHOD'])->name('hod.my-requests');
+    Route::delete('/hod/it-requests/{requestID}', [ITRequestsController::class, 'destroy'])->name('hod.it-requests.destroy');
 });
