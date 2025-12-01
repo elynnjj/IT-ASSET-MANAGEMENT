@@ -149,6 +149,7 @@
 										</td>
 										<td class="px-4 py-4">
 											<div class="flex items-center justify-center space-x-2">
+												@if($user->accStat === 'active')
 												<form action="{{ route('itdept.manage-users.deactivate', $user->userID) }}" method="POST" class="inline">
 													@csrf
 													@method('PATCH')
@@ -161,6 +162,20 @@
 														{{ __('Deactivate') }}
 													</button>
 												</form>
+												@else
+												<form action="{{ route('itdept.manage-users.activate', $user->userID) }}" method="POST" class="inline">
+													@csrf
+													@method('PATCH')
+													<button type="submit" 
+														class="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold uppercase tracking-widest rounded-md border transition"
+														style="border-color: #4BA9C2; color: #4BA9C2; background-color: white;"
+														onmouseover="this.style.backgroundColor='#f0f9ff'"
+														onmouseout="this.style.backgroundColor='white'"
+														title="{{ __('Activate') }}">
+														{{ __('Activate') }}
+													</button>
+												</form>
+												@endif
 												<a href="{{ route('itdept.manage-users.edit', $user->userID) }}" 
 												   class="inline-flex items-center justify-center px-4 py-2 rounded-md border transition"
 												   style="border-color: #4BA9C2; color: #4BA9C2; background-color: white;"

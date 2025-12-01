@@ -128,6 +128,14 @@ class ManageUserController
 		return back()->with('status', 'User deactivated');
 	}
 
+	public function activate(string $userID): RedirectResponse
+	{
+		$user = User::where('userID', $userID)->firstOrFail();
+		$user->accStat = 'active';
+		$user->save();
+		return back()->with('status', 'User activated');
+	}
+
 	public function downloadTemplate(): StreamedResponse
 	{
 		$headers = ['userID','fullName','email','password','department','role'];

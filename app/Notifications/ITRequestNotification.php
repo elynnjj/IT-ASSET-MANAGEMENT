@@ -44,9 +44,8 @@ class ITRequestNotification extends Notification
         return (new MailMessage)
             ->subject('New IT Request Requires Your Approval')
             ->greeting('Hello ' . $notifiable->fullName . ',')
-            ->line('A new IT request has been submitted by ' . $this->itRequest->requester->fullName . ' and requires your approval.')
+            ->line('A new IT request has been submitted by **' . $this->itRequest->requester->fullName . '** and requires your approval.')
             ->line('**Request Details:**')
-            ->line('**Request ID:** ' . $this->itRequest->requestID)
             ->line('**Request Date:** ' . Carbon::parse($this->itRequest->requestDate)->format('F d, Y'))
             ->line('**Title:** ' . $this->itRequest->title)
             ->line('**Description:** ' . $this->itRequest->requestDesc)
@@ -58,7 +57,9 @@ class ITRequestNotification extends Notification
             ->line('**Please approve or reject this request within 3 days.**')
             ->line('**Deadline:** ' . $deadlineDate)
             ->action('Review Request', $approvalUrl)
-            ->line('Thank you for your attention to this matter.');
+            ->line('Regards,')
+            ->line('**IT Department**')
+            ->salutation('');
     }
 
     /**

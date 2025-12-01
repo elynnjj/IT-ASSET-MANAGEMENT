@@ -383,12 +383,26 @@ class ManageAssetController
 		// Store the invoice file
 		$file = $request->file('invoiceFile');
 		$fileName = $file->getClientOriginalName();
-		$filePath = $file->store('invoices', 'public');
+		
+		// Handle filename conflicts by adding a unique suffix if file already exists
+		$storagePath = 'invoices/' . $fileName;
+		$counter = 1;
+		while (Storage::disk('public')->exists($storagePath)) {
+			$pathInfo = pathinfo($fileName);
+			$newFileName = $pathInfo['filename'] . '_' . $counter . '.' . ($pathInfo['extension'] ?? '');
+			$storagePath = 'invoices/' . $newFileName;
+			$counter++;
+		}
+		
+		// Store file with the final filename
+		$file->storeAs('invoices', basename($storagePath), 'public');
+		
+		// Use the final filename (which may have been modified if there was a conflict)
+		$finalFileName = basename($storagePath);
 
 		// Create invoice record (invoiceID will be auto-generated)
 		$invoice = Invoice::create([
-			'fileName' => $fileName,
-			'filePath' => $filePath,
+			'fileName' => $finalFileName,
 		]);
 
 		// Update assets with invoice ID
@@ -413,9 +427,18 @@ class ManageAssetController
 		}
 
 		$assets = Asset::where('assetType', $assetType)
-			->whereNull('invoiceID') // Only show assets that don't have an invoice yet
 			->orderBy('assetID')
-			->get(['assetID', 'assetType', 'model']);
+			->get(['assetID', 'assetType', 'model', 'invoiceID']);
+
+		// Transform to include invoice status
+		$assets = $assets->map(function ($asset) {
+			return [
+				'assetID' => $asset->assetID,
+				'assetType' => $asset->assetType,
+				'model' => $asset->model,
+				'hasInvoice' => !is_null($asset->invoiceID),
+			];
+		});
 
 		return response()->json($assets);
 	}
@@ -424,31 +447,11 @@ class ManageAssetController
 	{
 		$invoice = Invoice::findOrFail($invoiceID);
 		
-		// If filePath exists, use it
-		if ($invoice->filePath && Storage::disk('public')->exists($invoice->filePath)) {
-			return Storage::disk('public')->download($invoice->filePath, $invoice->fileName);
-		}
+		// Use fileName to locate the file
+		$filePath = 'invoices/' . $invoice->fileName;
 		
-		// Fallback: try to find file by searching all invoice files
-		// This handles old invoices that don't have filePath stored
-		$allFiles = Storage::disk('public')->allFiles('invoices');
-		
-		// Try to match by checking if any file's last modified time matches invoice creation
-		// or use a simple approach: get all files and try the most recent one
-		// Note: This is a fallback - ideally all invoices should have filePath stored
-		if (count($allFiles) > 0) {
-			// Get the most recently modified file as a fallback
-			$filesWithTime = collect($allFiles)->map(function($file) {
-				return [
-					'path' => $file,
-					'time' => Storage::disk('public')->lastModified($file)
-				];
-			})->sortByDesc('time');
-			
-			$matchingFile = $filesWithTime->first()['path'] ?? null;
-			if ($matchingFile && Storage::disk('public')->exists($matchingFile)) {
-				return Storage::disk('public')->download($matchingFile, $invoice->fileName);
-			}
+		if (Storage::disk('public')->exists($filePath)) {
+			return Storage::disk('public')->download($filePath, $invoice->fileName);
 		}
 		
 		abort(404, 'Invoice file not found');

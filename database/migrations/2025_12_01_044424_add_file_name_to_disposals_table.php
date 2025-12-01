@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('invoices', function (Blueprint $table) {
-            $table->id('invoiceID');
-            $table->string('fileName');
-            $table->timestamps();
+        Schema::table('disposals', function (Blueprint $table) {
+            $table->string('fileName')->nullable()->after('dispDate');
         });
     }
 
@@ -23,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('invoices');
+        Schema::table('disposals', function (Blueprint $table) {
+            $table->dropColumn('fileName');
+        });
     }
 };

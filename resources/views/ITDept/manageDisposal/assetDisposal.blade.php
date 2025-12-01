@@ -106,6 +106,11 @@
                                 x-bind:disabled="selectedAssets.length === 0"
                                 x-on:click="
                                     if (selectedAssets.length === 0) return;
+                                    const fileInput = document.getElementById('disposalInvoiceFile');
+                                    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                                        alert('Please select a disposal invoice file before disposing assets.');
+                                        return;
+                                    }
                                     if (!confirm('Dispose ' + selectedAssets.length + ' asset(s)?')) return;
 
                                     const form = document.getElementById('disposeForm');
@@ -132,8 +137,38 @@
                         @endif
                     </div>
 
+                    {{-- Hidden File Upload Section --}}
+                    @if ($tab==='pending')
+                    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md"
+                         x-show="selectedAssets.length > 0"
+                         x-transition
+                         style="display: none;">
+                        <h3 class="text-lg font-semibold mb-4">{{ __('Disposal Invoice') }}</h3>
+                        <div>
+                            <x-input-label for="disposalInvoiceFile" :value="__('Disposal Invoice File')" />
+                            <input type="file" 
+                                   id="disposalInvoiceFile" 
+                                   name="disposalInvoiceFile" 
+                                   form="disposeForm"
+                                   accept=".pdf,.jpg,.jpeg,.png" 
+                                   class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400
+                                   border border-gray-300 dark:border-gray-700 rounded-md
+                                   file:mr-4 file:py-2 file:px-4
+                                   file:rounded-md file:border-0
+                                   file:text-sm file:font-semibold
+                                   file:bg-blue-50 dark:file:bg-blue-900
+                                   file:text-blue-700 dark:file:text-blue-300
+                                   hover:file:bg-blue-100 dark:hover:file:bg-blue-800
+                                   cursor-pointer"
+                                   required />
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Accepted formats: PDF, JPG, JPEG, PNG (Max: 10MB)</p>
+                            <x-input-error :messages="$errors->get('disposalInvoiceFile')" class="mt-2" />
+                        </div>
+                    </div>
+                    @endif
+
                     {{-- Hidden Form --}}
-                    <form id="disposeForm" method="POST" action="{{ route('itdept.asset-disposal.bulk-dispose') }}">
+                    <form id="disposeForm" method="POST" action="{{ route('itdept.asset-disposal.bulk-dispose') }}" enctype="multipart/form-data">
                         @csrf
                     </form>
 
@@ -157,6 +192,7 @@
 
                                     @if($tab==='disposed')
                                     <th class="px-8 py-4">Disposal Date</th>
+                                    <th class="px-8 py-4">Action</th>
                                     @endif
                                 </tr>
                             </thead>
@@ -182,6 +218,21 @@
                                         @if($tab==='disposed')
                                         <td class="px-8 py-4">
                                             {{ optional($asset->disposals->first())->dispDate?->format('d/m/Y') ?? '-' }}
+                                        </td>
+                                        <td class="px-8 py-4">
+                                            @php($disposal = $asset->disposals->first())
+                                            @if($disposal && $disposal->invoice)
+                                                <a href="{{ route('itdept.asset-disposal.download-invoice', $disposal->disposeID) }}" 
+                                                   class="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold uppercase tracking-widest rounded-md border transition"
+                                                   style="border-color: #4BA9C2; color: #4BA9C2; background-color: white;"
+                                                   onmouseover="this.style.backgroundColor='#f0f9ff'"
+                                                   onmouseout="this.style.backgroundColor='white'"
+                                                   title="{{ __('Download Invoice') }}">
+                                                    Download Invoice
+                                                </a>
+                                            @else
+                                                <span class="text-gray-400 dark:text-gray-500 text-sm">No invoice</span>
+                                            @endif
                                         </td>
                                         @endif
                                     </tr>

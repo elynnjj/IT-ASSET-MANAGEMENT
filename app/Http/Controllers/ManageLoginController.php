@@ -44,6 +44,19 @@ class ManageLoginController
             ]);
         }
 
+        // Check if user is active
+        $user = Auth::user();
+        if ($user && $user->accStat !== 'active') {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            RateLimiter::hit($this->throttleKey($request));
+
+            throw ValidationException::withMessages([
+                'userID' => 'Your account has been deactivated. Please contact the administrator.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey($request));
 
         $request->session()->regenerate();

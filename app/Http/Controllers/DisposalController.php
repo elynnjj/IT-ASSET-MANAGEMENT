@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use App\Models\Disposal;
+use App\Models\Invoice;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class DisposalController
@@ -45,7 +47,7 @@ class DisposalController
 				$q->where('dispStatus', 'Disposed');
 			})
 				->with(['disposals' => function ($q) {
-					$q->where('dispStatus', 'Disposed');
+					$q->where('dispStatus', 'Disposed')->with('invoice');
 				}])
 				->when($search, function ($q) use ($search) {
 					$q->where(function ($qq) use ($search) {
@@ -99,6 +101,32 @@ class DisposalController
 		$validated = $request->validate([
 			'selectedAssets' => ['required', 'array', 'min:1'],
 			'selectedAssets.*' => ['required', 'string', 'exists:assets,assetID'],
+			'disposalInvoiceFile' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
+		]);
+
+		// Store the disposal invoice file
+		$file = $request->file('disposalInvoiceFile');
+		$fileName = $file->getClientOriginalName();
+		
+		// Handle filename conflicts by adding a unique suffix if file already exists
+		$storagePath = 'invoices/' . $fileName;
+		$counter = 1;
+		while (Storage::disk('public')->exists($storagePath)) {
+			$pathInfo = pathinfo($fileName);
+			$newFileName = $pathInfo['filename'] . '_' . $counter . '.' . ($pathInfo['extension'] ?? '');
+			$storagePath = 'invoices/' . $newFileName;
+			$counter++;
+		}
+		
+		// Store file with the final filename
+		$file->storeAs('invoices', basename($storagePath), 'public');
+		
+		// Use the final filename (which may have been modified if there was a conflict)
+		$finalFileName = basename($storagePath);
+
+		// Create invoice record
+		$invoice = Invoice::create([
+			'fileName' => $finalFileName,
 		]);
 
 		$assetIDs = $validated['selectedAssets'];
@@ -111,6 +139,8 @@ class DisposalController
 
 			if ($disposal) {
 				$disposal->dispStatus = 'Disposed';
+				$disposal->dispDate = Carbon::now()->toDateString();
+				$disposal->invoiceID = $invoice->invoiceID;
 				$disposal->save();
 				$updated++;
 			}
@@ -122,6 +152,24 @@ class DisposalController
 		}
 
 		return back()->withErrors(['assets' => 'No assets were disposed']);
+	}
+
+	public function downloadInvoice(string $disposeID)
+	{
+		$disposal = Disposal::with('invoice')->findOrFail($disposeID);
+		
+		if (!$disposal->invoice) {
+			abort(404, 'Disposal invoice file not found');
+		}
+		
+		// Use fileName to locate the file
+		$filePath = 'invoices/' . $disposal->invoice->fileName;
+		
+		if (Storage::disk('public')->exists($filePath)) {
+			return Storage::disk('public')->download($filePath, $disposal->invoice->fileName);
+		}
+		
+		abort(404, 'Disposal invoice file not found');
 	}
 }
 

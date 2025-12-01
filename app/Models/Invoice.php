@@ -9,7 +9,6 @@ class Invoice extends Model
 {
     protected $fillable = [
         'fileName',
-        'filePath',
     ];
 
     protected $primaryKey = 'invoiceID';

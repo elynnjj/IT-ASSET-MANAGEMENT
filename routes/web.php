@@ -63,6 +63,7 @@ Route::middleware(['auth', 'verified', 'itdept'])->group(function () {
 		Route::put('/{userID}', [ManageUserController::class, 'update'])->name('update');
 		Route::delete('/{userID}', [ManageUserController::class, 'destroy'])->name('destroy');
 		Route::patch('/{userID}/deactivate', [ManageUserController::class, 'deactivate'])->name('deactivate');
+		Route::patch('/{userID}/activate', [ManageUserController::class, 'activate'])->name('activate');
 	});
 
     // Manage Assets routes
@@ -99,6 +100,7 @@ Route::middleware(['auth', 'verified', 'itdept'])->group(function () {
 
     Route::get('/itdept/asset-disposal', [DisposalController::class, 'index'])->name('itdept.asset-disposal');
     Route::post('/itdept/asset-disposal/bulk-dispose', [DisposalController::class, 'bulkDispose'])->name('itdept.asset-disposal.bulk-dispose');
+    Route::get('/itdept/asset-disposal/{disposeID}/download-invoice', [DisposalController::class, 'downloadInvoice'])->name('itdept.asset-disposal.download-invoice');
 
     Route::get('/itdept/reports', function () {
         return view('ITDept.reports');

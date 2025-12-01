@@ -102,11 +102,46 @@
 					<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
 						<div class="flex items-center justify-between mb-4">
 							<h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">IT Requests</h3>
-							<a href="#" class="text-sm font-medium" style="color: #4BA9C2;">Show all</a>
+							<a href="{{ route('itdept.it-requests') }}" class="text-sm font-medium" style="color: #4BA9C2;">Show all</a>
 						</div>
-						<div class="text-center py-8 text-gray-500 dark:text-gray-400">
-							<p>No IT requests available</p>
-						</div>
+						
+						@if($pendingITRequests->count() > 0)
+							<div class="overflow-x-auto">
+								<table class="table-auto w-full border border-gray-300 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
+									<thead class="bg-gray-100 dark:bg-gray-700">
+										<tr>
+											<th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-200">{{ __('Request Date') }}</th>
+											<th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-200">{{ __('Asset ID') }}</th>
+											<th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-200">{{ __('Requester Name') }}</th>
+											<th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-200">{{ __('Action') }}</th>
+										</tr>
+									</thead>
+									<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+										@foreach($pendingITRequests as $request)
+											<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 {{ $loop->even ? 'bg-gray-50/50 dark:bg-gray-800/30' : 'bg-white dark:bg-gray-800' }}">
+												<td class="px-6 py-3 text-sm">{{ \Carbon\Carbon::parse($request->requestDate)->format('d/m/y') }}</td>
+												<td class="px-6 py-3 text-sm">{{ $request->asset ? $request->asset->assetID : 'N/A' }}</td>
+												<td class="px-6 py-3 text-sm">{{ $request->requester ? $request->requester->fullName : 'N/A' }}</td>
+												<td class="px-6 py-3">
+													<a href="{{ route('itdept.it-requests.show', $request->requestID) }}" 
+														class="inline-flex items-center justify-center px-3 py-1 rounded-md border transition text-xs"
+														style="border-color: #4BA9C2; color: #4BA9C2; background-color: white;"
+														onmouseover="this.style.backgroundColor='#f0f9ff'"
+														onmouseout="this.style.backgroundColor='white'"
+														title="{{ __('View Details') }}">
+														{{ __('View Details') }}
+													</a>
+												</td>
+											</tr>
+										@endforeach
+									</tbody>
+								</table>
+							</div>
+						@else
+							<div class="text-center py-8 text-gray-500 dark:text-gray-400">
+								<p>No pending IT requests</p>
+							</div>
+						@endif
 					</div>
 				</div>
 

@@ -38,6 +38,19 @@ class LoginForm extends Form
             ]);
         }
 
+        // Check if user is active
+        $user = Auth::user();
+        if ($user && $user->accStat !== 'active') {
+            Auth::logout();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'form.userID' => 'Your account has been deactivated. Please contact the administrator.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

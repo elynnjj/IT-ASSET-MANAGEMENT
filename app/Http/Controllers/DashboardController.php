@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\AssignAsset;
 use App\Models\Disposal;
+use App\Models\ITRequest;
 use App\Models\User;
 use Illuminate\View\View;
 
@@ -31,6 +32,14 @@ class DashboardController
 
         // Total Active Users
         $totalActiveUsers = User::where('accStat', 'active')->count();
+
+        // Get pending IT requests (up to 5)
+        $pendingITRequests = ITRequest::where('status', 'Pending IT')
+            ->with(['requester', 'asset'])
+            ->orderBy('requestDate', 'desc')
+            ->orderBy('requestID', 'desc')
+            ->limit(5)
+            ->get();
 
         // Asset Status for Pie Chart
         // Get all assets with their disposal status
@@ -132,6 +141,7 @@ class DashboardController
             'totalActiveUsers' => $totalActiveUsers,
             'statusData' => $statusData,
             'calendarEvents' => $calendarEvents,
+            'pendingITRequests' => $pendingITRequests,
         ]);
     }
 }

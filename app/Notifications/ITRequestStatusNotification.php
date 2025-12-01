@@ -52,7 +52,6 @@ class ITRequestStatusNotification extends Notification
                 ->greeting('Hello ' . $notifiable->fullName . ',')
                 ->line('Your IT request has been **approved** by ' . $this->hodName . ' (HOD).')
                 ->line('**Request Details:**')
-                ->line('**Request ID:** ' . $this->itRequest->requestID)
                 ->line('**Request Date:** ' . Carbon::parse($this->itRequest->requestDate)->format('F d, Y'))
                 ->line('**Title:** ' . $this->itRequest->title)
                 ->line('**Description:** ' . $this->itRequest->requestDesc)
@@ -64,14 +63,15 @@ class ITRequestStatusNotification extends Notification
                 ->line('**Status:** Pending IT')
                 ->line('Your request has been forwarded to the IT Department for processing.')
                 ->action('View Your Requests', $requestUrl)
-                ->line('Thank you for your patience. The IT Department will process your request shortly.');
+                ->line('Regards,')
+                ->line('**IT Department**')
+                ->salutation('');
         } else {
             return (new MailMessage)
                 ->subject('Your IT Request Has Been Rejected')
                 ->greeting('Hello ' . $notifiable->fullName . ',')
                 ->line('We regret to inform you that your IT request has been **rejected** by ' . $this->hodName . ' (HOD).')
                 ->line('**Request Details:**')
-                ->line('**Request ID:** ' . $this->itRequest->requestID)
                 ->line('**Request Date:** ' . Carbon::parse($this->itRequest->requestDate)->format('F d, Y'))
                 ->line('**Title:** ' . $this->itRequest->title)
                 ->line('**Description:** ' . $this->itRequest->requestDesc)
@@ -83,7 +83,9 @@ class ITRequestStatusNotification extends Notification
                 ->line('**Status:** Rejected')
                 ->line('If you have any questions or concerns about this decision, please contact your HOD.')
                 ->action('View Your Requests', $requestUrl)
-                ->line('Thank you for your understanding.');
+                ->line('Regards,')
+                ->line('**IT Department**')
+                ->salutation('');
         }
     }
 

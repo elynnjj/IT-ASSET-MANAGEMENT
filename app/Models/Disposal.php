@@ -11,6 +11,7 @@ class Disposal extends Model
         'dispStatus',
         'dispDate',
         'assetID',
+        'invoiceID',
     ];
 
     protected $primaryKey = 'disposeID';
@@ -32,6 +33,14 @@ class Disposal extends Model
     public function asset(): BelongsTo
     {
         return $this->belongsTo(Asset::class, 'assetID', 'assetID');
+    }
+
+    /**
+     * Get the invoice for this disposal.
+     */
+    public function invoice(): BelongsTo
+    {
+        return $this->belongsTo(Invoice::class, 'invoiceID', 'invoiceID');
     }
 }
 

@@ -61,7 +61,8 @@ class ITRequestITDeptNotification extends Notification
                 })
                 ->line('**Status:** Pending IT')
                 ->action('View Request', $requestUrl)
-                ->line('Please process this request accordingly.');
+                ->line('Please process this request accordingly.')
+                ->salutation('');
         } else {
             // New request from HOD
             return (new MailMessage)
@@ -80,7 +81,8 @@ class ITRequestITDeptNotification extends Notification
                         ->line('**Asset Model:** ' . ($this->itRequest->asset->model ?? 'N/A'));
                 })
                 ->action('View Request', $requestUrl)
-                ->line('Please process this request accordingly.');
+                ->line('Please process this request accordingly.')
+                ->salutation('');
         }
     }
 
