@@ -16,9 +16,11 @@ return new class extends Migration
             $table->enum('dispStatus', ['Pending', 'Disposed'])->default('Pending');
             $table->date('dispDate');
             $table->string('assetID');
+            $table->unsignedBigInteger('invoiceID')->nullable();
             $table->timestamps();
 
             $table->foreign('assetID')->references('assetID')->on('assets')->onDelete('cascade');
+            $table->foreign('invoiceID')->references('invoiceID')->on('invoices')->onDelete('set null');
         });
     }
 

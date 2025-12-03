@@ -6,6 +6,7 @@ use App\Http\Controllers\ManageAssetController;
 use App\Http\Controllers\DisposalController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ITRequestsController;
+use App\Http\Controllers\ReportController;
 
 Route::redirect('/', '/login');
 
@@ -102,9 +103,8 @@ Route::middleware(['auth', 'verified', 'itdept'])->group(function () {
     Route::post('/itdept/asset-disposal/bulk-dispose', [DisposalController::class, 'bulkDispose'])->name('itdept.asset-disposal.bulk-dispose');
     Route::get('/itdept/asset-disposal/{disposeID}/download-invoice', [DisposalController::class, 'downloadInvoice'])->name('itdept.asset-disposal.download-invoice');
 
-    Route::get('/itdept/reports', function () {
-        return view('ITDept.reports');
-    })->name('itdept.reports');
+    Route::get('/itdept/reports', [ReportController::class, 'index'])->name('itdept.reports');
+    Route::post('/itdept/reports/generate', [ReportController::class, 'generateReport'])->name('itdept.reports.generate');
 });
 
 // Employee routes
