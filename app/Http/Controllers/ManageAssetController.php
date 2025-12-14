@@ -6,6 +6,8 @@ use App\Models\Asset;
 use App\Models\AssignAsset;
 use App\Models\Invoice;
 use App\Models\User;
+use App\Notifications\AssetAssignmentNotification;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -101,9 +103,9 @@ class ManageAssetController
 			->orderBy('checkoutDate', 'desc')
 			->get();
 
-		// Get all IT requests for this asset (excluding rejected requests)
+		// Get IT requests for this asset (only Pending IT or Completed status)
 		$itRequests = \App\Models\ITRequest::where('assetID', $assetID)
-			->where('status', '!=', 'Rejected')
+			->whereIn('status', ['Pending IT', 'Completed'])
 			->with(['requester', 'approver'])
 			->orderBy('requestDate', 'desc')
 			->orderBy('requestID', 'desc')
@@ -174,7 +176,7 @@ class ManageAssetController
 		}
 
 		// Create assignment record
-		AssignAsset::create([
+		$assignment = AssignAsset::create([
 			'assetID' => $asset->assetID,
 			'userID' => $validated['userID'],
 			'checkoutDate' => $validated['checkoutDate'],
@@ -183,6 +185,12 @@ class ManageAssetController
 		// Update asset status
 		$asset->status = 'Checked Out';
 		$asset->save();
+
+		// Send notification to the assigned user
+		$user = User::find($validated['userID']);
+		if ($user) {
+			$user->notify(new AssetAssignmentNotification($asset, $assignment));
+		}
 
 		return redirect()->route('itdept.manage-assets.show', $asset->assetID)
 			->with('status', 'Asset checked out successfully');
@@ -542,6 +550,43 @@ class ManageAssetController
 
 		return redirect()->route('itdept.manage-assets.show', $asset->assetID)
 			->with('status', 'Installed software updated successfully');
+	}
+
+	public function downloadAgreement(string $assetID)
+	{
+		$asset = Asset::where('assetID', $assetID)->firstOrFail();
+		$currentAssignment = $asset->currentAssignment();
+
+		if (!$currentAssignment) {
+			return back()->withErrors(['asset' => 'No active assignment found for this asset']);
+		}
+
+		$user = $currentAssignment->user;
+		$checkoutDate = $currentAssignment->checkoutDate;
+
+		// Parse installed software
+		$installedSoftware = $asset->installedSoftware ?? '';
+		$softwareList = [];
+		if ($installedSoftware) {
+			$softwareArray = preg_split('/[,\n]+/', $installedSoftware);
+			$softwareArray = array_map('trim', $softwareArray);
+			$softwareArray = array_filter($softwareArray);
+			$softwareList = $softwareArray;
+		}
+
+		$data = [
+			'asset' => $asset,
+			'user' => $user,
+			'checkoutDate' => $checkoutDate,
+			'softwareList' => $softwareList,
+		];
+
+		$pdf = Pdf::loadView('ITDept.manageAsset.agreement', $data);
+		$pdf->setPaper('a4', 'portrait');
+
+		$filename = 'Asset_Agreement_' . $asset->assetID . '_' . now()->format('Ymd_His') . '.pdf';
+
+		return $pdf->download($filename);
 	}
 }
 

@@ -98,7 +98,7 @@
 								<a href="{{ route('hod.my-requests') }}" 
 								   class="interactive-button interactive-button-secondary">
 									<span class="button-content">
-										{{ __('Cancel') }}
+									{{ __('Cancel') }}
 									</span>
 								</a>
 								<button type="submit" 

@@ -81,6 +81,7 @@ Route::middleware(['auth', 'verified', 'itdept'])->group(function () {
 		Route::get('/{assetID}/checkout', [ManageAssetController::class, 'checkoutForm'])->name('checkout');
 		Route::post('/{assetID}/checkout', [ManageAssetController::class, 'checkout'])->name('checkout.store');
 		Route::patch('/{assetID}/checkin', [ManageAssetController::class, 'checkin'])->name('checkin');
+		Route::get('/{assetID}/agreement', [ManageAssetController::class, 'downloadAgreement'])->name('agreement');
 		Route::patch('/{assetID}/dispose', [DisposalController::class, 'dispose'])->name('dispose');
 		Route::get('/{assetID}/installed-software', [ManageAssetController::class, 'installedSoftwareForm'])->name('installed-software');
 		Route::post('/{assetID}/installed-software', [ManageAssetController::class, 'storeInstalledSoftware'])->name('installed-software.store');

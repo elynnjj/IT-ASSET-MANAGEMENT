@@ -33,20 +33,20 @@
 						{{-- Invoice Information Section --}}
 						<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
 							<h3 class="text-lg font-semibold mb-4">{{ __('Invoice Information') }}</h3>
-							<div class="space-y-5">
-								<div>
+							<div class="space-y-4">
+								<div class="input-container">
 									<x-input-label for="invoiceFile" :value="__('Invoice File')" />
-									<input type="file" id="invoiceFile" name="invoiceFile" accept=".pdf,.jpg,.jpeg,.png" 
-										class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400
-										border border-gray-300 dark:border-gray-700 rounded-md
-										file:mr-4 file:py-2 file:px-4
-										file:rounded-md file:border-0
-										file:text-sm file:font-semibold
-										file:bg-blue-50 dark:file:bg-blue-900
-										file:text-blue-700 dark:file:text-blue-300
-										hover:file:bg-blue-100 dark:hover:file:bg-blue-800
-										cursor-pointer"
-										required />
+									<div class="custom-file-input-wrapper mt-1">
+										<input type="file" id="invoiceFile" name="invoiceFile" accept=".pdf,.jpg,.jpeg,.png" 
+											class="hidden-file-input"
+											required />
+										<button type="button" class="file-select-button" onclick="document.getElementById('invoiceFile').click()">
+											{{ __('Choose File') }}
+										</button>
+										<div class="file-display-area" id="fileDisplay">
+											<span class="file-placeholder">{{ __('No file chosen') }}</span>
+										</div>
+									</div>
 									<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Accepted formats: PDF, JPG, JPEG, PNG (Max: 10MB)</p>
 									<x-input-error :messages="$errors->get('invoiceFile')" class="mt-2" />
 								</div>
@@ -56,11 +56,11 @@
 						{{-- Asset Linking Section --}}
 						<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md" x-data="{ assetCount: 1 }">
 							<h3 class="text-lg font-semibold mb-4">{{ __('Link Assets to Invoice') }}</h3>
-							<div class="space-y-5">
-								<div>
+							<div class="space-y-4">
+								<div class="input-container">
 									<x-input-label for="assetCount" :value="__('Number of Assets')" />
 									<x-text-input id="assetCount" name="assetCount" type="number" min="1" max="100" 
-										class="mt-1 block w-full" 
+										class="mt-1 block w-full interactive-input" 
 										x-model.number="assetCount"
 										required />
 									<x-input-error :messages="$errors->get('assetCount')" class="mt-2" />
@@ -69,14 +69,14 @@
 								{{-- Dynamic Asset Dropdowns --}}
 								<template x-for="i in Array.from({length: assetCount}, (_, i) => i + 1)" :key="i">
 									<div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-md mb-4">
-										<div>
+										<div class="input-container">
 											<label x-bind:for="'assetType_' + i" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
 												<span x-text="'Asset Type ' + i"></span>
 											</label>
 											<select 
 												x-bind:name="'assets[' + (i-1) + '][assetType]'"
 												x-bind:id="'assetType_' + i"
-												class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
+												class="mt-1 block w-full interactive-select"
 												x-on:change="updateAssetDropdown(i, $event.target.value)"
 												required>
 												<option value="">Select Asset Type</option>
@@ -85,7 +85,7 @@
 											</select>
 										</div>
 
-										<div>
+										<div class="input-container">
 											<label x-bind:for="'assetID_' + i" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
 												<span x-text="'Asset ID ' + i"></span>
 											</label>
@@ -93,7 +93,7 @@
 												x-bind:name="'assets[' + (i-1) + '][assetID]'"
 												x-bind:id="'assetID_' + i"
 												x-bind:data-index="i"
-												class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm asset-select"
+												class="mt-1 block w-full interactive-select asset-select"
 												required>
 												<option value="">Select Asset ID</option>
 											</select>
@@ -105,18 +105,19 @@
 
 						<div class="flex items-center justify-end space-x-6 mt-6">
 							<a href="{{ route('itdept.manage-assets.index') }}" 
-							   class="inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90"
-							   style="background-color: #797979;"
-							   onmouseover="this.style.backgroundColor='#666666'"
-							   onmouseout="this.style.backgroundColor='#797979'">
-								{{ __('Cancel') }}
+							   class="interactive-button interactive-button-secondary"
+							   style="padding: 10px 16px; font-size: 11px;">
+								<span class="button-content">
+									{{ __('Cancel') }}
+								</span>
 							</a>
 							<button type="submit" 
-								class="inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90"
-								style="background-color: #4BA9C2;"
-								onmouseover="this.style.backgroundColor='#3a8ba5'"
-								onmouseout="this.style.backgroundColor='#4BA9C2'">
-								{{ __('Upload Invoice') }}
+								class="interactive-button interactive-button-primary"
+								style="padding: 10px 16px; font-size: 11px;">
+								<span class="button-content">
+									<span class="button-text">{{ __('Upload Invoice') }}</span>
+									<span class="button-spinner"></span>
+								</span>
 							</button>
 						</div>
 					</form>
@@ -145,18 +146,18 @@
 				</div>
 				<div class="items-center px-4 py-3">
 					<button id="confirmOverwriteBtn" 
-						class="px-4 py-2 text-white text-base font-medium rounded-md w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 mb-2 transition ease-in-out duration-150"
-						style="background-color: #4BA9C2;"
-						onmouseover="this.style.backgroundColor='#3a8ba5'"
-						onmouseout="this.style.backgroundColor='#4BA9C2'">
-						Yes, Overwrite
+						class="interactive-button interactive-button-primary w-full mb-2"
+						style="padding: 10px 16px; font-size: 11px;">
+						<span class="button-content">
+							{{ __('Yes, Overwrite') }}
+						</span>
 					</button>
 					<button id="cancelOverwriteBtn" 
-						class="px-4 py-2 text-white text-base font-medium rounded-md w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition ease-in-out duration-150"
-						style="background-color: #797979;"
-						onmouseover="this.style.backgroundColor='#666666'"
-						onmouseout="this.style.backgroundColor='#797979'">
-						Cancel
+						class="interactive-button interactive-button-secondary w-full"
+						style="padding: 10px 16px; font-size: 11px;">
+						<span class="button-content">
+							{{ __('Cancel') }}
+						</span>
 					</button>
 				</div>
 			</div>
@@ -268,6 +269,439 @@
 		// Make functions available globally
 		window.updateAssetDropdown = updateAssetDropdown;
 		window.handleAssetSelection = handleAssetSelection;
+	</script>
+
+	<style>
+		/* Input container with hover effects */
+		.input-container {
+			position: relative;
+			transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		}
+
+		.input-container:hover {
+			transform: translateY(-1px);
+		}
+
+		.input-container:has(.interactive-input:focus),
+		.input-container:has(.interactive-textarea:focus),
+		.input-container:has(.interactive-select:focus),
+		.input-container:has(.hidden-file-input:focus) {
+			transform: translateY(-2px);
+		}
+
+		/* Interactive input styling */
+		.interactive-input,
+		.interactive-textarea,
+		.interactive-select {
+			width: 100%;
+			padding: 8px 12px;
+			border: 2px solid #9CA3AF;
+			border-radius: 8px;
+			font-size: 15px;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			background-color: #FFFFFF;
+			position: relative;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-input,
+			.interactive-textarea,
+			.interactive-select {
+				background-color: #111827;
+				border-color: #6B7280;
+				color: #D1D5DB;
+			}
+		}
+
+		.dark .interactive-input,
+		.dark .interactive-textarea,
+		.dark .interactive-select {
+			background-color: #111827;
+			border-color: #6B7280;
+			color: #D1D5DB;
+		}
+
+		.interactive-input:hover,
+		.interactive-textarea:hover,
+		.interactive-select:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.15);
+			transform: translateY(-1px);
+			background-color: #FAFAFA;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-input:hover,
+			.interactive-textarea:hover,
+			.interactive-select:hover {
+				border-color: #4BA9C2;
+				box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+				background-color: #1F2937;
+			}
+		}
+
+		.dark .interactive-input:hover,
+		.dark .interactive-textarea:hover,
+		.dark .interactive-select:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+			background-color: #1F2937;
+		}
+
+		.interactive-input:focus,
+		.interactive-textarea:focus,
+		.interactive-select:focus {
+			outline: none;
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.15), 0 6px 16px rgba(75, 169, 194, 0.2);
+			background-color: #FFFFFF;
+			transform: translateY(-2px);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-input:focus,
+			.interactive-textarea:focus,
+			.interactive-select:focus {
+				border-color: #4BA9C2;
+				box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+				background-color: #111827;
+				color: #D1D5DB;
+			}
+		}
+
+		.dark .interactive-input:focus,
+		.dark .interactive-textarea:focus,
+		.dark .interactive-select:focus {
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+			background-color: #111827;
+			color: #D1D5DB;
+		}
+
+		.interactive-textarea {
+			resize: vertical;
+			min-height: 120px;
+		}
+
+		/* Custom file input wrapper - side by side layout */
+		.custom-file-input-wrapper {
+			display: flex;
+			width: 100%;
+			gap: 0;
+			border: 2px solid #9CA3AF;
+			border-radius: 8px;
+			overflow: hidden;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			background-color: #FFFFFF;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.custom-file-input-wrapper {
+				background-color: #111827;
+				border-color: #6B7280;
+			}
+		}
+
+		.dark .custom-file-input-wrapper {
+			background-color: #111827;
+			border-color: #6B7280;
+		}
+
+		.custom-file-input-wrapper:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.15);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.custom-file-input-wrapper:hover {
+				border-color: #4BA9C2;
+				box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+			}
+		}
+
+		.dark .custom-file-input-wrapper:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+		}
+
+		.custom-file-input-wrapper:has(.hidden-file-input:focus) {
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.15), 0 6px 16px rgba(75, 169, 194, 0.2);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.custom-file-input-wrapper:has(.hidden-file-input:focus) {
+				border-color: #4BA9C2;
+				box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+			}
+		}
+
+		.dark .custom-file-input-wrapper:has(.hidden-file-input:focus) {
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+		}
+
+		.hidden-file-input {
+			position: absolute;
+			opacity: 0;
+			width: 0;
+			height: 0;
+			pointer-events: none;
+		}
+
+		/* File select button (left side) */
+		.file-select-button {
+			padding: 8px 20px;
+			border: none;
+			border-right: 2px solid #9CA3AF;
+			border-radius: 0;
+			background: linear-gradient(135deg, #4BA9C2 0%, #3a8ba5 100%);
+			color: white;
+			font-size: 15px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			white-space: nowrap;
+			flex-shrink: 0;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.file-select-button {
+				border-right-color: #6B7280;
+			}
+		}
+
+		.dark .file-select-button {
+			border-right-color: #6B7280;
+		}
+
+		.file-select-button:hover {
+			background: linear-gradient(135deg, #3a8ba5 0%, #2d6b82 100%);
+			box-shadow: 0 4px 8px rgba(75, 169, 194, 0.3);
+		}
+
+		.file-select-button:active {
+			background: linear-gradient(135deg, #2d6b82 0%, #1f5a6f 100%);
+			transform: scale(0.98);
+		}
+
+		/* File display area (right side) */
+		.file-display-area {
+			flex: 1;
+			padding: 8px 12px;
+			display: flex;
+			align-items: center;
+			background-color: #FFFFFF;
+			color: #374151;
+			font-size: 15px;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.file-display-area {
+				background-color: #111827;
+				color: #D1D5DB;
+			}
+
+			.file-placeholder {
+				color: #9CA3AF;
+			}
+
+			.file-name {
+				color: #D1D5DB;
+			}
+		}
+
+		.dark .file-display-area {
+			background-color: #111827;
+			color: #D1D5DB;
+		}
+
+		.file-placeholder {
+			color: #9CA3AF;
+		}
+
+		.dark .file-placeholder {
+			color: #9CA3AF;
+		}
+
+		.file-name {
+			color: #374151;
+			font-weight: 500;
+		}
+
+		.dark .file-name {
+			color: #D1D5DB;
+		}
+
+		/* Interactive button styling */
+		.interactive-button {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 14px 28px;
+			font-weight: 600;
+			font-size: 13px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			overflow: hidden;
+			text-decoration: none;
+		}
+
+		.interactive-button-primary {
+			background: linear-gradient(135deg, #4BA9C2 0%, #3a8ba5 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.3);
+		}
+
+		.interactive-button-primary::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-primary:hover {
+			background: linear-gradient(135deg, #3a8ba5 0%, #2d6b82 100%);
+			box-shadow: 0 8px 20px rgba(75, 169, 194, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-primary:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-primary:active {
+			background: linear-gradient(135deg, #2d6b82 0%, #1f5a6f 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(75, 169, 194, 0.3);
+		}
+
+		.interactive-button-secondary {
+			background: linear-gradient(135deg, #797979 0%, #666666 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(121, 121, 121, 0.3);
+		}
+
+		.interactive-button-secondary::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-secondary:hover {
+			background: linear-gradient(135deg, #666666 0%, #555555 100%);
+			box-shadow: 0 8px 20px rgba(121, 121, 121, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-secondary:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-secondary:active {
+			background: linear-gradient(135deg, #555555 0%, #444444 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(121, 121, 121, 0.3);
+		}
+
+		.button-content {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			position: relative;
+			z-index: 1;
+		}
+
+		.button-spinner {
+			display: none;
+			width: 18px;
+			height: 18px;
+			border: 2px solid rgba(255, 255, 255, 0.3);
+			border-top-color: white;
+			border-radius: 50%;
+			animation: spin 0.8s linear infinite;
+		}
+
+		.interactive-button.loading .button-spinner {
+			display: block;
+		}
+
+		.interactive-button.loading .button-text {
+			opacity: 0.7;
+		}
+
+		@keyframes spin {
+			to { transform: rotate(360deg); }
+		}
+
+		/* Dark mode support for buttons */
+		.dark .interactive-button-primary {
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.4);
+		}
+
+		.dark .interactive-button-primary:hover {
+			box-shadow: 0 8px 20px rgba(75, 169, 194, 0.6);
+		}
+
+		.dark .interactive-button-secondary {
+			box-shadow: 0 4px 12px rgba(121, 121, 121, 0.4);
+		}
+
+		.dark .interactive-button-secondary:hover {
+			box-shadow: 0 8px 20px rgba(121, 121, 121, 0.6);
+		}
+	</style>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Add loading state to submit button on form submission
+			const form = document.querySelector('form');
+			const submitButton = form?.querySelector('button[type="submit"]');
+			
+			if (form && submitButton) {
+				form.addEventListener('submit', function() {
+					submitButton.classList.add('loading');
+					submitButton.disabled = true;
+				});
+			}
+
+			// Handle file input change to display filename
+			const fileInput = document.getElementById('invoiceFile');
+			const fileDisplay = document.getElementById('fileDisplay');
+			const noFileText = @json(__('No file chosen'));
+			
+			if (fileInput && fileDisplay) {
+				fileInput.addEventListener('change', function(e) {
+					const file = e.target.files[0];
+					if (file) {
+						fileDisplay.innerHTML = '<span class="file-name">' + file.name + '</span>';
+					} else {
+						fileDisplay.innerHTML = '<span class="file-placeholder">' + noFileText + '</span>';
+					}
+				});
+			}
+		});
 	</script>
 </x-app-layout>
 

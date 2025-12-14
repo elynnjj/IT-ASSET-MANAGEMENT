@@ -124,9 +124,12 @@
 												<td class="px-6 py-3 text-sm text-gray-900 dark:text-gray-100">{{ $request->requester ? $request->requester->fullName : 'N/A' }}</td>
 												<td class="px-6 py-3">
 													<a href="{{ route('itdept.it-requests.show', $request->requestID) }}" 
-														class="view-details-link inline-flex items-center justify-center px-3 py-1 rounded-md border transition-all duration-200 text-xs"
+														class="interactive-button interactive-button-primary"
+														style="padding: 6px 12px; font-size: 11px;"
 														title="{{ __('View Details') }}">
-														{{ __('View Details') }}
+														<span class="button-content">
+															{{ __('View') }}
+														</span>
 													</a>
 												</td>
 											</tr>
@@ -307,29 +310,77 @@
 			font-variant-numeric: tabular-nums;
 		}
 		
-		/* View Details Link Styling */
-		.view-details-link {
-			border-color: #4BA9C2;
-			color: #4BA9C2;
-			background-color: white;
+		/* Interactive button styling */
+		.interactive-button {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 14px 28px;
+			font-weight: 600;
+			font-size: 13px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			overflow: hidden;
+			text-decoration: none;
 		}
-		
-		.view-details-link:hover {
-			background-color: #f0f9ff;
-			color: #3a8ba5;
-			border-color: #3a8ba5;
+
+		.interactive-button-primary {
+			background: linear-gradient(135deg, #4BA9C2 0%, #3a8ba5 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.3);
 		}
-		
-		.dark .view-details-link {
-			background-color: rgb(55, 65, 81);
-			color: #60a5fa;
-			border-color: #60a5fa;
+
+		.interactive-button-primary::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
 		}
-		
-		.dark .view-details-link:hover {
-			background-color: rgba(30, 58, 138, 0.3);
-			color: #93c5fd;
-			border-color: #93c5fd;
+
+		.interactive-button-primary:hover {
+			background: linear-gradient(135deg, #3a8ba5 0%, #2d6b82 100%);
+			box-shadow: 0 8px 20px rgba(75, 169, 194, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-primary:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-primary:active {
+			background: linear-gradient(135deg, #2d6b82 0%, #1f5a6f 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(75, 169, 194, 0.3);
+		}
+
+		.button-content {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			position: relative;
+			z-index: 1;
+		}
+
+		/* Dark mode support for buttons */
+		.dark .interactive-button-primary {
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.4);
+		}
+
+		.dark .interactive-button-primary:hover {
+			box-shadow: 0 8px 20px rgba(75, 169, 194, 0.6);
 		}
 		
 		@keyframes slideDown {

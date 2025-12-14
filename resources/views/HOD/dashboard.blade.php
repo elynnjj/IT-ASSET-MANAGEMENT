@@ -17,22 +17,22 @@
 						
 						<div class="space-y-3">
 							{{-- Name --}}
-							<div class="grid gap-0 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-md border border-gray-200 dark:border-gray-600" style="grid-template-columns: 40% 60%;">
+							<div class="grid gap-0 p-3 bg-white dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700" style="grid-template-columns: 40% 60%;">
 								<div class="flex items-center">
 									<label class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Name') }}</label>
 								</div>
-								<div class="flex items-center border-l border-gray-300 dark:border-gray-500 pl-3">
-									<p class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ auth()->user()->fullName }}</p>
+								<div class="flex items-center border-l border-gray-300 dark:border-gray-600 pl-3">
+									<p class="text-sm font-bold text-black dark:text-gray-300">{{ auth()->user()->fullName }}</p>
 								</div>
 							</div>
 
 							{{-- Department --}}
-							<div class="grid gap-0 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-md border border-gray-200 dark:border-gray-600" style="grid-template-columns: 40% 60%;">
+							<div class="grid gap-0 p-3 bg-white dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700" style="grid-template-columns: 40% 60%;">
 								<div class="flex items-center">
 									<label class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Department') }}</label>
 								</div>
-								<div class="flex items-center border-l border-gray-300 dark:border-gray-500 pl-3">
-									<p class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ auth()->user()->department ?? '-' }}</p>
+								<div class="flex items-center border-l border-gray-300 dark:border-gray-600 pl-3">
+									<p class="text-sm font-bold text-black dark:text-gray-300">{{ auth()->user()->department ?? '-' }}</p>
 								</div>
 							</div>
 						</div>
@@ -48,22 +48,22 @@
 						@if($userAsset)
 							<div class="space-y-3">
 								{{-- Asset ID --}}
-								<div class="grid gap-0 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-md border border-gray-200 dark:border-gray-600" style="grid-template-columns: 40% 60%;">
+								<div class="grid gap-0 p-3 bg-white dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700" style="grid-template-columns: 40% 60%;">
 									<div class="flex items-center">
 										<label class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Asset ID') }}</label>
 									</div>
-									<div class="flex items-center border-l border-gray-300 dark:border-gray-500 pl-3">
-										<p class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ $userAsset->assetID }}</p>
+									<div class="flex items-center border-l border-gray-300 dark:border-gray-600 pl-3">
+										<p class="text-sm font-bold text-black dark:text-gray-300">{{ $userAsset->assetID }}</p>
 									</div>
 								</div>
 
 								{{-- Model --}}
-								<div class="grid gap-0 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-md border border-gray-200 dark:border-gray-600" style="grid-template-columns: 40% 60%;">
+								<div class="grid gap-0 p-3 bg-white dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700" style="grid-template-columns: 40% 60%;">
 									<div class="flex items-center">
 										<label class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Model') }}</label>
 									</div>
-									<div class="flex items-center border-l border-gray-300 dark:border-gray-500 pl-3">
-										<p class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ $userAsset->model ?? '-' }}</p>
+									<div class="flex items-center border-l border-gray-300 dark:border-gray-600 pl-3">
+										<p class="text-sm font-bold text-black dark:text-gray-300">{{ $userAsset->model ?? '-' }}</p>
 									</div>
 								</div>
 							</div>

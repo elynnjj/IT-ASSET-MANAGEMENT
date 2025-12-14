@@ -92,7 +92,7 @@ class DisposalController
 		$asset->status = 'Disposed';
 		$asset->save();
 
-		return redirect()->route('itdept.manage-assets.show', $asset->assetID)
+		return redirect()->route('itdept.asset-disposal', ['tab' => 'pending'])
 			->with('status', 'Asset disposed successfully');
 	}
 
