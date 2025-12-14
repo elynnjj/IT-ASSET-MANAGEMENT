@@ -52,21 +52,23 @@
 						<table class="table-auto w-full border border-gray-300 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
 							<thead class="bg-gray-100 dark:bg-gray-700">
 								<tr>
-									<th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Requester Name') }}</th>
-									<th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Asset ID') }}</th>
-									<th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 w-64">{{ __('Request Title') }}</th>
-									<th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Request Description') }}</th>
-									<th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Status') }}</th>
-									<th class="px-4 py-4 text-center text-sm font-semibold text-gray-700 dark:text-gray-200 w-auto">{{ __('Action') }}</th>
+									<th class="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 10%;">{{ __('Request Date') }}</th>
+									<th class="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 12%;">{{ __('Requester Name') }}</th>
+									<th class="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 10%;">{{ __('Asset ID') }}</th>
+									<th class="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 15%;">{{ __('Request Title') }}</th>
+									<th class="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 30%;">{{ __('Request Description') }}</th>
+									<th class="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 10%;">{{ __('Status') }}</th>
+									<th class="px-4 py-4 text-center text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 13%;">{{ __('Action') }}</th>
 								</tr>
 							</thead>
 							<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
 								@forelse ($requests as $request)
 									<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 {{ $loop->even ? 'bg-gray-50/50 dark:bg-gray-800/30' : 'bg-white dark:bg-gray-800' }}">
-										<td class="px-8 py-4">{{ $request->requester->fullName ?? 'N/A' }}</td>
-										<td class="px-8 py-4">{{ $request->asset ? $request->asset->assetID : 'N/A' }}</td>
-										<td class="px-8 py-4">{{ $request->title }}</td>
-										<td class="px-8 py-4">{{ $request->requestDesc }}</td>
+										<td class="px-4 py-4">{{ \Carbon\Carbon::parse($request->requestDate)->format('d/m/y') }}</td>
+										<td class="px-4 py-4">{{ $request->requester->fullName ?? 'N/A' }}</td>
+										<td class="px-4 py-4">{{ $request->asset ? $request->asset->assetID : 'N/A' }}</td>
+										<td class="px-4 py-4">{{ $request->title }}</td>
+										<td class="px-4 py-4">{{ $request->requestDesc }}</td>
 										<td class="px-8 py-4">
 											@php
 												$statusColors = [
@@ -85,27 +87,27 @@
 										<td class="px-4 py-4">
 											<div class="flex items-center justify-center space-x-2">
 												@if($request->status === 'Pending')
-													<form action="{{ route('hod.it-requests.approve', $request->requestID) }}" method="POST" class="inline">
+													<form action="{{ route('hod.it-requests.approve', $request->requestID) }}" method="POST" class="inline approval-form">
 														@csrf
 														<button type="submit" 
-															class="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold uppercase tracking-widest rounded-md border transition"
-															style="border-color: #4BA9C2; color: #4BA9C2; background-color: white;"
-															onmouseover="this.style.backgroundColor='#f0f9ff'"
-															onmouseout="this.style.backgroundColor='white'"
+															class="interactive-button interactive-button-approve"
 															title="{{ __('Approve') }}">
-															{{ __('Approve') }}
+															<span class="button-content">
+																<span class="button-text">{{ __('Approve') }}</span>
+																<span class="button-spinner"></span>
+															</span>
 														</button>
 													</form>
-													<form action="{{ route('hod.it-requests.reject', $request->requestID) }}" method="POST" class="inline">
+													<form action="{{ route('hod.it-requests.reject', $request->requestID) }}" method="POST" class="inline rejection-form">
 														@csrf
 														<button type="submit" 
-															class="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold uppercase tracking-widest rounded-md border transition"
-															style="border-color: #dc2626; color: #dc2626; background-color: white;"
-															onmouseover="this.style.backgroundColor='#fef2f2'"
-															onmouseout="this.style.backgroundColor='white'"
+															class="interactive-button interactive-button-reject"
 															title="{{ __('Reject') }}"
 															onclick="return confirm('Are you sure you want to reject this request?');">
-															{{ __('Reject') }}
+															<span class="button-content">
+																<span class="button-text">{{ __('Reject') }}</span>
+																<span class="button-spinner"></span>
+															</span>
 														</button>
 													</form>
 												@endif
@@ -114,7 +116,7 @@
 									</tr>
 								@empty
 									<tr>
-										<td colspan="6" class="px-8 py-6 text-center text-gray-500">
+										<td colspan="7" class="px-8 py-6 text-center text-gray-500">
 											No requests found.
 										</td>
 									</tr>
@@ -132,4 +134,183 @@
 			</div>
 		</div>
 	</div>
+
+	<style>
+		/* Interactive button styling */
+		.interactive-button {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 10px 20px;
+			font-weight: 600;
+			font-size: 12px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			overflow: hidden;
+			text-decoration: none;
+		}
+
+		.interactive-button-approve {
+			background: linear-gradient(135deg, #1D9F26 0%, #1A8F22 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(29, 159, 38, 0.3);
+		}
+
+		.interactive-button-approve::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-approve:hover {
+			background: linear-gradient(135deg, #1A8F22 0%, #17891F 100%);
+			box-shadow: 0 8px 20px rgba(29, 159, 38, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-approve:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-approve:active {
+			background: linear-gradient(135deg, #17891F 0%, #15721A 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(29, 159, 38, 0.3);
+		}
+
+		.interactive-button-reject {
+			background: linear-gradient(135deg, #B40814 0%, #A10712 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(180, 8, 20, 0.3);
+		}
+
+		.interactive-button-reject::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-reject:hover {
+			background: linear-gradient(135deg, #A10712 0%, #990610 100%);
+			box-shadow: 0 8px 20px rgba(180, 8, 20, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-reject:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-reject:active {
+			background: linear-gradient(135deg, #990610 0%, #86050E 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(180, 8, 20, 0.3);
+		}
+
+		.button-content {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			position: relative;
+			z-index: 1;
+		}
+
+		.button-spinner {
+			display: none;
+			width: 16px;
+			height: 16px;
+			border: 2px solid rgba(255, 255, 255, 0.3);
+			border-top-color: white;
+			border-radius: 50%;
+			animation: spin 0.8s linear infinite;
+		}
+
+		.interactive-button.loading .button-spinner {
+			display: block;
+		}
+
+		.interactive-button.loading .button-text {
+			opacity: 0.7;
+		}
+
+		.interactive-button:disabled {
+			opacity: 0.7;
+			cursor: not-allowed;
+			transform: none;
+		}
+
+		.interactive-button:disabled:hover {
+			transform: none;
+		}
+
+		@keyframes spin {
+			to { transform: rotate(360deg); }
+		}
+
+		/* Dark mode support for buttons */
+		.dark .interactive-button-approve {
+			box-shadow: 0 4px 12px rgba(29, 159, 38, 0.4);
+		}
+
+		.dark .interactive-button-approve:hover {
+			box-shadow: 0 8px 20px rgba(29, 159, 38, 0.6);
+		}
+
+		.dark .interactive-button-reject {
+			box-shadow: 0 4px 12px rgba(180, 8, 20, 0.4);
+		}
+
+		.dark .interactive-button-reject:hover {
+			box-shadow: 0 8px 20px rgba(180, 8, 20, 0.6);
+		}
+	</style>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Add loading state to approve buttons on form submission
+			const approveForms = document.querySelectorAll('.approval-form');
+			approveForms.forEach(form => {
+				const submitButton = form.querySelector('button[type="submit"]');
+				if (submitButton) {
+					form.addEventListener('submit', function() {
+						submitButton.classList.add('loading');
+						submitButton.disabled = true;
+					});
+				}
+			});
+
+			// Add loading state to reject buttons on form submission
+			const rejectForms = document.querySelectorAll('.rejection-form');
+			rejectForms.forEach(form => {
+				const submitButton = form.querySelector('button[type="submit"]');
+				if (submitButton) {
+					form.addEventListener('submit', function() {
+						submitButton.classList.add('loading');
+						submitButton.disabled = true;
+					});
+				}
+			});
+		});
+	</script>
 </x-app-layout>

@@ -37,7 +37,7 @@
 
 {{-- Salutation --}}
 @if (! empty($salutation))
-{{ $salutation }}
+{!! nl2br(e($salutation)) !!}
 @endif
 
 {{-- Subcopy --}}

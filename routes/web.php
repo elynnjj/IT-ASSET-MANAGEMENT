@@ -19,8 +19,8 @@ Route::get('dashboard', function () {
 
     return match ($user->role) {
         'ITDept' => app(DashboardController::class)->index(),
-        'Employee' => view('Employee.dashboard'),
-        'HOD' => view('HOD.dashboard'),
+        'Employee' => app(DashboardController::class)->employeeDashboard(),
+        'HOD' => app(DashboardController::class)->hodDashboard(),
         default => view('dashboard'),
     };
 })

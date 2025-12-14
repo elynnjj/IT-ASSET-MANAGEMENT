@@ -50,7 +50,7 @@ new class extends Component
                 {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.') }}
             </p>
 
-            <div class="mt-6">
+            <div class="mt-6 input-container">
                 <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
 
                 <x-text-input
@@ -58,7 +58,7 @@ new class extends Component
                     id="password"
                     name="password"
                     type="password"
-                    class="mt-1 block w-3/4"
+                    class="mt-1 block w-3/4 interactive-input"
                     placeholder="{{ __('Password') }}"
                 />
 

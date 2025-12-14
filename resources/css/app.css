@@ -1,3 +1,58 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    /* Make all form inputs, selects, textareas, and file inputs have more visible borders */
+    /* Target all inputs except hidden, submit, button, reset, and image types */
+    input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="image"]),
+    textarea,
+    select {
+        border-width: 2px !important;
+        border-color: rgb(156 163 175) !important; /* gray-400 - more visible */
+    }
+    
+    /* Dark mode support */
+    .dark input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="image"]),
+    .dark textarea,
+    .dark select,
+    [class*="dark:"] input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="image"]),
+    [class*="dark:"] textarea,
+    [class*="dark:"] select {
+        border-color: rgb(75 85 99) !important; /* gray-600 - more visible in dark mode */
+    }
+    
+    /* Focus states */
+    input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="image"]):focus,
+    textarea:focus,
+    select:focus {
+        border-color: rgb(107 114 128) !important; /* gray-500 - darker on focus */
+    }
+    
+    .dark input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="image"]):focus,
+    .dark textarea:focus,
+    .dark select:focus {
+        border-color: rgb(107 114 128) !important; /* gray-500 - darker on focus */
+    }
+    
+    /* File input styling - make the button area more visible */
+    input[type="file"]::file-selector-button {
+        border-width: 2px !important;
+        border-color: rgb(156 163 175) !important;
+        border-right-width: 2px !important;
+    }
+    
+    .dark input[type="file"]::file-selector-button {
+        border-color: rgb(75 85 99) !important;
+    }
+    
+    /* Ensure file input container also has visible border */
+    input[type="file"] {
+        border-width: 2px !important;
+        border-color: rgb(156 163 175) !important;
+    }
+    
+    .dark input[type="file"] {
+        border-color: rgb(75 85 99) !important;
+    }
+}

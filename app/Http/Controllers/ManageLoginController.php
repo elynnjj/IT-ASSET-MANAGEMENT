@@ -104,9 +104,16 @@ class ManageLoginController
      */
     public function sendPasswordResetLink(Request $request): RedirectResponse
     {
+        try {
         $request->validate([
             'email' => ['required', 'string', 'email'],
         ]);
+        } catch (ValidationException $e) {
+            // Redirect to login page with errors to keep forgot password form visible
+            return redirect()->route('login')
+                ->withErrors($e->errors())
+                ->withInput($request->only('email'));
+        }
 
         // We will send the password reset link to this user. Once we have attempted
         // to send the link, we will examine the response then see the message we
@@ -116,12 +123,13 @@ class ManageLoginController
         );
 
         if ($status != Password::RESET_LINK_SENT) {
-            throw ValidationException::withMessages([
-                'email' => [__($status)],
-            ]);
+            // Redirect to login page with errors to keep forgot password form visible
+            return redirect()->route('login')
+                ->withErrors(['email' => __($status)])
+                ->withInput($request->only('email'));
         }
 
-        return back()->with('status', __($status));
+        return redirect()->route('login')->with('status', __($status));
     }
 
     /**

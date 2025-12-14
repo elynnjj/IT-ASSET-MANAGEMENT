@@ -40,11 +40,11 @@
 						@if($assignedAsset)
 							<div class="grid grid-cols-2 gap-4">
 								<div class="border border-gray-200 dark:border-gray-600 rounded-md p-3 bg-white dark:bg-gray-800">
-									<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Asset ID') }}</label>
+									<label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Asset ID') }}</label>
 									<p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ $assignedAsset->asset->assetID }}</p>
 								</div>
 								<div class="border border-gray-200 dark:border-gray-600 rounded-md p-3 bg-white dark:bg-gray-800">
-									<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Model') }}</label>
+									<label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Model') }}</label>
 									<p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ $assignedAsset->asset->model ?? 'N/A' }}</p>
 								</div>
 							</div>
@@ -61,20 +61,20 @@
 
 							<div class="space-y-5">
 								{{-- Request Date --}}
-								<div>
+								<div class="input-container">
 									<x-input-label for="requestDate" :value="__('Request Date')" />
 									<x-text-input id="requestDate" name="requestDate" type="date" 
-										class="mt-1 block w-full" 
+										class="mt-1 block w-full interactive-input" 
 										value="{{ old('requestDate', date('Y-m-d')) }}"
 										required />
 									<x-input-error :messages="$errors->get('requestDate')" class="mt-2" />
 								</div>
 
 								{{-- Request Title --}}
-								<div>
+								<div class="input-container">
 									<x-input-label for="title" :value="__('Request Title')" />
 									<x-text-input id="title" name="title" type="text" 
-										class="mt-1 block w-full" 
+										class="mt-1 block w-full interactive-input" 
 										placeholder="Enter a brief title for your request"
 										value="{{ old('title') }}"
 										required />
@@ -82,11 +82,11 @@
 								</div>
 
 								{{-- Request Description --}}
-								<div>
+								<div class="input-container">
 									<x-input-label for="requestDesc" :value="__('Request Description')" />
 									<textarea id="requestDesc" name="requestDesc" 
 										rows="5"
-										class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
+										class="mt-1 block w-full interactive-textarea"
 										placeholder="Describe your IT request in detail..."
 										required>{{ old('requestDesc') }}</textarea>
 									<x-input-error :messages="$errors->get('requestDesc')" class="mt-2" />
@@ -96,18 +96,17 @@
 							{{-- Buttons --}}
 							<div class="flex items-center justify-end space-x-6 mt-6">
 								<a href="{{ route('hod.my-requests') }}" 
-								   class="inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90"
-								   style="background-color: #797979;"
-								   onmouseover="this.style.backgroundColor='#666666'"
-								   onmouseout="this.style.backgroundColor='#797979'">
-									{{ __('Cancel') }}
+								   class="interactive-button interactive-button-secondary">
+									<span class="button-content">
+										{{ __('Cancel') }}
+									</span>
 								</a>
 								<button type="submit" 
-									class="inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90"
-									style="background-color: #4BA9C2;"
-									onmouseover="this.style.backgroundColor='#3a8ba5'"
-									onmouseout="this.style.backgroundColor='#4BA9C2'">
-									{{ __('Submit Request') }}
+									class="interactive-button interactive-button-primary">
+									<span class="button-content">
+										<span class="button-text">{{ __('Submit Request') }}</span>
+										<span class="button-spinner"></span>
+									</span>
 								</button>
 							</div>
 						</form>
@@ -116,4 +115,231 @@
 			</div>
 		</div>
 	</div>
+
+	<style>
+		/* Input container with hover effects */
+		.input-container {
+			position: relative;
+			transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		}
+
+		.input-container:hover {
+			transform: translateY(-1px);
+		}
+
+		.input-container:has(.interactive-input:focus),
+		.input-container:has(.interactive-textarea:focus) {
+			transform: translateY(-2px);
+		}
+
+		/* Interactive input styling */
+		.interactive-input,
+		.interactive-textarea {
+			width: 100%;
+			padding: 14px;
+			border: 2px solid #E5E7EB;
+			border-radius: 8px;
+			font-size: 15px;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			background-color: #FFFFFF;
+			position: relative;
+		}
+
+		.dark .interactive-input,
+		.dark .interactive-textarea {
+			background-color: rgba(55, 65, 81, 0.8);
+			border-color: #4B5563;
+			color: #F9FAFB;
+		}
+
+		.interactive-input:hover,
+		.interactive-textarea:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.15);
+			transform: translateY(-1px);
+			background-color: #FAFAFA;
+		}
+
+		.dark .interactive-input:hover,
+		.dark .interactive-textarea:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+			background-color: rgba(55, 65, 81, 0.95);
+		}
+
+		.interactive-input:focus,
+		.interactive-textarea:focus {
+			outline: none;
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.15), 0 6px 16px rgba(75, 169, 194, 0.2);
+			background-color: #FFFFFF;
+			transform: translateY(-2px);
+		}
+
+		.dark .interactive-input:focus,
+		.dark .interactive-textarea:focus {
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+			background-color: rgba(55, 65, 81, 1);
+		}
+
+		.interactive-textarea {
+			resize: vertical;
+			min-height: 120px;
+		}
+
+		/* Interactive button styling */
+		.interactive-button {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 14px 28px;
+			font-weight: 600;
+			font-size: 13px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			overflow: hidden;
+			text-decoration: none;
+		}
+
+		.interactive-button-primary {
+			background: linear-gradient(135deg, #4BA9C2 0%, #3a8ba5 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.3);
+		}
+
+		.interactive-button-primary::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-primary:hover {
+			background: linear-gradient(135deg, #3a8ba5 0%, #2d6b82 100%);
+			box-shadow: 0 8px 20px rgba(75, 169, 194, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-primary:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-primary:active {
+			background: linear-gradient(135deg, #2d6b82 0%, #1f5a6f 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(75, 169, 194, 0.3);
+		}
+
+		.interactive-button-secondary {
+			background: linear-gradient(135deg, #797979 0%, #666666 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(121, 121, 121, 0.3);
+		}
+
+		.interactive-button-secondary::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-secondary:hover {
+			background: linear-gradient(135deg, #666666 0%, #555555 100%);
+			box-shadow: 0 8px 20px rgba(121, 121, 121, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-secondary:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-secondary:active {
+			background: linear-gradient(135deg, #555555 0%, #444444 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(121, 121, 121, 0.3);
+		}
+
+		.button-content {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			position: relative;
+			z-index: 1;
+		}
+
+		.button-spinner {
+			display: none;
+			width: 18px;
+			height: 18px;
+			border: 2px solid rgba(255, 255, 255, 0.3);
+			border-top-color: white;
+			border-radius: 50%;
+			animation: spin 0.8s linear infinite;
+		}
+
+		.interactive-button.loading .button-spinner {
+			display: block;
+		}
+
+		.interactive-button.loading .button-text {
+			opacity: 0.7;
+		}
+
+		@keyframes spin {
+			to { transform: rotate(360deg); }
+		}
+
+		/* Dark mode support for buttons */
+		.dark .interactive-button-primary {
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.4);
+		}
+
+		.dark .interactive-button-primary:hover {
+			box-shadow: 0 8px 20px rgba(75, 169, 194, 0.6);
+		}
+
+		.dark .interactive-button-secondary {
+			box-shadow: 0 4px 12px rgba(121, 121, 121, 0.4);
+		}
+
+		.dark .interactive-button-secondary:hover {
+			box-shadow: 0 8px 20px rgba(121, 121, 121, 0.6);
+		}
+	</style>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Add loading state to submit button on form submission
+			const form = document.querySelector('form');
+			const submitButton = form?.querySelector('button[type="submit"]');
+			
+			if (form && submitButton) {
+				form.addEventListener('submit', function() {
+					submitButton.classList.add('loading');
+					submitButton.disabled = true;
+				});
+			}
+		});
+	</script>
 </x-app-layout>

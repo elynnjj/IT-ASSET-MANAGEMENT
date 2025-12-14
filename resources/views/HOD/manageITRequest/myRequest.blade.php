@@ -13,14 +13,13 @@
 					{{-- Add Request Button --}}
 					<div class="mb-6 flex justify-end">
 						<a href="{{ route('hod.submit-it-request') }}" 
-						class="inline-flex items-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90"
-						style="background-color: #4BA9C2;"
-						onmouseover="this.style.backgroundColor='#3a8ba5'"
-						onmouseout="this.style.backgroundColor='#4BA9C2'">
-							<svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-							</svg>
-							{{ __('New Request') }}
+						class="interactive-button interactive-button-primary">
+							<span class="button-content">
+								<svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+								</svg>
+								{{ __('New Request') }}
+							</span>
 						</a>
 					</div>
 
@@ -75,18 +74,18 @@
 										<td class="px-4 py-4">
 											<div class="flex items-center justify-center space-x-2">
 												@if($request->status === 'Pending IT')
-													<form action="{{ route('hod.it-requests.destroy', $request->requestID) }}" method="POST" class="inline" onsubmit="return confirm('Delete this request?');">
+													<form action="{{ route('hod.it-requests.destroy', $request->requestID) }}" method="POST" class="inline delete-form">
 														@csrf
 														@method('DELETE')
 														<button type="submit" 
-															class="inline-flex items-center justify-center px-4 py-2 rounded-md border transition"
-															style="border-color: #4BA9C2; color: #4BA9C2; background-color: white;"
-															onmouseover="this.style.backgroundColor='#f0f9ff'"
-															onmouseout="this.style.backgroundColor='white'"
+															class="interactive-button interactive-button-delete"
 															title="{{ __('Delete') }}">
-															<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-																<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-															</svg>
+															<span class="button-content">
+																<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+																</svg>
+																<span class="button-spinner"></span>
+															</span>
 														</button>
 													</form>
 												@endif
@@ -113,4 +112,179 @@
 			</div>
 		</div>
 	</div>
+
+	<style>
+		/* Interactive button styling */
+		.interactive-button {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 14px 28px;
+			font-weight: 600;
+			font-size: 13px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			overflow: hidden;
+			text-decoration: none;
+		}
+
+		.interactive-button-primary {
+			background: linear-gradient(135deg, #4BA9C2 0%, #3a8ba5 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.3);
+		}
+
+		.interactive-button-primary::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-primary:hover {
+			background: linear-gradient(135deg, #3a8ba5 0%, #2d6b82 100%);
+			box-shadow: 0 8px 20px rgba(75, 169, 194, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-primary:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-primary:active {
+			background: linear-gradient(135deg, #2d6b82 0%, #1f5a6f 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(75, 169, 194, 0.3);
+		}
+
+		.interactive-button-delete {
+			background: linear-gradient(135deg, #B40814 0%, #A10712 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(180, 8, 20, 0.3);
+			padding: 10px 16px;
+		}
+
+		.interactive-button-delete::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-delete:hover {
+			background: linear-gradient(135deg, #A10712 0%, #990610 100%);
+			box-shadow: 0 8px 20px rgba(180, 8, 20, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-delete:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-delete:active {
+			background: linear-gradient(135deg, #990610 0%, #86050E 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(180, 8, 20, 0.3);
+		}
+
+		.button-content {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			position: relative;
+			z-index: 1;
+		}
+
+		.button-spinner {
+			display: none;
+			width: 16px;
+			height: 16px;
+			border: 2px solid rgba(255, 255, 255, 0.3);
+			border-top-color: white;
+			border-radius: 50%;
+			animation: spin 0.8s linear infinite;
+		}
+
+		.interactive-button.loading .button-spinner {
+			display: block;
+		}
+
+		.interactive-button.loading .button-text {
+			opacity: 0.7;
+		}
+
+		.interactive-button:disabled {
+			opacity: 0.7;
+			cursor: not-allowed;
+			transform: none;
+		}
+
+		.interactive-button:disabled:hover {
+			transform: none;
+		}
+
+		@keyframes spin {
+			to { transform: rotate(360deg); }
+		}
+
+		/* Dark mode support for buttons */
+		.dark .interactive-button-primary {
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.4);
+		}
+
+		.dark .interactive-button-primary:hover {
+			box-shadow: 0 8px 20px rgba(75, 169, 194, 0.6);
+		}
+
+		.dark .interactive-button-delete {
+			box-shadow: 0 4px 12px rgba(180, 8, 20, 0.4);
+		}
+
+		.dark .interactive-button-delete:hover {
+			box-shadow: 0 8px 20px rgba(180, 8, 20, 0.6);
+		}
+	</style>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Handle delete button confirmation and loading state
+			const deleteForms = document.querySelectorAll('.delete-form');
+			deleteForms.forEach(form => {
+				const submitButton = form.querySelector('button[type="submit"]');
+				if (submitButton) {
+					form.addEventListener('submit', function(e) {
+						// Show confirmation dialog
+						if (!confirm('Delete this request?')) {
+							// User cancelled - prevent form submission
+							e.preventDefault();
+							return false;
+						}
+						// User confirmed - add loading state
+						submitButton.classList.add('loading');
+						submitButton.disabled = true;
+					});
+				}
+			});
+		});
+	</script>
 </x-app-layout>
