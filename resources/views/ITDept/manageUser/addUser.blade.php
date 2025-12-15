@@ -33,24 +33,14 @@
 						<form action="{{ route('itdept.manage-users.store') }}" method="POST">
 							@csrf
 							<div class="space-y-5">
-								{{-- Row 1: Username and Password --}}
-								<div class="grid grid-cols-2 gap-4">
-									<div>
-										<x-input-label for="userID" :value="__('Username')" />
-										<x-text-input id="userID" name="userID" type="text" 
-											class="mt-1 block w-full" 
-											placeholder="Enter username"
-											required />
-										<x-input-error :messages="$errors->get('userID')" class="mt-2" />
-									</div>
-									<div>
-										<x-input-label for="password" :value="__('Password')" />
-										<x-text-input id="password" name="password" type="password" 
-											class="mt-1 block w-full" 
-											placeholder="Enter password"
-											required />
-										<x-input-error :messages="$errors->get('password')" class="mt-2" />
-									</div>
+								{{-- Row 1: Username --}}
+								<div>
+									<x-input-label for="userID" :value="__('Username')" />
+									<x-text-input id="userID" name="userID" type="text" 
+										class="mt-1 block w-full" 
+										placeholder="Enter username"
+										required />
+									<x-input-error :messages="$errors->get('userID')" class="mt-2" />
 								</div>
 
 								{{-- Row 2: Full Name --}}

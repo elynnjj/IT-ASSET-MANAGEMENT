@@ -27,6 +27,7 @@ class User extends Authenticatable
 		'department',
 		'role',
 		'accStat',
+		'firstLogin',
 	];
 
 	/**

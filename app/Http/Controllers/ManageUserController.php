@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Notifications\NewUserWelcomeNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\View\View;
 
@@ -67,18 +69,25 @@ class ManageUserController
 			'userID' => ['required', 'string', 'max:255', 'unique:users,userID'],
 			'fullName' => ['required', 'string', 'max:255'],
 			'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-			'password' => ['required', 'string', 'min:8'],
 			'department' => ['required', 'string', 'max:255'],
 			'role' => ['required', 'in:Employee,HOD'],
 		]);
 
-		$payload = $validated;
-		$payload['accStat'] = 'active';
+		// Generate temporary password
+		$temporaryPassword = Str::random(12);
 
-		User::create($payload);
+		$payload = $validated;
+		$payload['password'] = $temporaryPassword;
+		$payload['accStat'] = 'active';
+		$payload['firstLogin'] = true;
+
+		$user = User::create($payload);
+
+		// Send welcome email with temporary password
+		$user->notify(new NewUserWelcomeNotification($temporaryPassword));
 
 		return redirect()->route('itdept.manage-users.index', ['role' => $validated['role']])
-			->with('status', 'User created');
+			->with('status', 'User created successfully. A welcome email with temporary password has been sent.');
 	}
 
 	public function edit(string $userID): View
@@ -138,14 +147,14 @@ class ManageUserController
 
 	public function downloadTemplate(): StreamedResponse
 	{
-		$headers = ['userID','fullName','email','password','department','role'];
+		$headers = ['userID','fullName','email','department','role'];
 		$filename = 'user_import_template.csv';
 
 		return response()->streamDownload(function () use ($headers) {
 			$output = fopen('php://output', 'w');
 			fputcsv($output, $headers);
-			// Example row
-			fputcsv($output, ['jdoe','John Doe','john@example.com','Password123','IT','Employee']);
+			// Example row (password will be auto-generated)
+			fputcsv($output, ['jdoe','John Doe','john@example.com','IT','Employee']);
 			fclose($output);
 		}, $filename, [
 			'Content-Type' => 'text/csv',
@@ -171,14 +180,20 @@ class ManageUserController
 			return back()->withErrors(['file' => 'Empty CSV file']);
 		}
 
-		$created = 0; $updated = 0; $skipped = 0; $errors = 0;
+		// Normalize headers (trim whitespace)
+		$header = array_map('trim', $header);
+
+		$created = 0; $skipped = 0; $errors = 0;
 
 		while (($row = fgetcsv($handle)) !== false) {
 			$data = array_combine($header, $row);
 			if (!$data) { $skipped++; continue; }
 
-			// Basic per-row validation
-			if (!isset($data['userID'],$data['fullName'],$data['email'],$data['password'],$data['department'],$data['role'])) {
+			// Trim all values
+			$data = array_map('trim', $data);
+
+			// Basic per-row validation (password no longer required)
+			if (!isset($data['userID'],$data['fullName'],$data['email'],$data['department'],$data['role'])) {
 				$skipped++; continue;
 			}
 			if (!in_array($data['role'], ['Employee','HOD'], true)) { $skipped++; continue; }
@@ -190,15 +205,23 @@ class ManageUserController
 					continue;
 				}
 
+				// Generate temporary password
+				$temporaryPassword = Str::random(12);
+
 				$user = new User();
 				$user->userID = $data['userID'];
 				$user->fullName = $data['fullName'];
 				$user->email = $data['email'];
-				$user->password = $data['password'];
+				$user->password = $temporaryPassword;
 				$user->department = $data['department'];
 				$user->role = $data['role'];
 				$user->accStat = 'active';
+				$user->firstLogin = true;
 				$user->save();
+
+				// Send welcome email with temporary password
+				$user->notify(new NewUserWelcomeNotification($temporaryPassword));
+
 				$created++;
 			} catch (\Throwable $e) {
 				$errors++;
@@ -207,7 +230,7 @@ class ManageUserController
 
 		fclose($handle);
 
-		return back()->with('status', "Imported: $created created, $skipped skipped (existing), $errors errors");
+		return back()->with('status', "Imported: $created created, $skipped skipped (existing), $errors errors. Welcome emails sent to new users.");
 	}
 }
 

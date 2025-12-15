@@ -45,6 +45,10 @@ Route::middleware('auth')->group(function () {
 
     Volt::route('confirm-password', 'pages.auth.confirm-password')
         ->name('password.confirm');
+
+    // Force password change routes (for first login)
+    Route::get('password/change', [ManageLoginController::class, 'showChangePasswordForm'])->name('password.change');
+    Route::post('password/change', [ManageLoginController::class, 'changePassword'])->name('password.change.update');
 });
 
 // Logout route

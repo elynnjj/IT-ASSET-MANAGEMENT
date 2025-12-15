@@ -61,6 +61,11 @@ class ManageLoginController
 
         $request->session()->regenerate();
 
+        // Check if user must change password on first login
+        if ($user && $user->firstLogin) {
+            return redirect()->route('password.change');
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
@@ -179,6 +184,46 @@ class ManageLoginController
         }
 
         return redirect()->route('login')->with('status', __($status));
+    }
+
+    /**
+     * Display the force password change form.
+     */
+    public function showChangePasswordForm(): View
+    {
+        $user = Auth::user();
+        
+        if (!$user || !$user->firstLogin) {
+            return redirect()->route('dashboard');
+        }
+
+        return view('manageLogin.changePassword');
+    }
+
+    /**
+     * Handle an incoming password change request (for first login).
+     */
+    public function changePassword(Request $request): RedirectResponse
+    {
+        $user = Auth::user();
+        
+        if (!$user || !$user->firstLogin) {
+            return redirect()->route('dashboard');
+        }
+
+        $request->validate([
+            'current_password' => ['required', 'string', 'current_password'],
+            'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+        ]);
+
+        // Update password and clear firstLogin flag
+        $user->forceFill([
+            'password' => Hash::make($request->password),
+            'firstLogin' => false,
+        ])->save();
+
+        return redirect()->route('dashboard')
+            ->with('status', 'Password changed successfully. You can now access the system.');
     }
 }
 
