@@ -59,10 +59,10 @@
 						<form action="{{ route('hod.it-requests.store') }}" method="POST">
 							@csrf
 
-							<div class="space-y-5">
+							<div class="space-y-4">
 								{{-- Request Date --}}
 								<div class="input-container">
-									<x-input-label for="requestDate" :value="__('Request Date')" />
+									<x-input-label for="requestDate" :value="__('Request Date')" class="text-[15px]" />
 									<x-text-input id="requestDate" name="requestDate" type="date" 
 										class="mt-1 block w-full interactive-input" 
 										value="{{ old('requestDate', date('Y-m-d')) }}"
@@ -72,7 +72,7 @@
 
 								{{-- Request Title --}}
 								<div class="input-container">
-									<x-input-label for="title" :value="__('Request Title')" />
+									<x-input-label for="title" :value="__('Request Title')" class="text-[15px]" />
 									<x-text-input id="title" name="title" type="text" 
 										class="mt-1 block w-full interactive-input" 
 										placeholder="Enter a brief title for your request"
@@ -83,7 +83,7 @@
 
 								{{-- Request Description --}}
 								<div class="input-container">
-									<x-input-label for="requestDesc" :value="__('Request Description')" />
+									<x-input-label for="requestDesc" :value="__('Request Description')" class="text-[15px]" />
 									<textarea id="requestDesc" name="requestDesc" 
 										rows="5"
 										class="mt-1 block w-full interactive-textarea"
@@ -96,13 +96,15 @@
 							{{-- Buttons --}}
 							<div class="flex items-center justify-end space-x-6 mt-6">
 								<a href="{{ route('hod.my-requests') }}" 
-								   class="interactive-button interactive-button-secondary">
+								   class="interactive-button interactive-button-secondary"
+								   style="padding: 10px 16px; font-size: 11px;">
 									<span class="button-content">
-									{{ __('Cancel') }}
+										{{ __('Cancel') }}
 									</span>
 								</a>
 								<button type="submit" 
-									class="interactive-button interactive-button-primary">
+									class="interactive-button interactive-button-primary"
+									style="padding: 10px 16px; font-size: 11px;">
 									<span class="button-content">
 										<span class="button-text">{{ __('Submit Request') }}</span>
 										<span class="button-spinner"></span>
@@ -136,8 +138,8 @@
 		.interactive-input,
 		.interactive-textarea {
 			width: 100%;
-			padding: 14px;
-			border: 2px solid #E5E7EB;
+			padding: 8px 12px;
+			border: 2px solid #9CA3AF;
 			border-radius: 8px;
 			font-size: 15px;
 			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -145,11 +147,20 @@
 			position: relative;
 		}
 
+		@media (prefers-color-scheme: dark) {
+			.interactive-input,
+			.interactive-textarea {
+				background-color: #111827;
+				border-color: #6B7280;
+				color: #D1D5DB;
+			}
+		}
+
 		.dark .interactive-input,
 		.dark .interactive-textarea {
-			background-color: rgba(55, 65, 81, 0.8);
-			border-color: #4B5563;
-			color: #F9FAFB;
+			background-color: #111827;
+			border-color: #6B7280;
+			color: #D1D5DB;
 		}
 
 		.interactive-input:hover,
@@ -160,11 +171,20 @@
 			background-color: #FAFAFA;
 		}
 
+		@media (prefers-color-scheme: dark) {
+			.interactive-input:hover,
+			.interactive-textarea:hover {
+				border-color: #4BA9C2;
+				box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+				background-color: #1F2937;
+			}
+		}
+
 		.dark .interactive-input:hover,
 		.dark .interactive-textarea:hover {
 			border-color: #4BA9C2;
 			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
-			background-color: rgba(55, 65, 81, 0.95);
+			background-color: #1F2937;
 		}
 
 		.interactive-input:focus,
@@ -176,11 +196,22 @@
 			transform: translateY(-2px);
 		}
 
+		@media (prefers-color-scheme: dark) {
+			.interactive-input:focus,
+			.interactive-textarea:focus {
+				border-color: #4BA9C2;
+				box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+				background-color: #111827;
+				color: #D1D5DB;
+			}
+		}
+
 		.dark .interactive-input:focus,
 		.dark .interactive-textarea:focus {
 			border-color: #4BA9C2;
 			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
-			background-color: rgba(55, 65, 81, 1);
+			background-color: #111827;
+			color: #D1D5DB;
 		}
 
 		.interactive-textarea {
@@ -193,9 +224,7 @@
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
-			padding: 14px 28px;
 			font-weight: 600;
-			font-size: 13px;
 			text-transform: uppercase;
 			letter-spacing: 0.5px;
 			border: none;

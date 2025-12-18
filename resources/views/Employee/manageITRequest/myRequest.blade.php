@@ -13,9 +13,10 @@
 					{{-- Add Request Button --}}
 					<div class="mb-6 flex justify-end">
 						<a href="{{ route('employee.submit-it-request') }}" 
-						class="interactive-button interactive-button-primary">
+						class="interactive-button interactive-button-primary"
+						style="padding: 10px 16px; font-size: 11px;">
 							<span class="button-content">
-								<svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<svg class="w-3 h-3 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
 								</svg>
 								{{ __('New Request') }}
@@ -45,21 +46,21 @@
 						<table class="table-auto w-full border border-gray-300 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
 							<thead class="bg-gray-100 dark:bg-gray-700">
 								<tr>
-									<th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Request Date') }}</th>
-									<th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 w-64">{{ __('Request Title') }}</th>
-									<th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Request Description') }}</th>
-									<th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Status') }}</th>
-									<th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 w-64">{{ __('HOD Name') }}</th>
-									<th class="px-4 py-4 text-center text-sm font-semibold text-gray-700 dark:text-gray-200 w-auto">{{ __('Action') }}</th>
+									<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Request Date') }}</th>
+									<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 w-64">{{ __('Request Title') }}</th>
+									<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Request Description') }}</th>
+									<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Status') }}</th>
+									<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 w-64">{{ __('HOD Name') }}</th>
+									<th class="px-3 py-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-200 w-auto">{{ __('Action') }}</th>
 								</tr>
 							</thead>
 							<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
 								@forelse ($requests as $request)
 									<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 {{ $loop->even ? 'bg-gray-50/50 dark:bg-gray-800/30' : 'bg-white dark:bg-gray-800' }}">
-										<td class="px-8 py-4">{{ \Carbon\Carbon::parse($request->requestDate)->format('d/m/y') }}</td>
-										<td class="px-8 py-4">{{ $request->title }}</td>
-										<td class="px-8 py-4">{{ $request->requestDesc }}</td>
-										<td class="px-8 py-4">
+										<td class="px-4 py-2 text-sm">{{ \Carbon\Carbon::parse($request->requestDate)->format('d/m/y') }}</td>
+										<td class="px-4 py-2 text-sm">{{ $request->title }}</td>
+										<td class="px-4 py-2 text-sm">{{ $request->requestDesc }}</td>
+										<td class="px-4 py-2">
 											@php
 												$statusColors = [
 													'Pending' => 'text-yellow-600',
@@ -74,15 +75,16 @@
 												{{ $request->status }}
 											</span>
 										</td>
-										<td class="px-8 py-4">{{ $request->approver ? $request->approver->fullName : 'N/A' }}</td>
-										<td class="px-4 py-4">
-											<div class="flex items-center justify-center space-x-2">
+										<td class="px-4 py-2 text-sm">{{ $request->approver ? $request->approver->fullName : 'N/A' }}</td>
+										<td class="px-3 py-2">
+											<div class="flex items-center justify-center gap-1">
 												@if($request->status === 'Pending')
 													<form action="{{ route('employee.it-requests.destroy', $request->requestID) }}" method="POST" class="inline delete-form">
 														@csrf
 														@method('DELETE')
 														<button type="submit" 
 															class="interactive-button interactive-button-delete"
+															style="padding: 6px 12px; font-size: 11px;"
 															title="{{ __('Delete') }}">
 															<span class="button-content">
 																<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,7 +100,7 @@
 									</tr>
 								@empty
 									<tr>
-										<td colspan="6" class="px-8 py-6 text-center text-gray-500">
+										<td colspan="6" class="px-4 py-4 text-center text-sm text-gray-500">
 											No requests found.
 										</td>
 									</tr>
@@ -123,9 +125,7 @@
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
-			padding: 14px 28px;
 			font-weight: 600;
-			font-size: 13px;
 			text-transform: uppercase;
 			letter-spacing: 0.5px;
 			border: none;
@@ -177,7 +177,6 @@
 			background: linear-gradient(135deg, #B40814 0%, #A10712 100%);
 			color: white;
 			box-shadow: 0 4px 12px rgba(180, 8, 20, 0.3);
-			padding: 10px 16px;
 		}
 
 		.interactive-button-delete::before {
@@ -276,16 +275,21 @@
 			deleteForms.forEach(form => {
 				const submitButton = form.querySelector('button[type="submit"]');
 				if (submitButton) {
-					form.addEventListener('submit', function(e) {
+					form.addEventListener('submit', async function(e) {
+						e.preventDefault();
+						
 						// Show confirmation dialog
-						if (!confirm('Delete this request?')) {
-							// User cancelled - prevent form submission
-							e.preventDefault();
-							return false;
+						const confirmed = await window.showConfirmation(
+							'Delete this request?',
+							'Delete Request'
+						);
+						
+						if (confirmed) {
+							// User confirmed - add loading state and submit
+							submitButton.classList.add('loading');
+							submitButton.disabled = true;
+							form.submit();
 						}
-						// User confirmed - add loading state
-						submitButton.classList.add('loading');
-						submitButton.disabled = true;
 					});
 				}
 			});

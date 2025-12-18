@@ -18,7 +18,8 @@
 								
 								{{-- Status dropdown --}}
 								<select name="status" 
-										class="rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+										class="interactive-select"
+										style="padding: 8px 32px 8px 12px; font-size: 13px;"
 										onchange="this.form.submit()">
 									<option value="">{{ __('All Status') }}</option>
 									<option value="Pending" @selected(request('status') === 'Pending')>{{ __('Pending') }}</option>
@@ -52,24 +53,24 @@
 						<table class="table-auto w-full border border-gray-300 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
 							<thead class="bg-gray-100 dark:bg-gray-700">
 								<tr>
-									<th class="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 10%;">{{ __('Request Date') }}</th>
-									<th class="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 12%;">{{ __('Requester Name') }}</th>
-									<th class="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 10%;">{{ __('Asset ID') }}</th>
-									<th class="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 15%;">{{ __('Request Title') }}</th>
-									<th class="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 30%;">{{ __('Request Description') }}</th>
-									<th class="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 10%;">{{ __('Status') }}</th>
-									<th class="px-4 py-4 text-center text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 13%;">{{ __('Action') }}</th>
+									<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 10%;">{{ __('Request Date') }}</th>
+									<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 12%;">{{ __('Requester Name') }}</th>
+									<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 10%;">{{ __('Asset ID') }}</th>
+									<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 15%;">{{ __('Request Title') }}</th>
+									<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 30%;">{{ __('Request Description') }}</th>
+									<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 10%;">{{ __('Status') }}</th>
+									<th class="px-3 py-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 13%;">{{ __('Action') }}</th>
 								</tr>
 							</thead>
 							<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
 								@forelse ($requests as $request)
 									<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 {{ $loop->even ? 'bg-gray-50/50 dark:bg-gray-800/30' : 'bg-white dark:bg-gray-800' }}">
-										<td class="px-4 py-4">{{ \Carbon\Carbon::parse($request->requestDate)->format('d/m/y') }}</td>
-										<td class="px-4 py-4">{{ $request->requester->fullName ?? 'N/A' }}</td>
-										<td class="px-4 py-4">{{ $request->asset ? $request->asset->assetID : 'N/A' }}</td>
-										<td class="px-4 py-4">{{ $request->title }}</td>
-										<td class="px-4 py-4">{{ $request->requestDesc }}</td>
-										<td class="px-8 py-4">
+										<td class="px-4 py-2 text-sm">{{ \Carbon\Carbon::parse($request->requestDate)->format('d/m/y') }}</td>
+										<td class="px-4 py-2 text-sm">{{ $request->requester->fullName ?? 'N/A' }}</td>
+										<td class="px-4 py-2 text-sm">{{ $request->asset ? $request->asset->assetID : 'N/A' }}</td>
+										<td class="px-4 py-2 text-sm">{{ $request->title }}</td>
+										<td class="px-4 py-2 text-sm">{{ $request->requestDesc }}</td>
+										<td class="px-4 py-2">
 											@php
 												$statusColors = [
 													'Pending' => 'text-yellow-600',
@@ -84,13 +85,14 @@
 												{{ $request->status }}
 											</span>
 										</td>
-										<td class="px-4 py-4">
-											<div class="flex items-center justify-center space-x-2">
+										<td class="px-3 py-2">
+											<div class="flex items-center justify-center gap-2">
 												@if($request->status === 'Pending')
 													<form action="{{ route('hod.it-requests.approve', $request->requestID) }}" method="POST" class="inline approval-form">
 														@csrf
 														<button type="submit" 
 															class="interactive-button interactive-button-approve"
+															style="padding: 6px 12px; font-size: 11px;"
 															title="{{ __('Approve') }}">
 															<span class="button-content">
 																<span class="button-text">{{ __('Approve') }}</span>
@@ -102,8 +104,8 @@
 														@csrf
 														<button type="submit" 
 															class="interactive-button interactive-button-reject"
-															title="{{ __('Reject') }}"
-															onclick="return confirm('Are you sure you want to reject this request?');">
+															style="padding: 6px 12px; font-size: 11px;"
+															title="{{ __('Reject') }}">
 															<span class="button-content">
 																<span class="button-text">{{ __('Reject') }}</span>
 																<span class="button-spinner"></span>
@@ -116,7 +118,7 @@
 									</tr>
 								@empty
 									<tr>
-										<td colspan="7" class="px-8 py-6 text-center text-gray-500">
+										<td colspan="7" class="px-4 py-4 text-center text-sm text-gray-500">
 											No requests found.
 										</td>
 									</tr>
@@ -136,14 +138,83 @@
 	</div>
 
 	<style>
+		/* Interactive select styling */
+		.interactive-select {
+			width: 100%;
+			padding: 8px 32px 8px 12px;
+			border: 2px solid #9CA3AF;
+			border-radius: 8px;
+			font-size: 15px;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			background-color: #FFFFFF;
+			position: relative;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-select {
+				background-color: #111827;
+				border-color: #6B7280;
+				color: #D1D5DB;
+			}
+		}
+
+		.dark .interactive-select {
+			background-color: #111827;
+			border-color: #6B7280;
+			color: #D1D5DB;
+		}
+
+		.interactive-select:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.15);
+			transform: translateY(-1px);
+			background-color: #FAFAFA;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-select:hover {
+				border-color: #4BA9C2;
+				box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+				background-color: #1F2937;
+			}
+		}
+
+		.dark .interactive-select:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+			background-color: #1F2937;
+		}
+
+		.interactive-select:focus {
+			outline: none;
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.15), 0 6px 16px rgba(75, 169, 194, 0.2);
+			background-color: #FFFFFF;
+			transform: translateY(-2px);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-select:focus {
+				border-color: #4BA9C2;
+				box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+				background-color: #111827;
+				color: #D1D5DB;
+			}
+		}
+
+		.dark .interactive-select:focus {
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+			background-color: #111827;
+			color: #D1D5DB;
+		}
+
 		/* Interactive button styling */
 		.interactive-button {
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
-			padding: 10px 20px;
 			font-weight: 600;
-			font-size: 12px;
 			text-transform: uppercase;
 			letter-spacing: 0.5px;
 			border: none;
@@ -300,14 +371,24 @@
 				}
 			});
 
-			// Add loading state to reject buttons on form submission
+			// Add confirmation and loading state to reject buttons on form submission
 			const rejectForms = document.querySelectorAll('.rejection-form');
 			rejectForms.forEach(form => {
 				const submitButton = form.querySelector('button[type="submit"]');
 				if (submitButton) {
-					form.addEventListener('submit', function() {
-						submitButton.classList.add('loading');
-						submitButton.disabled = true;
+					form.addEventListener('submit', async function(e) {
+						e.preventDefault();
+						
+						const confirmed = await window.showConfirmation(
+							'Are you sure you want to reject this request?',
+							'Reject Request'
+						);
+						
+						if (confirmed) {
+							submitButton.classList.add('loading');
+							submitButton.disabled = true;
+							form.submit();
+						}
 					});
 				}
 			});

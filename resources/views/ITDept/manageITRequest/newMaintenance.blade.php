@@ -13,19 +13,22 @@
 				<p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
 					{{ __('This maintenance involved hardware changes. Do you want to update asset details now?') }}
 				</p>
-				<div class="flex justify-center space-x-4">
+				<div class="flex justify-center gap-4">
 					<button id="skipBtn" type="button" 
-						class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 transition"
+						class="interactive-button interactive-button-secondary"
+						style="padding: 10px 16px; font-size: 11px;"
 						onclick="submitMaintenance(false)">
-						{{ __('No, Skip') }}
+						<span class="button-content">
+							{{ __('No, Skip') }}
+						</span>
 					</button>
 					<button id="updateBtn" type="button" 
-						class="px-4 py-2 text-white rounded-md transition"
-						style="background-color: #4BA9C2;"
-						onmouseover="this.style.backgroundColor='#3a8ba5'"
-						onmouseout="this.style.backgroundColor='#4BA9C2'"
+						class="interactive-button interactive-button-primary"
+						style="padding: 10px 16px; font-size: 11px;"
 						onclick="submitMaintenance(true)">
-						{{ __('Yes, Update Now') }}
+						<span class="button-content">
+							{{ __('Yes, Update Now') }}
+						</span>
 					</button>
 				</div>
 			</div>
@@ -77,19 +80,18 @@
 						<form id="maintenanceForm" action="{{ route('itdept.store-maintenance') }}" method="POST">
 							@csrf
 							<input type="hidden" name="updateAsset" id="updateAsset" value="0">
-							<div class="space-y-5">
+							<div class="space-y-4">
 								{{-- Asset Type --}}
 								<div>
-									<x-input-label for="assetType" :value="__('Asset Type')" />
+									<x-input-label for="assetType" :value="__('Asset Type')" class="text-[15px]" />
 									<div class="mt-2 space-x-6">
 										@foreach($assetTypes as $type)
-											<label class="inline-flex items-center">
+											<label class="inline-flex items-center interactive-option-label">
 												<input type="radio" name="assetType" value="{{ $type }}" 
-													class="me-2 asset-type-radio"
-													style="accent-color: #4BA9C2;"
+													class="me-2 interactive-radio"
 													required
 													onchange="loadAssetsByType('{{ $type }}')">
-												<span class="text-gray-700 dark:text-gray-300">{{ $type }}</span>
+												<span class="text-gray-700 dark:text-gray-300 text-[15px]">{{ $type }}</span>
 											</label>
 										@endforeach
 									</div>
@@ -97,10 +99,10 @@
 								</div>
 
 								{{-- Asset ID --}}
-								<div>
-									<x-input-label for="assetID" :value="__('Asset ID')" />
+								<div class="input-container">
+									<x-input-label for="assetID" :value="__('Asset ID')" class="text-[15px]" />
 									<select id="assetID" name="assetID" 
-										class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
+										class="mt-1 block w-full interactive-select"
 										required
 										disabled>
 										<option value="">{{ __('Select Asset Type first') }}</option>
@@ -109,21 +111,21 @@
 								</div>
 
 								{{-- Maintenance Date --}}
-								<div>
-									<x-input-label for="mainDate" :value="__('Maintenance Date')" />
+								<div class="input-container">
+									<x-input-label for="mainDate" :value="__('Maintenance Date')" class="text-[15px]" />
 									<x-text-input id="mainDate" name="mainDate" type="date" 
-										class="mt-1 block w-full" 
+										class="mt-1 block w-full interactive-input" 
 										value="{{ old('mainDate', date('Y-m-d')) }}"
 										required />
 									<x-input-error :messages="$errors->get('mainDate')" class="mt-2" />
 								</div>
 
 								{{-- Maintenance Description --}}
-								<div>
-									<x-input-label for="mainDesc" :value="__('Maintenance Description')" />
+								<div class="input-container">
+									<x-input-label for="mainDesc" :value="__('Maintenance Description')" class="text-[15px]" />
 									<textarea id="mainDesc" name="mainDesc" 
 										rows="5"
-										class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
+										class="mt-1 block w-full interactive-textarea"
 										placeholder="Describe the maintenance work performed..."
 										required>{{ old('mainDesc') }}</textarea>
 									<x-input-error :messages="$errors->get('mainDesc')" class="mt-2" />
@@ -131,13 +133,12 @@
 
 								{{-- Hardware Changes Checkbox --}}
 								<div>
-									<label class="inline-flex items-center">
+									<label class="inline-flex items-center interactive-option-label">
 										<input type="checkbox" 
 											name="hardwareChanges" 
 											id="hardwareChangesCheckbox"
-											class="rounded border-gray-300 dark:border-gray-700 dark:bg-gray-900 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
-											style="accent-color: #4BA9C2;">
-										<span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Does this maintenance include hardware changes?') }}</span>
+											class="me-2 interactive-checkbox">
+										<span class="text-sm text-gray-600 dark:text-gray-400">{{ __('Does this maintenance include hardware changes?') }}</span>
 									</label>
 								</div>
 							</div>
@@ -145,19 +146,20 @@
 							{{-- Buttons --}}
 							<div class="flex items-center justify-end space-x-6 mt-6">
 								<a href="{{ route('itdept.repairs-maintenance') }}" 
-									class="inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90"
-									style="background-color: #797979;"
-									onmouseover="this.style.backgroundColor='#666666'"
-									onmouseout="this.style.backgroundColor='#797979'">
-									{{ __('Cancel') }}
+									class="interactive-button interactive-button-secondary"
+									style="padding: 10px 16px; font-size: 11px;">
+									<span class="button-content">
+										{{ __('Cancel') }}
+									</span>
 								</a>
 								<button type="button" 
 									id="submitMaintenanceBtn"
-									class="inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90"
-									style="background-color: #4BA9C2;"
-									onmouseover="this.style.backgroundColor='#3a8ba5'"
-									onmouseout="this.style.backgroundColor='#4BA9C2'">
-									{{ __('Submit Maintenance') }}
+									class="interactive-button interactive-button-primary"
+									style="padding: 10px 16px; font-size: 11px;">
+									<span class="button-content">
+										<span class="button-text">{{ __('Submit Maintenance') }}</span>
+										<span class="button-spinner"></span>
+									</span>
 								</button>
 							</div>
 						</form>
@@ -249,4 +251,505 @@
 			document.getElementById('maintenanceForm').submit();
 		}
 	</script>
+
+	<style>
+		/* Input container with hover effects */
+		.input-container {
+			position: relative;
+			transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		}
+
+		.input-container:hover {
+			transform: translateY(-1px);
+		}
+
+		.input-container:has(.interactive-input:focus),
+		.input-container:has(.interactive-select:focus),
+		.input-container:has(.interactive-textarea:focus) {
+			transform: translateY(-2px);
+		}
+
+		/* Interactive input styling */
+		.interactive-input,
+		.interactive-textarea {
+			width: 100%;
+			padding: 8px 12px;
+			border: 2px solid #9CA3AF;
+			border-radius: 8px;
+			font-size: 15px;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			background-color: #FFFFFF;
+			position: relative;
+		}
+
+		.interactive-textarea {
+			resize: vertical;
+			min-height: 120px;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-input,
+			.interactive-textarea {
+				background-color: #111827;
+				border-color: #6B7280;
+				color: #D1D5DB;
+			}
+		}
+
+		.dark .interactive-input,
+		.dark .interactive-textarea {
+			background-color: #111827;
+			border-color: #6B7280;
+			color: #D1D5DB;
+		}
+
+		.interactive-input:hover,
+		.interactive-textarea:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.15);
+			transform: translateY(-1px);
+			background-color: #FAFAFA;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-input:hover,
+			.interactive-textarea:hover {
+				border-color: #4BA9C2;
+				box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+				background-color: #1F2937;
+			}
+		}
+
+		.dark .interactive-input:hover,
+		.dark .interactive-textarea:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+			background-color: #1F2937;
+		}
+
+		.interactive-input:focus,
+		.interactive-textarea:focus {
+			outline: none;
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.15), 0 6px 16px rgba(75, 169, 194, 0.2);
+			background-color: #FFFFFF;
+			transform: translateY(-2px);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-input:focus,
+			.interactive-textarea:focus {
+				border-color: #4BA9C2;
+				box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+				background-color: #111827;
+				color: #D1D5DB;
+			}
+		}
+
+		.dark .interactive-input:focus,
+		.dark .interactive-textarea:focus {
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+			background-color: #111827;
+			color: #D1D5DB;
+		}
+
+		.interactive-input:disabled {
+			background-color: #F3F4F6;
+			border-color: #D1D5DB;
+			color: #6B7280;
+			cursor: not-allowed;
+			opacity: 0.7;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-input:disabled {
+				background-color: #1F2937;
+				border-color: #374151;
+				color: #9CA3AF;
+			}
+		}
+
+		.dark .interactive-input:disabled {
+			background-color: #1F2937;
+			border-color: #374151;
+			color: #9CA3AF;
+		}
+
+		.interactive-input:disabled:hover {
+			transform: none;
+			box-shadow: none;
+			border-color: #D1D5DB;
+		}
+
+		/* Interactive select styling */
+		.interactive-select {
+			width: 100%;
+			padding: 8px 32px 8px 12px;
+			border: 2px solid #9CA3AF;
+			border-radius: 8px;
+			font-size: 15px;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			background-color: #FFFFFF;
+			position: relative;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-select {
+				background-color: #111827;
+				border-color: #6B7280;
+				color: #D1D5DB;
+			}
+		}
+
+		.dark .interactive-select {
+			background-color: #111827;
+			border-color: #6B7280;
+			color: #D1D5DB;
+		}
+
+		.interactive-select:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.15);
+			transform: translateY(-1px);
+			background-color: #FAFAFA;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-select:hover {
+				border-color: #4BA9C2;
+				box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+				background-color: #1F2937;
+			}
+		}
+
+		.dark .interactive-select:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+			background-color: #1F2937;
+		}
+
+		.interactive-select:focus {
+			outline: none;
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.15), 0 6px 16px rgba(75, 169, 194, 0.2);
+			background-color: #FFFFFF;
+			transform: translateY(-2px);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-select:focus {
+				border-color: #4BA9C2;
+				box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+				background-color: #111827;
+				color: #D1D5DB;
+			}
+		}
+
+		.dark .interactive-select:focus {
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+			background-color: #111827;
+			color: #D1D5DB;
+		}
+
+		.interactive-select:disabled {
+			background-color: #F3F4F6;
+			border-color: #D1D5DB;
+			color: #6B7280;
+			cursor: not-allowed;
+			opacity: 0.7;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-select:disabled {
+				background-color: #1F2937;
+				border-color: #374151;
+				color: #9CA3AF;
+			}
+		}
+
+		.dark .interactive-select:disabled {
+			background-color: #1F2937;
+			border-color: #374151;
+			color: #9CA3AF;
+		}
+
+		.interactive-select:disabled:hover {
+			transform: none;
+			box-shadow: none;
+			border-color: #D1D5DB;
+		}
+
+		/* Interactive button styling */
+		.interactive-button {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			overflow: hidden;
+			text-decoration: none;
+		}
+
+		.interactive-button-primary {
+			background: linear-gradient(135deg, #4BA9C2 0%, #3a8ba5 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.3);
+		}
+
+		.interactive-button-primary::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-primary:hover {
+			background: linear-gradient(135deg, #3a8ba5 0%, #2d6b82 100%);
+			box-shadow: 0 8px 20px rgba(75, 169, 194, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-primary:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-primary:active {
+			background: linear-gradient(135deg, #2d6b82 0%, #1f5a6f 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(75, 169, 194, 0.3);
+		}
+
+		.interactive-button-secondary {
+			background: linear-gradient(135deg, #797979 0%, #666666 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(121, 121, 121, 0.3);
+		}
+
+		.interactive-button-secondary::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-secondary:hover {
+			background: linear-gradient(135deg, #666666 0%, #555555 100%);
+			box-shadow: 0 8px 20px rgba(121, 121, 121, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-secondary:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-secondary:active {
+			background: linear-gradient(135deg, #555555 0%, #444444 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(121, 121, 121, 0.3);
+		}
+
+		.button-content {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			position: relative;
+			z-index: 1;
+		}
+
+		.button-spinner {
+			display: none;
+			width: 18px;
+			height: 18px;
+			border: 2px solid rgba(255, 255, 255, 0.3);
+			border-top-color: white;
+			border-radius: 50%;
+			animation: spin 0.8s linear infinite;
+		}
+
+		.interactive-button.loading .button-spinner {
+			display: block;
+		}
+
+		.interactive-button.loading .button-text {
+			opacity: 0.7;
+		}
+
+		@keyframes spin {
+			to { transform: rotate(360deg); }
+		}
+
+		/* Interactive radio button styling */
+		.interactive-radio {
+			width: 18px;
+			height: 18px;
+			border: 2px solid #9CA3AF;
+			border-radius: 50%;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			appearance: none;
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			background-color: #FFFFFF;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-radio {
+				background-color: #111827;
+				border-color: #6B7280;
+			}
+		}
+
+		.dark .interactive-radio {
+			background-color: #111827;
+			border-color: #6B7280;
+		}
+
+		.interactive-radio:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 2px 8px rgba(75, 169, 194, 0.15);
+			transform: scale(1.05);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-radio:hover {
+				background-color: #1F2937;
+			}
+		}
+
+		.dark .interactive-radio:hover {
+			background-color: #1F2937;
+		}
+
+		.interactive-radio:checked {
+			background-color: #4BA9C2;
+			border-color: #4BA9C2;
+		}
+
+		.interactive-radio:checked::after {
+			content: '';
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background-color: white;
+		}
+
+		.interactive-radio:focus {
+			outline: none;
+			box-shadow: 0 0 0 3px rgba(75, 169, 194, 0.2);
+		}
+
+		/* Interactive checkbox styling */
+		.interactive-checkbox {
+			width: 18px;
+			height: 18px;
+			border: 2px solid #9CA3AF;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			appearance: none;
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			background-color: #FFFFFF;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-checkbox {
+				background-color: #111827;
+				border-color: #6B7280;
+			}
+		}
+
+		.dark .interactive-checkbox {
+			background-color: #111827;
+			border-color: #6B7280;
+		}
+
+		.interactive-checkbox:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 2px 8px rgba(75, 169, 194, 0.15);
+			transform: scale(1.05);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-checkbox:hover {
+				background-color: #1F2937;
+			}
+		}
+
+		.dark .interactive-checkbox:hover {
+			background-color: #1F2937;
+		}
+
+		.interactive-checkbox:checked {
+			background-color: #4BA9C2;
+			border-color: #4BA9C2;
+		}
+
+		.interactive-checkbox:checked::after {
+			content: '✓';
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+			color: white;
+			font-size: 12px;
+			font-weight: bold;
+		}
+
+		.interactive-checkbox:focus {
+			outline: none;
+			box-shadow: 0 0 0 3px rgba(75, 169, 194, 0.2);
+		}
+
+		/* Interactive option label hover effect */
+		.interactive-option-label {
+			cursor: pointer;
+			transition: color 0.2s ease;
+			padding: 4px 8px;
+			border-radius: 4px;
+		}
+
+		.interactive-option-label:hover {
+			color: #4BA9C2;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-option-label:hover {
+				color: #4BA9C2;
+			}
+		}
+
+		.dark .interactive-option-label:hover {
+			color: #4BA9C2;
+		}
+	</style>
 </x-app-layout>

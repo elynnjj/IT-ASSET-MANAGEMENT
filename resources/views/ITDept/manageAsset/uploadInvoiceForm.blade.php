@@ -37,9 +37,9 @@
 								<div class="input-container">
 									<x-input-label for="invoiceFile" :value="__('Invoice File')" />
 									<div class="custom-file-input-wrapper mt-1">
-										<input type="file" id="invoiceFile" name="invoiceFile" accept=".pdf,.jpg,.jpeg,.png" 
+									<input type="file" id="invoiceFile" name="invoiceFile" accept=".pdf,.jpg,.jpeg,.png" 
 											class="hidden-file-input"
-											required />
+										required />
 										<button type="button" class="file-select-button" onclick="document.getElementById('invoiceFile').click()">
 											{{ __('Choose File') }}
 										</button>
@@ -108,7 +108,7 @@
 							   class="interactive-button interactive-button-secondary"
 							   style="padding: 10px 16px; font-size: 11px;">
 								<span class="button-content">
-									{{ __('Cancel') }}
+								{{ __('Cancel') }}
 								</span>
 							</a>
 							<button type="submit" 

@@ -6,22 +6,29 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.update-profile-information-form />
-                </div>
-            </div>
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            {{-- Main Content Card --}}
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    {{-- Title --}}
+                    <div class="mb-6">
+                        <h1 class="text-xl font-semibold">{{ __('Profile') }}</h1>
+                    </div>
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.update-password-form />
-                </div>
-            </div>
+                    {{-- Profile Information Section --}}
+                    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+                        <livewire:profile.update-profile-information-form />
+                    </div>
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.delete-user-form />
+                    {{-- Update Password Section --}}
+                    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+                        <livewire:profile.update-password-form />
+                    </div>
+
+                    {{-- Delete Account Section --}}
+                    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+                        <livewire:profile.delete-user-form />
+                    </div>
                 </div>
             </div>
         </div>
@@ -47,8 +54,8 @@
         .interactive-input,
         .interactive-textarea {
             width: 100%;
-            padding: 14px;
-            border: 2px solid #E5E7EB;
+            padding: 8px 12px;
+            border: 2px solid #9CA3AF;
             border-radius: 8px;
             font-size: 15px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -56,11 +63,20 @@
             position: relative;
         }
 
+        @media (prefers-color-scheme: dark) {
+            .interactive-input,
+            .interactive-textarea {
+                background-color: #111827;
+                border-color: #6B7280;
+                color: #D1D5DB;
+            }
+        }
+
         .dark .interactive-input,
         .dark .interactive-textarea {
-            background-color: rgba(55, 65, 81, 0.8);
-            border-color: #4B5563;
-            color: #F9FAFB;
+            background-color: #111827;
+            border-color: #6B7280;
+            color: #D1D5DB;
         }
 
         .interactive-input:hover,
@@ -71,11 +87,20 @@
             background-color: #FAFAFA;
         }
 
+        @media (prefers-color-scheme: dark) {
+            .interactive-input:hover,
+            .interactive-textarea:hover {
+                border-color: #4BA9C2;
+                box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+                background-color: #1F2937;
+            }
+        }
+
         .dark .interactive-input:hover,
         .dark .interactive-textarea:hover {
             border-color: #4BA9C2;
             box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
-            background-color: rgba(55, 65, 81, 0.95);
+            background-color: #1F2937;
         }
 
         .interactive-input:focus,
@@ -87,11 +112,22 @@
             transform: translateY(-2px);
         }
 
+        @media (prefers-color-scheme: dark) {
+            .interactive-input:focus,
+            .interactive-textarea:focus {
+                border-color: #4BA9C2;
+                box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+                background-color: #111827;
+                color: #D1D5DB;
+            }
+        }
+
         .dark .interactive-input:focus,
         .dark .interactive-textarea:focus {
             border-color: #4BA9C2;
             box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
-            background-color: rgba(55, 65, 81, 1);
+            background-color: #111827;
+            color: #D1D5DB;
         }
 
         /* Interactive button styling */
@@ -99,9 +135,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 14px 28px;
             font-weight: 600;
-            font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             border: none;
@@ -287,61 +321,6 @@
             box-shadow: 0 8px 20px rgba(180, 8, 20, 0.6);
         }
 
-        /* Apply interactive styles to all inputs in profile forms */
-        section form input[type="text"],
-        section form input[type="email"],
-        section form input[type="password"] {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #E5E7EB;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background-color: #FFFFFF;
-        }
-
-        .dark section form input[type="text"],
-        .dark section form input[type="email"],
-        .dark section form input[type="password"] {
-            background-color: rgba(55, 65, 81, 0.8);
-            border-color: #4B5563;
-            color: #F9FAFB;
-        }
-
-        section form input[type="text"]:hover,
-        section form input[type="email"]:hover,
-        section form input[type="password"]:hover {
-            border-color: #4BA9C2;
-            box-shadow: 0 4px 12px rgba(75, 169, 194, 0.15);
-            transform: translateY(-1px);
-            background-color: #FAFAFA;
-        }
-
-        .dark section form input[type="text"]:hover,
-        .dark section form input[type="email"]:hover,
-        .dark section form input[type="password"]:hover {
-            border-color: #4BA9C2;
-            box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
-            background-color: rgba(55, 65, 81, 0.95);
-        }
-
-        section form input[type="text"]:focus,
-        section form input[type="email"]:focus,
-        section form input[type="password"]:focus {
-            outline: none;
-            border-color: #4BA9C2;
-            box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.15), 0 6px 16px rgba(75, 169, 194, 0.2);
-            background-color: #FFFFFF;
-            transform: translateY(-2px);
-        }
-
-        .dark section form input[type="text"]:focus,
-        .dark section form input[type="email"]:focus,
-        .dark section form input[type="password"]:focus {
-            border-color: #4BA9C2;
-            box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
-            background-color: rgba(55, 65, 81, 1);
-        }
     </style>
 
     <script>

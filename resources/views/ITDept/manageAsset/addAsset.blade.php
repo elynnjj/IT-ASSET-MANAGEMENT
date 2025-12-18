@@ -197,7 +197,7 @@
 								   class="interactive-button interactive-button-secondary"
 								   style="padding: 10px 16px; font-size: 11px;">
 									<span class="button-content">
-										{{ __('Cancel') }}
+									{{ __('Cancel') }}
 									</span>
 								</a>
 								<button type="submit" 

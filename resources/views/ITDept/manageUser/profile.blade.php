@@ -6,61 +6,157 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <!-- Profile Information (Read-only) -->
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    {{-- Profile Information --}}
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            {{-- Main Content Card --}}
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    {{-- Title --}}
+                    <div class="mb-6">
+                        <h1 class="text-xl font-semibold">{{ __('Profile') }}</h1>
+                    </div>
+
+                    {{-- Profile Information Section --}}
                     <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
-                        <h3 class="text-lg font-semibold mb-3">{{ __('Profile Information') }}</h3>
-                        <div class="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <label class="font-medium text-gray-700 dark:text-gray-300">{{ __('Username') }}:</label>
-                                <p class="text-gray-900 dark:text-gray-100">{{ auth()->user()->userID }}</p>
+                        <h3 class="text-lg font-semibold mb-4">{{ __('Profile Information') }}</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="border border-gray-200 dark:border-gray-600 rounded-md p-3 bg-white dark:bg-gray-800">
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Username') }}</label>
+                                <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ auth()->user()->userID }}</p>
                             </div>
-                            <div>
-                                <label class="font-medium text-gray-700 dark:text-gray-300">{{ __('Full Name') }}:</label>
-                                <p class="text-gray-900 dark:text-gray-100">{{ auth()->user()->fullName }}</p>
+                            <div class="border border-gray-200 dark:border-gray-600 rounded-md p-3 bg-white dark:bg-gray-800">
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Full Name') }}</label>
+                                <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ auth()->user()->fullName }}</p>
                             </div>
-                            <div>
-                                <label class="font-medium text-gray-700 dark:text-gray-300">{{ __('Email') }}:</label>
-                                <p class="text-gray-900 dark:text-gray-100">{{ auth()->user()->email }}</p>
+                            <div class="border border-gray-200 dark:border-gray-600 rounded-md p-3 bg-white dark:bg-gray-800">
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Email') }}</label>
+                                <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ auth()->user()->email }}</p>
                             </div>
-                            <div>
-                                <label class="font-medium text-gray-700 dark:text-gray-300">{{ __('Department') }}:</label>
-                                <p class="text-gray-900 dark:text-gray-100">{{ auth()->user()->department ?? '-' }}</p>
+                            <div class="border border-gray-200 dark:border-gray-600 rounded-md p-3 bg-white dark:bg-gray-800">
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Department') }}</label>
+                                <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ auth()->user()->department ?? '-' }}</p>
                             </div>
-                            <div>
-                                <label class="font-medium text-gray-700 dark:text-gray-300">{{ __('Role') }}:</label>
-                                <p class="text-gray-900 dark:text-gray-100">{{ auth()->user()->role }}</p>
+                            <div class="border border-gray-200 dark:border-gray-600 rounded-md p-3 bg-white dark:bg-gray-800">
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Role') }}</label>
+                                <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ auth()->user()->role }}</p>
                             </div>
-                            <div>
-                                <label class="font-medium text-gray-700 dark:text-gray-300">{{ __('Account Status') }}:</label>
-                                <p class="text-gray-900 dark:text-gray-100">{{ auth()->user()->accStat ?? '-' }}</p>
+                            <div class="border border-gray-200 dark:border-gray-600 rounded-md p-3 bg-white dark:bg-gray-800">
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{ __('Account Status') }}</label>
+                                <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ auth()->user()->accStat ?? '-' }}</p>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Update Password -->
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.update-password-form />
+                    {{-- Update Password Section --}}
+                    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+                        <livewire:profile.update-password-form />
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <style>
+        /* Input container with hover effects */
+        .input-container {
+            position: relative;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .input-container:hover {
+            transform: translateY(-1px);
+        }
+
+        .input-container:has(.interactive-input:focus),
+        .input-container:has(.interactive-textarea:focus) {
+            transform: translateY(-2px);
+        }
+
+        /* Interactive input styling */
+        .interactive-input,
+        .interactive-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #9CA3AF;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #FFFFFF;
+            position: relative;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .interactive-input,
+            .interactive-textarea {
+                background-color: #111827;
+                border-color: #6B7280;
+                color: #D1D5DB;
+            }
+        }
+
+        .dark .interactive-input,
+        .dark .interactive-textarea {
+            background-color: #111827;
+            border-color: #6B7280;
+            color: #D1D5DB;
+        }
+
+        .interactive-input:hover,
+        .interactive-textarea:hover {
+            border-color: #4BA9C2;
+            box-shadow: 0 4px 12px rgba(75, 169, 194, 0.15);
+            transform: translateY(-1px);
+            background-color: #FAFAFA;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .interactive-input:hover,
+            .interactive-textarea:hover {
+                border-color: #4BA9C2;
+                box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+                background-color: #1F2937;
+            }
+        }
+
+        .dark .interactive-input:hover,
+        .dark .interactive-textarea:hover {
+            border-color: #4BA9C2;
+            box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+            background-color: #1F2937;
+        }
+
+        .interactive-input:focus,
+        .interactive-textarea:focus {
+            outline: none;
+            border-color: #4BA9C2;
+            box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.15), 0 6px 16px rgba(75, 169, 194, 0.2);
+            background-color: #FFFFFF;
+            transform: translateY(-2px);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .interactive-input:focus,
+            .interactive-textarea:focus {
+                border-color: #4BA9C2;
+                box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+                background-color: #111827;
+                color: #D1D5DB;
+            }
+        }
+
+        .dark .interactive-input:focus,
+        .dark .interactive-textarea:focus {
+            border-color: #4BA9C2;
+            box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+            background-color: #111827;
+            color: #D1D5DB;
+        }
+
         /* Interactive button styling */
         .interactive-button {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 14px 28px;
             font-weight: 600;
-            font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             border: none;
@@ -139,61 +235,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Apply interactive styles to all inputs in profile forms */
-        section form input[type="text"],
-        section form input[type="email"],
-        section form input[type="password"] {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #E5E7EB;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background-color: #FFFFFF;
-        }
-
-        .dark section form input[type="text"],
-        .dark section form input[type="email"],
-        .dark section form input[type="password"] {
-            background-color: rgba(55, 65, 81, 0.8);
-            border-color: #4B5563;
-            color: #F9FAFB;
-        }
-
-        section form input[type="text"]:hover,
-        section form input[type="email"]:hover,
-        section form input[type="password"]:hover {
-            border-color: #4BA9C2;
-            box-shadow: 0 4px 12px rgba(75, 169, 194, 0.15);
-            transform: translateY(-1px);
-            background-color: #FAFAFA;
-        }
-
-        .dark section form input[type="text"]:hover,
-        .dark section form input[type="email"]:hover,
-        .dark section form input[type="password"]:hover {
-            border-color: #4BA9C2;
-            box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
-            background-color: rgba(55, 65, 81, 0.95);
-        }
-
-        section form input[type="text"]:focus,
-        section form input[type="email"]:focus,
-        section form input[type="password"]:focus {
-            outline: none;
-            border-color: #4BA9C2;
-            box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.15), 0 6px 16px rgba(75, 169, 194, 0.2);
-            background-color: #FFFFFF;
-            transform: translateY(-2px);
-        }
-
-        .dark section form input[type="text"]:focus,
-        .dark section form input[type="email"]:focus,
-        .dark section form input[type="password"]:focus {
-            border-color: #4BA9C2;
-            box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
-            background-color: rgba(55, 65, 81, 1);
-        }
     </style>
 
     <script>

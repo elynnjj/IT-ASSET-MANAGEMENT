@@ -574,13 +574,13 @@
 									</label>
 									<div x-show="showOthersInput" x-transition class="flex-1">
 										<div class="input-container">
-											<input id="othersSoftware" name="othersSoftware" type="text" 
+										<input id="othersSoftware" name="othersSoftware" type="text" 
 												class="interactive-input" 
-												x-model="othersSoftware"
-												value="{{ $othersSoftware ?? '' }}"
-												placeholder="Enter additional software (eg; Foxit Editor Pro, Nitro Pro)" />
+										x-model="othersSoftware"
+										value="{{ $othersSoftware ?? '' }}"
+										placeholder="Enter additional software (eg; Foxit Editor Pro, Nitro Pro)" />
 										</div>
-										<x-input-error :messages="$errors->get('othersSoftware')" class="mt-2" />
+									<x-input-error :messages="$errors->get('othersSoftware')" class="mt-2" />
 									</div>
 								</div>
 							</div>

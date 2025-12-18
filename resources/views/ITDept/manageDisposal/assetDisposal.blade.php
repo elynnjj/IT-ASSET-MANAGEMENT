@@ -85,19 +85,24 @@
                         <form method="GET" id="filterForm" class="flex flex-wrap items-center gap-2 flex-1">
                             <input type="hidden" name="tab" value="{{ $tab }}">
 
-                            <input type="text" name="q"
-                                   value="{{ $search }}"
-                                   placeholder="Search Serial, Asset ID, Model..."
-                                   class="flex-1 min-w-[200px] rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
-                                   x-on:input="clearTimeout(window.searchTimer); window.searchTimer=setTimeout(()=> document.getElementById('filterForm').submit(), 500)">
+                            <div class="input-container flex-1 min-w-[200px]">
+                                <input type="text" id="searchInput" name="q"
+                                       value="{{ $search }}"
+                                       placeholder="Search Serial, Asset ID, Model..."
+                                       class="interactive-input w-full"
+                                       style="padding: 8px 12px; font-size: 13px;"
+                                       autocomplete="off" />
+                            </div>
                             
-                            <select name="assetType"
-                                    class="rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
-                                    onchange="this.form.submit()">
-                                <option value="">Filter Asset Type</option>
-                                <option value="Laptop" {{ $assetType == 'Laptop' ? 'selected':'' }}>Laptop</option>
-                                <option value="Desktop" {{ $assetType == 'Desktop' ? 'selected':'' }}>Desktop</option>
-                            </select>
+                            <div class="input-container">
+                                <select name="assetType" id="assetTypeSelect"
+                                        class="interactive-select"
+                                        style="padding: 8px 32px 8px 12px; font-size: 13px; min-width: 150px;">
+                                    <option value="">Filter Asset Type</option>
+                                    <option value="Laptop" {{ $assetType == 'Laptop' ? 'selected':'' }}>Laptop</option>
+                                    <option value="Desktop" {{ $assetType == 'Desktop' ? 'selected':'' }}>Desktop</option>
+                                </select>
+                            </div>
                         </form>
 
                         {{-- Dispose Button --}}
@@ -105,34 +110,44 @@
                         <button type="button"
                                 x-bind:disabled="selectedAssets.length === 0"
                                 x-on:click="
-                                    if (selectedAssets.length === 0) return;
-                                    const fileInput = document.getElementById('disposalInvoiceFile');
-                                    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-                                        alert('Please select a disposal invoice file before disposing assets.');
-                                        return;
-                                    }
-                                    if (!confirm('Dispose ' + selectedAssets.length + ' asset(s)?')) return;
+                                    (async () => {
+                                        if (selectedAssets.length === 0) return;
+                                        const fileInput = document.getElementById('disposalInvoiceFile');
+                                        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                                            window.showAlert('Please select a disposal invoice file before disposing assets.', 'warning');
+                                            return;
+                                        }
+                                        
+                                        const confirmed = await window.showConfirmation(
+                                            'Dispose ' + selectedAssets.length + ' asset(s)?',
+                                            'Dispose Assets'
+                                        );
+                                        
+                                        if (!confirmed) return;
 
-                                    const form = document.getElementById('disposeForm');
-                                    // Remove only the selectedAssets inputs, preserve CSRF token
-                                    const existingInputs = form.querySelectorAll('input[name=\'selectedAssets[]\']');
-                                    existingInputs.forEach(input => input.remove());
-                                    
-                                    // Add selected assets
-                                    selectedAssets.forEach(id => {
-                                        let input = document.createElement('input');
-                                        input.type='hidden';
-                                        input.name='selectedAssets[]';
-                                        input.value=id;
-                                        form.appendChild(input);
-                                    });
-                                    form.submit();
+                                        const form = document.getElementById('disposeForm');
+                                        // Remove only the selectedAssets inputs, preserve CSRF token
+                                        const existingInputs = form.querySelectorAll('input[name=\'selectedAssets[]\']');
+                                        existingInputs.forEach(input => input.remove());
+                                        
+                                        // Add selected assets
+                                        selectedAssets.forEach(id => {
+                                            let input = document.createElement('input');
+                                            input.type='hidden';
+                                            input.name='selectedAssets[]';
+                                            input.value=id;
+                                            form.appendChild(input);
+                                        });
+                                        form.submit();
+                                    })();
                                 "
                                 x-bind:class="selectedAssets.length === 0 
-                                    ? 'inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest cursor-not-allowed opacity-50' 
-                                    : 'inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90 bg-red-600 hover:bg-red-700' "
-                                x-bind:style="selectedAssets.length === 0 ? 'background-color: #B2B2B2;' : ''">
-                            Dispose
+                                    ? 'interactive-button interactive-button-secondary opacity-50 cursor-not-allowed' 
+                                    : 'interactive-button interactive-button-delete'"
+                                style="padding: 10px 16px; font-size: 11px;">
+                            <span class="button-content">
+                                Dispose
+                            </span>
                         </button>
                         @endif
                     </div>
@@ -144,23 +159,23 @@
                          x-transition
                          style="display: none;">
                         <h3 class="text-lg font-semibold mb-4">{{ __('Disposal Invoice') }}</h3>
-                        <div>
-                            <x-input-label for="disposalInvoiceFile" :value="__('Disposal Invoice File')" />
-                            <input type="file" 
-                                   id="disposalInvoiceFile" 
-                                   name="disposalInvoiceFile" 
-                                   form="disposeForm"
-                                   accept=".pdf,.jpg,.jpeg,.png" 
-                                   class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400
-                                   border border-gray-300 dark:border-gray-700 rounded-md
-                                   file:mr-4 file:py-2 file:px-4
-                                   file:rounded-md file:border-0
-                                   file:text-sm file:font-semibold
-                                   file:bg-blue-50 dark:file:bg-blue-900
-                                   file:text-blue-700 dark:file:text-blue-300
-                                   hover:file:bg-blue-100 dark:hover:file:bg-blue-800
-                                   cursor-pointer"
-                                   required />
+                        <div class="input-container">
+                            <x-input-label for="disposalInvoiceFile" :value="__('Disposal Invoice File')" class="text-[15px]" />
+                            <div class="custom-file-input-wrapper mt-1">
+                                <input type="file" 
+                                       id="disposalInvoiceFile" 
+                                       name="disposalInvoiceFile" 
+                                       form="disposeForm"
+                                       accept=".pdf,.jpg,.jpeg,.png" 
+                                       class="hidden-file-input"
+                                       required />
+                                <button type="button" class="file-select-button" onclick="document.getElementById('disposalInvoiceFile').click()">
+                                    {{ __('Choose File') }}
+                                </button>
+                                <div class="file-display-area" id="disposalFileDisplay">
+                                    <span class="file-placeholder">{{ __('No file chosen') }}</span>
+                                </div>
+                            </div>
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Accepted formats: PDF, JPG, JPEG, PNG (Max: 10MB)</p>
                             <x-input-error :messages="$errors->get('disposalInvoiceFile')" class="mt-2" />
                         </div>
@@ -173,36 +188,39 @@
                     </form>
 
                     {{-- Table --}}
-                    <div class="overflow-x-auto">
-                        <table class="table-auto w-full border border-gray-300 dark:border-gray-700 divide-y">
+                    <div class="overflow-x-auto" id="disposalTableContainer">
+                        <div id="loadingIndicator" class="hidden text-center py-4 text-gray-500 dark:text-gray-400">
+                            <p>Searching...</p>
+                        </div>
+                        <table class="table-auto w-full border border-gray-300 dark:border-gray-700 divide-y" id="disposalTable">
                             <thead class="bg-gray-100 dark:bg-gray-700">
                                 <tr>
                                     @if($tab==='pending')
-                                    <th class="px-4 py-4 text-center">
+                                    <th class="px-4 py-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-200">
                                         <input id="selectAll" type="checkbox" 
                                                x-on:change="toggleAll($event)"
                                                class="rounded border-gray-300">
                                     </th>
                                     @endif
 
-                                    <th class="px-8 py-4">Asset ID</th>
-                                    <th class="px-8 py-4">Serial Number</th>
-                                    <th class="px-8 py-4">Model</th>
-                                    <th class="px-8 py-4">Processor</th>
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Asset ID</th>
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Serial Number</th>
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Model</th>
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Processor</th>
 
                                     @if($tab==='disposed')
-                                    <th class="px-8 py-4">Disposal Date</th>
-                                    <th class="px-8 py-4">Action</th>
+                                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Disposal Date</th>
+                                    <th class="px-3 py-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 20%;">Action</th>
                                     @endif
                                 </tr>
                             </thead>
 
-                            <tbody class="divide-y dark:divide-gray-700">
+                            <tbody id="disposalTableBody" class="divide-y dark:divide-gray-700">
                                 @forelse($assets as $asset)
                                     <tr class="{{ $loop->even ? 'bg-gray-50 dark:bg-gray-800/40' : 'bg-white dark:bg-gray-800' }}">
 
                                         @if($tab==='pending')
-                                        <td class="px-4 py-4 text-center">
+                                        <td class="px-4 py-2 text-center">
                                             <input type="checkbox"
                                                    value="{{ $asset->assetID }}"
                                                    class="asset-checkbox rounded border-gray-300"
@@ -210,25 +228,25 @@
                                         </td>
                                         @endif
 
-                                        <td class="px-8 py-4">{{ $asset->assetID }}</td>
-                                        <td class="px-8 py-4">{{ $asset->serialNum ?? '-' }}</td>
-                                        <td class="px-8 py-4">{{ $asset->model ?? '-' }}</td>
-                                        <td class="px-8 py-4">{{ $asset->processor ?? '-' }}</td>
+                                        <td class="px-4 py-2 text-sm">{{ $asset->assetID }}</td>
+                                        <td class="px-4 py-2 text-sm">{{ $asset->serialNum ?? '-' }}</td>
+                                        <td class="px-4 py-2 text-sm">{{ $asset->model ?? '-' }}</td>
+                                        <td class="px-4 py-2 text-sm">{{ $asset->processor ?? '-' }}</td>
 
                                         @if($tab==='disposed')
-                                        <td class="px-8 py-4">
+                                        <td class="px-4 py-2 text-sm">
                                             {{ optional($asset->disposals->first())->dispDate?->format('d/m/Y') ?? '-' }}
                                         </td>
-                                        <td class="px-8 py-4">
+                                        <td class="px-3 py-2">
                                             @php($disposal = $asset->disposals->first())
                                             @if($disposal && $disposal->invoice)
                                                 <a href="{{ route('itdept.asset-disposal.download-invoice', $disposal->disposeID) }}" 
-                                                   class="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold uppercase tracking-widest rounded-md border transition"
-                                                   style="border-color: #4BA9C2; color: #4BA9C2; background-color: white;"
-                                                   onmouseover="this.style.backgroundColor='#f0f9ff'"
-                                                   onmouseout="this.style.backgroundColor='white'"
+                                                   class="interactive-button interactive-button-primary"
+                                                   style="padding: 6px 12px; font-size: 11px;"
                                                    title="{{ __('Download Invoice') }}">
-                                                    Download Invoice
+                                                    <span class="button-content">
+                                                        Download Invoice
+                                                    </span>
                                                 </a>
                                             @else
                                                 <span class="text-gray-400 dark:text-gray-500 text-sm">No invoice</span>
@@ -238,7 +256,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="px-8 py-6 text-center text-gray-500">
+                                        <td colspan="6" class="px-4 py-4 text-center text-sm text-gray-500">
                                             No assets found.
                                         </td>
                                     </tr>
@@ -251,4 +269,548 @@
             </div>
         </div>
     </div>
+
+	<style>
+		/* Input container with hover effects */
+		.input-container {
+			position: relative;
+			transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		}
+
+		.input-container:hover {
+			transform: translateY(-1px);
+		}
+
+		.input-container:has(.interactive-input:focus),
+		.input-container:has(.interactive-select:focus),
+		.input-container:has(.hidden-file-input:focus) {
+			transform: translateY(-2px);
+		}
+
+		/* Interactive input styling */
+		.interactive-input {
+			width: 100%;
+			border: 2px solid #9CA3AF;
+			border-radius: 8px;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			background-color: #FFFFFF;
+			position: relative;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-input {
+				background-color: #111827;
+				border-color: #6B7280;
+				color: #D1D5DB;
+			}
+		}
+
+		.dark .interactive-input {
+			background-color: #111827;
+			border-color: #6B7280;
+			color: #D1D5DB;
+		}
+
+		.interactive-input:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.15);
+			transform: translateY(-1px);
+			background-color: #FAFAFA;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-input:hover {
+				border-color: #4BA9C2;
+				box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+				background-color: #1F2937;
+			}
+		}
+
+		.dark .interactive-input:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+			background-color: #1F2937;
+		}
+
+		.interactive-input:focus {
+			outline: none;
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.15), 0 6px 16px rgba(75, 169, 194, 0.2);
+			background-color: #FFFFFF;
+			transform: translateY(-2px);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-input:focus {
+				border-color: #4BA9C2;
+				box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+				background-color: #111827;
+				color: #D1D5DB;
+			}
+		}
+
+		.dark .interactive-input:focus {
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+			background-color: #111827;
+			color: #D1D5DB;
+		}
+
+		/* Interactive select styling */
+		.interactive-select {
+			border: 2px solid #9CA3AF;
+			border-radius: 8px;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			background-color: #FFFFFF;
+			position: relative;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-select {
+				background-color: #111827;
+				border-color: #6B7280;
+				color: #D1D5DB;
+			}
+		}
+
+		.dark .interactive-select {
+			background-color: #111827;
+			border-color: #6B7280;
+			color: #D1D5DB;
+		}
+
+		.interactive-select:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.15);
+			transform: translateY(-1px);
+			background-color: #FAFAFA;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-select:hover {
+				border-color: #4BA9C2;
+				box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+				background-color: #1F2937;
+			}
+		}
+
+		.dark .interactive-select:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+			background-color: #1F2937;
+		}
+
+		.interactive-select:focus {
+			outline: none;
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.15), 0 6px 16px rgba(75, 169, 194, 0.2);
+			background-color: #FFFFFF;
+			transform: translateY(-2px);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.interactive-select:focus {
+				border-color: #4BA9C2;
+				box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+				background-color: #111827;
+				color: #D1D5DB;
+			}
+		}
+
+		.dark .interactive-select:focus {
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.2), 0 6px 16px rgba(75, 169, 194, 0.3);
+			background-color: #111827;
+			color: #D1D5DB;
+		}
+
+		/* Custom file input wrapper - side by side layout */
+		.custom-file-input-wrapper {
+			display: flex;
+			width: 100%;
+			gap: 0;
+			border: 2px solid #9CA3AF;
+			border-radius: 8px;
+			overflow: hidden;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			background-color: #FFFFFF;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.custom-file-input-wrapper {
+				background-color: #111827;
+				border-color: #6B7280;
+			}
+		}
+
+		.dark .custom-file-input-wrapper {
+			background-color: #111827;
+			border-color: #6B7280;
+		}
+
+		.custom-file-input-wrapper:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.15);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.custom-file-input-wrapper:hover {
+				border-color: #4BA9C2;
+				box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+			}
+		}
+
+		.dark .custom-file-input-wrapper:hover {
+			border-color: #4BA9C2;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.2);
+		}
+
+		.custom-file-input-wrapper:has(.hidden-file-input:focus) {
+			border-color: #4BA9C2;
+			box-shadow: 0 0 0 4px rgba(75, 169, 194, 0.15), 0 6px 16px rgba(75, 169, 194, 0.2);
+		}
+
+		.hidden-file-input {
+			position: absolute;
+			opacity: 0;
+			width: 0;
+			height: 0;
+			pointer-events: none;
+		}
+
+		.file-select-button {
+			padding: 8px 20px;
+			border: none;
+			border-right: 2px solid #9CA3AF;
+			border-radius: 0;
+			background: linear-gradient(135deg, #4BA9C2 0%, #3a8ba5 100%);
+			color: white;
+			font-size: 15px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			white-space: nowrap;
+			flex-shrink: 0;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.file-select-button {
+				border-right-color: #6B7280;
+			}
+		}
+
+		.dark .file-select-button {
+			border-right-color: #6B7280;
+		}
+
+		.file-select-button:hover {
+			background: linear-gradient(135deg, #3a8ba5 0%, #2d6b82 100%);
+			box-shadow: 0 4px 8px rgba(75, 169, 194, 0.3);
+		}
+
+		.file-select-button:active {
+			background: linear-gradient(135deg, #2d6b82 0%, #1f5a6f 100%);
+			transform: scale(0.98);
+		}
+
+		.file-display-area {
+			flex: 1;
+			padding: 8px 12px;
+			display: flex;
+			align-items: center;
+			background-color: #FFFFFF;
+			color: #374151;
+			font-size: 15px;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.file-display-area {
+				background-color: #111827;
+				color: #D1D5DB;
+			}
+		}
+
+		.dark .file-display-area {
+			background-color: #111827;
+			color: #D1D5DB;
+		}
+
+		.file-placeholder {
+			color: #9CA3AF;
+		}
+
+		.file-name {
+			color: #374151;
+			font-weight: 500;
+		}
+
+		.dark .file-name {
+			color: #D1D5DB;
+		}
+
+		/* Interactive button styling */
+		.interactive-button {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			overflow: hidden;
+			text-decoration: none;
+		}
+
+		.interactive-button-primary {
+			background: linear-gradient(135deg, #4BA9C2 0%, #3a8ba5 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.3);
+		}
+
+		.interactive-button-primary::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-primary:hover {
+			background: linear-gradient(135deg, #3a8ba5 0%, #2d6b82 100%);
+			box-shadow: 0 8px 20px rgba(75, 169, 194, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-primary:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-primary:active {
+			background: linear-gradient(135deg, #2d6b82 0%, #1f5a6f 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(75, 169, 194, 0.3);
+		}
+
+		.interactive-button-secondary {
+			background: linear-gradient(135deg, #797979 0%, #666666 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(121, 121, 121, 0.3);
+		}
+
+		.interactive-button-secondary::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-secondary:hover {
+			background: linear-gradient(135deg, #666666 0%, #555555 100%);
+			box-shadow: 0 8px 20px rgba(121, 121, 121, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-secondary:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-secondary:active {
+			background: linear-gradient(135deg, #555555 0%, #444444 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(121, 121, 121, 0.3);
+		}
+
+		.interactive-button-delete {
+			background: linear-gradient(135deg, #B40814 0%, #A10712 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(180, 8, 20, 0.3);
+		}
+
+		.interactive-button-delete::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-delete:hover {
+			background: linear-gradient(135deg, #A10712 0%, #990610 100%);
+			box-shadow: 0 8px 20px rgba(180, 8, 20, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-delete:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-delete:active {
+			background: linear-gradient(135deg, #990610 0%, #86050E 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(180, 8, 20, 0.3);
+		}
+
+		.button-content {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+	</style>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Real-time search functionality with AJAX
+			const searchInput = document.getElementById('searchInput');
+			const assetTypeSelect = document.getElementById('assetTypeSelect');
+			const filterForm = document.getElementById('filterForm');
+			const disposalTableBody = document.getElementById('disposalTableBody');
+			const disposalTableContainer = document.getElementById('disposalTableContainer');
+			const loadingIndicator = document.getElementById('loadingIndicator');
+			const disposalTable = document.getElementById('disposalTable');
+			let searchTimeout = null;
+			let currentRequest = null;
+
+			function performSearch() {
+				const formData = new FormData(filterForm);
+				const searchParams = new URLSearchParams();
+				
+				// Add all form data to URL params
+				for (const [key, value] of formData.entries()) {
+					if (value) {
+						searchParams.append(key, value);
+					}
+				}
+
+				// Show loading indicator
+				if (disposalTable) disposalTable.style.opacity = '0.5';
+				if (loadingIndicator) loadingIndicator.classList.remove('hidden');
+
+				// Create abort controller for request cancellation
+				const abortController = new AbortController();
+				currentRequest = abortController;
+
+				// Fetch results via AJAX
+				fetch('{{ route("itdept.asset-disposal") }}?' + searchParams.toString(), {
+					method: 'GET',
+					headers: {
+						'X-Requested-With': 'XMLHttpRequest',
+						'Accept': 'text/html',
+					},
+					signal: abortController.signal
+				})
+				.then(response => response.text())
+				.then(html => {
+					// Parse the response HTML
+					const parser = new DOMParser();
+					const doc = parser.parseFromString(html, 'text/html');
+					const newTableBody = doc.querySelector('#disposalTableBody');
+					
+					if (newTableBody) {
+						// Update table body
+						disposalTableBody.innerHTML = newTableBody.innerHTML;
+						
+						// Update URL without reload
+						const newUrl = '{{ route("itdept.asset-disposal") }}?' + searchParams.toString();
+						window.history.pushState({}, '', newUrl);
+						
+						// Re-initialize Alpine.js data if needed
+						// Note: Alpine.js should handle the x-data automatically, but we may need to re-trigger
+						if (window.Alpine) {
+							window.Alpine.initTree(disposalTableContainer);
+						}
+					}
+				})
+				.catch(error => {
+					if (error.name !== 'AbortError') {
+						console.error('Search error:', error);
+					}
+				})
+				.finally(() => {
+					// Hide loading indicator
+					if (disposalTable) disposalTable.style.opacity = '1';
+					if (loadingIndicator) loadingIndicator.classList.add('hidden');
+					currentRequest = null;
+				});
+			}
+
+			// Search input event listener
+			if (searchInput && filterForm && disposalTableBody) {
+				searchInput.addEventListener('input', function() {
+					// Clear previous timeout
+					clearTimeout(searchTimeout);
+					
+					// Cancel previous request if still pending
+					if (currentRequest) {
+						currentRequest.abort();
+					}
+					
+					// Set new timeout to search after 300ms of no typing
+					searchTimeout = setTimeout(function() {
+						performSearch();
+					}, 300);
+				});
+
+				// Also search on Enter key press
+				searchInput.addEventListener('keydown', function(e) {
+					if (e.key === 'Enter') {
+						e.preventDefault();
+						clearTimeout(searchTimeout);
+						if (currentRequest) {
+							currentRequest.abort();
+						}
+						performSearch();
+					}
+				});
+			}
+
+			// Asset type dropdown event listener
+			if (assetTypeSelect) {
+				assetTypeSelect.addEventListener('change', function() {
+					clearTimeout(searchTimeout);
+					if (currentRequest) {
+						currentRequest.abort();
+					}
+					performSearch();
+				});
+			}
+
+			// File input display handler
+			const disposalFileInput = document.getElementById('disposalInvoiceFile');
+			const disposalFileDisplay = document.getElementById('disposalFileDisplay');
+
+			if (disposalFileInput && disposalFileDisplay) {
+				disposalFileInput.addEventListener('change', function(e) {
+					const file = e.target.files[0];
+					if (file) {
+						disposalFileDisplay.innerHTML = '<span class="file-name">' + file.name + '</span>';
+					} else {
+						disposalFileDisplay.innerHTML = '<span class="file-placeholder">{{ __('No file chosen') }}</span>';
+					}
+				});
+			}
+		});
+	</script>
 </x-app-layout>

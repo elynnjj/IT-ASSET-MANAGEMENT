@@ -24,19 +24,19 @@
 								<div class="flex items-center border-l border-gray-300 dark:border-gray-600 pl-3">
 									<p class="text-sm font-bold text-black dark:text-gray-300">{{ auth()->user()->fullName }}</p>
 								</div>
-							</div>
+								</div>
 
 							{{-- Department --}}
 							<div class="grid gap-0 p-3 bg-white dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700" style="grid-template-columns: 40% 60%;">
 								<div class="flex items-center">
 									<label class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Department') }}</label>
-								</div>
+										</div>
 								<div class="flex items-center border-l border-gray-300 dark:border-gray-600 pl-3">
 									<p class="text-sm font-bold text-black dark:text-gray-300">{{ auth()->user()->department ?? '-' }}</p>
-								</div>
-							</div>
-						</div>
-					</div>
+										</div>
+									</div>
+										</div>
+									</div>
 
 					{{-- Asset Details Section --}}
 					<div class="dashboard-card bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-out" style="flex: 1;">
@@ -564,43 +564,43 @@
 			}
 			
 			// Show activity details popup
-			function showActivityDetails(date, events) {
-				const popupCard = document.getElementById('activityPopupCard');
-				const popupDate = document.getElementById('popupDate');
-				const popupDateShort = document.getElementById('popupDateShort');
-				const popupActivities = document.getElementById('popupActivities');
-				
-				if (!popupCard) return;
-				
-				// Format date for display
-				const dateObj = new Date(date + 'T00:00:00');
-				const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-				const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-					'July', 'August', 'September', 'October', 'November', 'December'];
-				
-				const dayName = dayNames[dateObj.getDay()];
-				const day = dateObj.getDate();
-				const month = monthNames[dateObj.getMonth()];
-				const year = dateObj.getFullYear();
-				
-				popupDate.textContent = day + ' ' + dayName;
-				popupDateShort.textContent = day + ' ' + month.substring(0, 3) + ' ' + year;
-				
-				// Clear previous activities
-				popupActivities.innerHTML = '';
-				
-				// Add each activity with attractive styling
-				if (events && events.length > 0) {
-					events.forEach(function(event, index) {
-						const activityDiv = document.createElement('div');
-						activityDiv.className = 'activity-item p-4 rounded-xl border-2 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer';
-						activityDiv.style.animation = `fadeInUp 0.4s ease-out ${index * 0.1}s both`;
-						
-						let activityText = '';
-						let activitySubtext = '';
-						let activityColor = '';
-						let activityIcon = '';
-						
+		function showActivityDetails(date, events) {
+			const popupCard = document.getElementById('activityPopupCard');
+			const popupDate = document.getElementById('popupDate');
+			const popupDateShort = document.getElementById('popupDateShort');
+			const popupActivities = document.getElementById('popupActivities');
+			
+			if (!popupCard) return;
+			
+			// Format date for display
+			const dateObj = new Date(date + 'T00:00:00');
+			const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+			const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+				'July', 'August', 'September', 'October', 'November', 'December'];
+			
+			const dayName = dayNames[dateObj.getDay()];
+			const day = dateObj.getDate();
+			const month = monthNames[dateObj.getMonth()];
+			const year = dateObj.getFullYear();
+			
+			popupDate.textContent = day + ' ' + dayName;
+			popupDateShort.textContent = day + ' ' + month.substring(0, 3) + ' ' + year;
+			
+			// Clear previous activities
+			popupActivities.innerHTML = '';
+			
+			// Add each activity with attractive styling
+			if (events && events.length > 0) {
+				events.forEach(function(event, index) {
+					const activityDiv = document.createElement('div');
+					activityDiv.className = 'activity-item p-4 rounded-xl border-2 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer';
+					activityDiv.style.animation = `fadeInUp 0.4s ease-out ${index * 0.1}s both`;
+					
+					let activityText = '';
+					let activitySubtext = '';
+					let activityColor = '';
+					let activityIcon = '';
+					
 						if (event.type === 'submitted') {
 							// Differentiate between HOD and Employee requests
 							if (event.requesterRole === 'HOD') {
@@ -632,21 +632,21 @@
 							activitySubtext = typeof event === 'object' ? JSON.stringify(event) : event;
 							activityColor = '#6B7280';
 						}
-						
-						activityDiv.innerHTML = `
+							
+							activityDiv.innerHTML = `
 							<div class="flex items-start gap-4">
 								<div class="flex-shrink-0 p-2 rounded-lg" style="background-color: ${activityColor}; color: white;">
-									${activityIcon}
-								</div>
+										${activityIcon}
+									</div>
 								<div class="flex-1">
 									<h4 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">${activityText}</h4>
 									<p class="text-sm text-gray-600 dark:text-gray-400">${activitySubtext}</p>
 								</div>
-							</div>
-						`;
-						popupActivities.appendChild(activityDiv);
-					});
-				} else {
+								</div>
+							`;
+					popupActivities.appendChild(activityDiv);
+				});
+			} else {
 					popupActivities.innerHTML = `
 						<div class="text-center py-12">
 							<svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -656,18 +656,18 @@
 							<p class="text-sm text-gray-400 dark:text-gray-500 mt-2">No IT request activities</p>
 						</div>
 					`;
-				}
-				
-				// Show popup with animation
-				popupCard.classList.remove('hidden');
-				popupCard.style.opacity = '0';
+			}
+			
+			// Show popup with animation
+			popupCard.classList.remove('hidden');
+			popupCard.style.opacity = '0';
 				popupCard.style.transform = 'scale(0.9) translateY(20px)';
 				
-				setTimeout(() => {
+			setTimeout(() => {
 					popupCard.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-					popupCard.style.opacity = '1';
+				popupCard.style.opacity = '1';
 					popupCard.style.transform = 'scale(1) translateY(0)';
-				}, 10);
+			}, 10);
 				
 				// Ensure close button is set up
 				const closeBtn = document.getElementById('closePopupBtn');
@@ -677,26 +677,26 @@
 						window.closeActivityPopup();
 					};
 				}
-			}
-			
+		}
+		
 			// Function to close activity popup card (make it globally accessible)
-			window.closeActivityPopup = function() {
-				const popupCard = document.getElementById('activityPopupCard');
-				if (popupCard) {
+		window.closeActivityPopup = function() {
+			const popupCard = document.getElementById('activityPopupCard');
+			if (popupCard) {
 					popupCard.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
-					popupCard.style.opacity = '0';
+				popupCard.style.opacity = '0';
 					popupCard.style.transform = 'scale(0.9) translateY(20px)';
-					setTimeout(() => {
-						popupCard.classList.add('hidden');
-					}, 200);
-				}
-			};
-			
-			// Close popup on Escape key
-			document.addEventListener('keydown', function(e) {
-				if (e.key === 'Escape') {
-					window.closeActivityPopup();
-				}
+				setTimeout(() => {
+					popupCard.classList.add('hidden');
+				}, 200);
+			}
+		};
+		
+		// Close popup on Escape key
+		document.addEventListener('keydown', function(e) {
+			if (e.key === 'Escape') {
+				window.closeActivityPopup();
+			}
 			});
 			
 			// Initial render

@@ -66,30 +66,30 @@ new class extends Component
 }; ?>
 
 <section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+    <header class="mb-4">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {{ __('Profile Information') }}
-        </h2>
+        </h3>
 
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
             {{ __("Update your account's profile information and email address.") }}
         </p>
     </header>
 
-    <form wire:submit="updateProfileInformation" class="mt-6 space-y-6">
+    <form wire:submit="updateProfileInformation" class="space-y-4">
         <div class="input-container">
-            <x-input-label for="userID" :value="__('Username')" />
+            <x-input-label for="userID" :value="__('Username')" class="text-[15px]" />
             <x-text-input wire:model="userID" id="userID" name="userID" type="text" class="mt-1 block w-full interactive-input" required autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('userID')" />
         </div>
         <div class="input-container">
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input wire:model="name" id="name" name="name" type="text" class="mt-1 block w-full interactive-input" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+            <x-input-label for="fullName" :value="__('Name')" class="text-[15px]" />
+            <x-text-input wire:model="fullName" id="fullName" name="fullName" type="text" class="mt-1 block w-full interactive-input" required autofocus autocomplete="name" />
+            <x-input-error class="mt-2" :messages="$errors->get('fullName')" />
         </div>
 
         <div class="input-container">
-            <x-input-label for="email" :value="__('Email')" />
+            <x-input-label for="email" :value="__('Email')" class="text-[15px]" />
             <x-text-input wire:model="email" id="email" name="email" type="email" class="mt-1 block w-full interactive-input" required autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
@@ -112,8 +112,15 @@ new class extends Component
             @endif
         </div>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+        <div class="flex items-center justify-end mt-6">
+            <button type="submit" 
+                class="interactive-button interactive-button-primary"
+                style="padding: 10px 16px; font-size: 11px;">
+                <span class="button-content">
+                    <span class="button-text">{{ __('Save') }}</span>
+                    <span class="button-spinner"></span>
+                </span>
+            </button>
 
             <x-action-message class="me-3" on="profile-updated">
                 {{ __('Saved.') }}

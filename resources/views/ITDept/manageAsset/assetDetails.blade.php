@@ -232,13 +232,13 @@
 											<label class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Status') }}</label>
 										</div>
 										<div class="flex items-center border-l border-gray-300 dark:border-gray-600 pl-3">
-											<p class="text-sm">
-												<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-													{{ $asset->status === 'Available' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
-													{{ $asset->status ?? 'Available' }}
-												</span>
-											</p>
-										</div>
+										<p class="text-sm">
+											<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+												{{ $asset->status === 'Available' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
+												{{ $asset->status ?? 'Available' }}
+											</span>
+										</p>
+									</div>
 									</div>
 									<div class="grid gap-0 p-3 bg-white dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700" style="grid-template-columns: 30% 70%;">
 										<div class="flex items-center">
@@ -549,10 +549,16 @@
 			// Add confirmation for dispose asset form
 			const disposeForm = document.querySelector('.dispose-asset-form');
 			if (disposeForm) {
-				disposeForm.addEventListener('submit', function(e) {
-					if (!confirm('Are you sure you want to dispose this asset? This action cannot be undone.')) {
-						e.preventDefault();
-						return false;
+				disposeForm.addEventListener('submit', async function(e) {
+					e.preventDefault();
+					
+					const confirmed = await window.showConfirmation(
+						'Are you sure you want to dispose this asset? This action cannot be undone.',
+						'Dispose Asset'
+					);
+					
+					if (confirmed) {
+						disposeForm.submit();
 					}
 				});
 			}

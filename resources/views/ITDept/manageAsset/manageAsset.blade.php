@@ -36,7 +36,7 @@
 								{{-- Search input with auto-submit --}}
 								<div class="input-container flex-1 min-w-[200px]">
 									<input type="text" id="searchInput" name="q" value="{{ $q }}" 
-										placeholder="{{ __('Search asset ID, serial number or model') }}"
+									placeholder="{{ __('Search asset ID, serial number or model') }}"
 										class="interactive-input w-full"
 										style="padding: 8px 12px; font-size: 13px;"
 										autocomplete="off" />
@@ -48,9 +48,9 @@
 								style="padding: 10px 16px; font-size: 11px;">
 									<span class="button-content">
 										<svg class="w-3 h-3 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-										</svg>
-										{{ __('Upload Invoice') }}
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+									</svg>
+									{{ __('Upload Invoice') }}
 									</span>
 								</a>
 
@@ -60,9 +60,9 @@
 								style="padding: 10px 16px; font-size: 11px;">
 									<span class="button-content">
 										<svg class="w-3 h-3 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-										</svg>
-										{{ __('Add New Asset') }}
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+									</svg>
+									{{ __('Add New Asset') }}
 									</span>
 								</a>
 							</form>
@@ -149,7 +149,7 @@
 											</span>
 										</td>
 										<td class="px-3 py-2">
-											<div class="flex items-center justify-center gap-1">
+											<div class="flex items-center justify-center gap-2">
 												<a href="{{ route('itdept.manage-assets.show', $asset->assetID) }}" 
 												   class="interactive-button interactive-button-primary"
 												   style="padding: 6px 12px; font-size: 11px;"
@@ -163,9 +163,9 @@
 												   style="padding: 6px 10px; font-size: 11px;"
 												   title="{{ __('Edit') }}">
 													<span class="button-content">
-														<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-														</svg>
+													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+													</svg>
 													</span>
 												</a>
 												<form action="{{ route('itdept.manage-assets.destroy', $asset->assetID) }}" method="POST" class="inline delete-asset-form">
@@ -488,16 +488,21 @@
                 
                 const submitButton = newForm.querySelector('button[type="submit"]');
                 if (submitButton) {
-                    newForm.addEventListener('submit', function(e) {
+                    newForm.addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        
                         // Show confirmation dialog
-                        if (!confirm('Are you sure you want to delete this asset? This action cannot be undone.')) {
-                            // User cancelled - prevent form submission
-                            e.preventDefault();
-                            return false;
+                        const confirmed = await window.showConfirmation(
+                            'Are you sure you want to delete this asset? This action cannot be undone.',
+                            'Delete Asset'
+                        );
+                        
+                        if (confirmed) {
+                            // User confirmed - add loading state and submit
+                            submitButton.classList.add('loading');
+                            submitButton.disabled = true;
+                            newForm.submit();
                         }
-                        // User confirmed - add loading state
-                        submitButton.classList.add('loading');
-                        submitButton.disabled = true;
                     });
                 }
             });
