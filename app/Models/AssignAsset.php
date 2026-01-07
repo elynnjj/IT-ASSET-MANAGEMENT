@@ -13,6 +13,8 @@ class AssignAsset extends Model
         'checkinDate',
         'assetID',
         'userID',
+        'userFullName',
+        'userDepartment',
     ];
 
     protected $primaryKey = 'assignID';

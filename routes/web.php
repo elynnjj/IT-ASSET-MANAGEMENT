@@ -77,10 +77,13 @@ Route::middleware(['auth', 'verified', 'itdept'])->group(function () {
 		Route::get('/upload-invoice', [ManageAssetController::class, 'uploadInvoiceForm'])->name('upload-invoice');
 		Route::post('/upload-invoice', [ManageAssetController::class, 'storeInvoice'])->name('store-invoice');
 		Route::get('/api/assets-by-type', [ManageAssetController::class, 'getAssetsByType'])->name('api.assets-by-type');
+		Route::get('/api/next-asset-id', [ManageAssetController::class, 'getNextAssetID'])->name('api.next-asset-id');
+		Route::get('/invoice/{invoiceID}/view', [ManageAssetController::class, 'viewInvoice'])->name('invoice.view');
 		Route::get('/invoice/{invoiceID}/download', [ManageAssetController::class, 'downloadInvoice'])->name('invoice.download');
 		Route::get('/{assetID}/checkout', [ManageAssetController::class, 'checkoutForm'])->name('checkout');
 		Route::post('/{assetID}/checkout', [ManageAssetController::class, 'checkout'])->name('checkout.store');
 		Route::patch('/{assetID}/checkin', [ManageAssetController::class, 'checkin'])->name('checkin');
+		Route::get('/{assetID}/agreement/view', [ManageAssetController::class, 'viewAgreement'])->name('agreement.view');
 		Route::get('/{assetID}/agreement', [ManageAssetController::class, 'downloadAgreement'])->name('agreement');
 		Route::patch('/{assetID}/dispose', [DisposalController::class, 'dispose'])->name('dispose');
 		Route::get('/{assetID}/installed-software', [ManageAssetController::class, 'installedSoftwareForm'])->name('installed-software');

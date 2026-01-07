@@ -129,10 +129,218 @@
 				box-shadow: 0 2px 6px rgba(75, 169, 194, 0.4);
 			}
 
-			.dark .interactive-button-small:hover {
-				box-shadow: 0 4px 10px rgba(75, 169, 194, 0.6);
-			}
-		</style>
+		.dark .interactive-button-small:hover {
+			box-shadow: 0 4px 10px rgba(75, 169, 194, 0.6);
+		}
+
+		/* Full interactive button styling */
+		.interactive-button {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 14px 28px;
+			font-weight: 600;
+			font-size: 13px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			overflow: hidden;
+			text-decoration: none;
+		}
+
+		.interactive-button-primary {
+			background: linear-gradient(135deg, #4BA9C2 0%, #3a8ba5 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.3);
+		}
+
+		.interactive-button-primary::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-primary:hover {
+			background: linear-gradient(135deg, #3a8ba5 0%, #2d6b82 100%);
+			box-shadow: 0 8px 20px rgba(75, 169, 194, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-primary:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-primary:active {
+			background: linear-gradient(135deg, #2d6b82 0%, #1f5a6f 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(75, 169, 194, 0.3);
+		}
+
+		.interactive-button-secondary {
+			background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+		}
+
+		.interactive-button-secondary::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-secondary:hover {
+			background: linear-gradient(135deg, #4B5563 0%, #374151 100%);
+			box-shadow: 0 8px 20px rgba(107, 114, 128, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-secondary:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-secondary:active {
+			background: linear-gradient(135deg, #374151 0%, #1F2937 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
+		}
+
+		.interactive-button-delete {
+			background: linear-gradient(135deg, #B40814 0%, #A10712 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(180, 8, 20, 0.3);
+		}
+
+		.interactive-button-delete::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-delete:hover {
+			background: linear-gradient(135deg, #A10712 0%, #990610 100%);
+			box-shadow: 0 8px 20px rgba(180, 8, 20, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-delete:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-delete:active {
+			background: linear-gradient(135deg, #990610 0%, #86050E 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(180, 8, 20, 0.3);
+		}
+
+		.interactive-button-neutral {
+			background: linear-gradient(135deg, #374151 0%, #1F2937 100%);
+			color: white;
+			box-shadow: 0 4px 12px rgba(55, 65, 81, 0.3);
+		}
+
+		.interactive-button-neutral::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			transform: translate(-50%, -50%);
+			transition: width 0.6s, height 0.6s;
+		}
+
+		.interactive-button-neutral:hover {
+			background: linear-gradient(135deg, #1F2937 0%, #111827 100%);
+			box-shadow: 0 8px 20px rgba(55, 65, 81, 0.5);
+			transform: translateY(-2px) scale(1.02);
+		}
+
+		.interactive-button-neutral:active::before {
+			width: 300px;
+			height: 300px;
+		}
+
+		.interactive-button-neutral:active {
+			background: linear-gradient(135deg, #111827 0%, #030712 100%);
+			transform: translateY(0) scale(0.98);
+			box-shadow: 0 2px 8px rgba(55, 65, 81, 0.3);
+		}
+
+		.button-content {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			position: relative;
+			z-index: 1;
+		}
+
+		/* Dark mode support for buttons */
+		.dark .interactive-button-primary {
+			box-shadow: 0 4px 12px rgba(75, 169, 194, 0.4);
+		}
+
+		.dark .interactive-button-primary:hover {
+			box-shadow: 0 8px 20px rgba(75, 169, 194, 0.6);
+		}
+
+		.dark .interactive-button-secondary {
+			box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4);
+		}
+
+		.dark .interactive-button-secondary:hover {
+			box-shadow: 0 8px 20px rgba(107, 114, 128, 0.6);
+		}
+
+		.dark .interactive-button-delete {
+			box-shadow: 0 4px 12px rgba(180, 8, 20, 0.4);
+		}
+
+		.dark .interactive-button-delete:hover {
+			box-shadow: 0 8px 20px rgba(180, 8, 20, 0.6);
+		}
+
+		.dark .interactive-button-neutral {
+			background: linear-gradient(135deg, #E5E7EB 0%, #D1D5DB 100%);
+			color: #111827;
+			box-shadow: 0 4px 12px rgba(229, 231, 235, 0.3);
+		}
+
+		.dark .interactive-button-neutral:hover {
+			background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+			box-shadow: 0 8px 20px rgba(229, 231, 235, 0.5);
+		}
+	</style>
 		<div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 			{{-- Breadcrumb --}}
 			<div class="mb-6">
@@ -144,6 +352,20 @@
 				<span class="text-gray-600 dark:text-gray-400"> > </span>
 				<span class="text-gray-600 dark:text-gray-400">{{ $asset->assetID }}</span>
 			</div>
+
+			{{-- Status message --}}
+			@if (session('status'))
+				<div class="mb-4 p-4 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg">
+					<div class="flex items-center">
+						<svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+						</svg>
+						<p class="text-green-700 dark:text-green-300 font-medium">
+							{{ session('status') }}
+						</p>
+					</div>
+				</div>
+			@endif
 
 			{{-- Top Section: Asset Details --}}
 			<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
@@ -162,7 +384,7 @@
 							</div>
 
 							{{-- Asset Information Section --}}
-							<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+							<div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-md">
 								<h3 class="text-lg font-semibold mb-4">{{ __('Asset Information') }}</h3>
 								<div class="space-y-3">
 								{{-- Row 1: Model and Processor --}}
@@ -246,9 +468,12 @@
 										</div>
 										<div class="flex flex-col border-l border-gray-300 dark:border-gray-600 pl-3">
 											@if($currentAssignment)
-												<p class="text-sm font-bold text-black dark:text-gray-300">{{ $currentAssignment->user->fullName }}</p>
-												@if($currentAssignment->user->department)
-													<p class="text-sm font-bold text-black dark:text-gray-300 mt-1">({{ $currentAssignment->user->department }} Department)</p>
+												<p class="text-sm font-bold text-black dark:text-gray-300">{{ $currentAssignment->userFullName ?? ($currentAssignment->user->fullName ?? 'User Deleted') }}</p>
+												@php
+													$dept = $currentAssignment->userDepartment ?? ($currentAssignment->user->department ?? null);
+												@endphp
+												@if($dept)
+													<p class="text-sm font-bold text-black dark:text-gray-300 mt-1">({{ $dept }} Department)</p>
 												@endif
 											@else
 												<p class="text-sm font-bold text-black dark:text-gray-300">With IT</p>
@@ -279,53 +504,24 @@
 
 						{{-- Right Section: Action Buttons --}}
 						<div class="flex flex-col gap-2 flex-shrink-0">
-							{{-- Check-Out Button --}}
-							@if($asset->status !== 'Checked Out')
-							<a href="{{ route('itdept.manage-assets.checkout', $asset->assetID) }}" 
-							   class="inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90 w-full"
-							   style="background-color: #4BA9C2;"
-							   onmouseover="this.style.backgroundColor='#3a8ba5'"
-							   onmouseout="this.style.backgroundColor='#4BA9C2'">
-								{{ __('Check-Out') }}
+							{{-- Edit Button --}}
+							<a href="{{ route('itdept.manage-assets.edit', $asset->assetID) }}" 
+							   class="interactive-button interactive-button-secondary w-full"
+							   style="padding: 10px 16px; font-size: 11px;">
+								<span class="button-content">
+									{{ __('Edit') }}
+								</span>
 							</a>
-							@else
-							<button type="button" disabled
-								class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest cursor-not-allowed opacity-50 w-full"
-								style="background-color: #B2B2B2;">
-								{{ __('Check-Out') }}
-							</button>
-							@endif
-
-							{{-- Check-In Button --}}
-							@if($asset->status === 'Checked Out' && $currentAssignment)
-							<form action="{{ route('itdept.manage-assets.checkin', $asset->assetID) }}" method="POST" class="inline w-full">
-								@csrf
-								@method('PATCH')
-								<button type="submit" 
-									class="inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90 w-full"
-									style="background-color: #1D9F26;"
-									onmouseover="this.style.backgroundColor='#1A8F22'"
-									onmouseout="this.style.backgroundColor='#1D9F26'">
-									{{ __('Check-In') }}
-								</button>
-							</form>
-							@else
-							<button type="button" disabled
-								class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest cursor-not-allowed opacity-50 w-full"
-								style="background-color: #B2B2B2;">
-								{{ __('Check-In') }}
-							</button>
-							@endif
 
 							{{-- Asset Agreement Button --}}
 							@if($asset->status === 'Checked Out' && $currentAssignment)
-							<a href="{{ route('itdept.manage-assets.agreement', $asset->assetID) }}" 
+							<a href="{{ route('itdept.manage-assets.agreement.view', $asset->assetID) }}" 
 							   target="_blank"
-							   class="inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 hover:opacity-90 w-full"
-							   style="background-color: #4BA9C2;"
-							   onmouseover="this.style.backgroundColor='#3a8ba5'"
-							   onmouseout="this.style.backgroundColor='#4BA9C2'">
-								{{ __('Asset Agreement') }}
+							   class="interactive-button interactive-button-primary w-full"
+							   style="padding: 10px 16px; font-size: 11px;">
+								<span class="button-content">
+									{{ __('Asset Agreement') }}
+								</span>
 							</a>
 							@else
 							<button type="button" disabled
@@ -337,10 +533,13 @@
 
 							{{-- Invoice Button --}}
 							@if($asset->invoice)
-							<a href="{{ route('itdept.manage-assets.invoice.download', $asset->invoice->invoiceID) }}" 
+							<a href="{{ route('itdept.manage-assets.invoice.view', $asset->invoice->invoiceID) }}" 
 							   target="_blank"
-							   class="inline-flex items-center justify-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none transition ease-in-out duration-150 w-full">
-								{{ __('Invoice') }}
+							   class="interactive-button interactive-button-neutral w-full"
+							   style="padding: 10px 16px; font-size: 11px;">
+								<span class="button-content">
+									{{ __('Invoice') }}
+								</span>
 							</a>
 							@else
 							<button type="button" disabled
@@ -356,8 +555,11 @@
 								@csrf
 								@method('PATCH')
 								<button type="submit" 
-									class="inline-flex items-center justify-center px-4 py-2 bg-red-600 dark:bg-red-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-600 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none transition ease-in-out duration-150 w-full">
-									{{ __('Dispose Asset') }}
+									class="interactive-button interactive-button-delete w-full"
+									style="padding: 10px 16px; font-size: 11px;">
+									<span class="button-content">
+										{{ __('Dispose Asset') }}
+									</span>
 								</button>
 							</form>
 							@else
@@ -417,10 +619,10 @@
 									@foreach($previousAssignments as $assignment)
 									<tr>
 										<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-											{{ $assignment->user->fullName }}
+											{{ $assignment->userFullName ?? ($assignment->user->fullName ?? 'User Deleted') }}
 										</td>
 										<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-											{{ $assignment->user->department ?? '-' }}
+											{{ $assignment->userDepartment ?? ($assignment->user->department ?? '-') }}
 										</td>
 										<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
 											{{ $assignment->checkoutDate->format('d/m/Y') }}
@@ -565,4 +767,3 @@
 		});
 	</script>
 </x-app-layout>
-

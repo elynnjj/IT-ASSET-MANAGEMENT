@@ -399,7 +399,7 @@
 					</div>
 
 					{{-- Asset Information --}}
-					<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+					<div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-md">
 						<h3 class="text-lg font-semibold mb-3">{{ __('Asset Information') }}</h3>
 						<div class="grid grid-cols-2 gap-4 text-sm">
 							<div>
@@ -417,13 +417,13 @@
 						x-data="{ 
 							showOfficeVersion: {{ in_array('Microsoft Office', $existingSoftware) ? 'true' : 'false' }},
 							showOthersInput: {{ in_array('Others', $existingSoftware) ? 'true' : 'false' }},
-							officeVersion: '{{ $officeVersion ?? '' }}',
-							othersSoftware: '{{ $othersSoftware ?? '' }}'
+							officeVersion: @js($officeVersion ?? ''),
+							othersSoftware: @js($othersSoftware ?? '')
 						}">
 						@csrf
 
 						{{-- Select Installed Software Section --}}
-						<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+						<div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-md">
 							<h3 class="text-lg font-semibold mb-4">{{ __('Select Installed Software') }}</h3>
 							<div class="space-y-1">
 								{{-- Microsoft Office --}}
@@ -438,38 +438,14 @@
 								</div>
 								<div x-show="showOfficeVersion" x-transition class="ms-6 mb-3">
 									<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('Version') }}</label>
-									<div class="space-y-2">
-										<label class="inline-flex items-center me-4 interactive-option-label">
-											<input type="radio" name="officeVersion" value="2010" x-model="officeVersion" 
-												@if(($officeVersion ?? '') === '2010') checked @endif
-												class="me-2 interactive-radio">
-											<span class="text-sm text-gray-700 dark:text-gray-300">2010</span>
-										</label>
-										<label class="inline-flex items-center me-4 interactive-option-label">
-											<input type="radio" name="officeVersion" value="2013" x-model="officeVersion" 
-												@if(($officeVersion ?? '') === '2013') checked @endif
-												class="me-2 interactive-radio">
-											<span class="text-sm text-gray-700 dark:text-gray-300">2013</span>
-										</label>
-										<label class="inline-flex items-center me-4 interactive-option-label">
-											<input type="radio" name="officeVersion" value="2019" x-model="officeVersion" 
-												@if(($officeVersion ?? '') === '2019') checked @endif
-												class="me-2 interactive-radio">
-											<span class="text-sm text-gray-700 dark:text-gray-300">2019</span>
-										</label>
-										<label class="inline-flex items-center me-4 interactive-option-label">
-											<input type="radio" name="officeVersion" value="2020" x-model="officeVersion" 
-												@if(($officeVersion ?? '') === '2020') checked @endif
-												class="me-2 interactive-radio">
-											<span class="text-sm text-gray-700 dark:text-gray-300">2020</span>
-										</label>
-										<label class="inline-flex items-center interactive-option-label">
-											<input type="radio" name="officeVersion" value="2024" x-model="officeVersion" 
-												@if(($officeVersion ?? '') === '2024') checked @endif
-												class="me-2 interactive-radio">
-											<span class="text-sm text-gray-700 dark:text-gray-300">2024</span>
-										</label>
+									<div class="input-container">
+										<input id="officeVersion" name="officeVersion" type="text" 
+												class="interactive-input" 
+												x-model="officeVersion"
+												value="{{ $officeVersion ?? '' }}"
+												placeholder="eg: Professional 2025" />
 									</div>
+									<x-input-error :messages="$errors->get('officeVersion')" class="mt-2" />
 								</div>
 
 								{{-- Other Software Options --}}

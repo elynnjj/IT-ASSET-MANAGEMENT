@@ -30,7 +30,7 @@
 					</div>
 
 					{{-- Edit User Section --}}
-					<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+					<div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-md">
 						<h3 class="text-lg font-semibold mb-4">{{ __('User Information') }}</h3>
 						<form action="{{ route('itdept.manage-users.update', $user->userID) }}" method="POST">
 							@csrf
@@ -566,16 +566,19 @@
 
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
-			// Add loading state to submit button on form submission
-			const form = document.querySelector('form');
-			const submitButton = form?.querySelector('button[type="submit"]');
+			// Add loading state to submit buttons on form submission
+			const forms = document.querySelectorAll('form');
 			
-			if (form && submitButton) {
-				form.addEventListener('submit', function() {
-					submitButton.classList.add('loading');
-					submitButton.disabled = true;
-				});
-			}
+			forms.forEach(form => {
+				const submitButton = form?.querySelector('button[type="submit"]');
+				
+				if (form && submitButton) {
+					form.addEventListener('submit', function() {
+						submitButton.classList.add('loading');
+						submitButton.disabled = true;
+					});
+				}
+			});
 		});
 	</script>
 </x-app-layout>

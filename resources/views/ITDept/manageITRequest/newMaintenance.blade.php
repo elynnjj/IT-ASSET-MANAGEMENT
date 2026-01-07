@@ -64,18 +64,8 @@
 						</div>
 					@endif
 
-					@if ($errors->any())
-						<div class="mb-4 p-4 bg-red-100 dark:bg-red-900 border border-red-400 text-red-700 dark:text-red-300 rounded-md">
-							<ul class="list-disc list-inside">
-								@foreach ($errors->all() as $error)
-									<li>{{ $error }}</li>
-								@endforeach
-							</ul>
-						</div>
-					@endif
-
 					{{-- Add New Maintenance Form Section --}}
-					<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+					<div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-md">
 						<h3 class="text-lg font-semibold mb-4">{{ __('Maintenance Details') }}</h3>
 						<form id="maintenanceForm" action="{{ route('itdept.store-maintenance') }}" method="POST">
 							@csrf
@@ -218,9 +208,22 @@
 				submitBtn.addEventListener('click', function(e) {
 					e.preventDefault();
 					
+					// Validate form before showing spinner
+					if (!maintenanceForm.checkValidity()) {
+						maintenanceForm.reportValidity();
+						return;
+					}
+					
+					// Show spinner and disable button
+					submitBtn.classList.add('loading');
+					submitBtn.disabled = true;
+					
 					if (hardwareCheckbox.checked) {
 						// Show modal if hardware changes checkbox is checked
 						modal.style.display = 'block';
+						// Re-enable button if modal is shown (user might cancel)
+						submitBtn.classList.remove('loading');
+						submitBtn.disabled = false;
 					} else {
 						// Submit directly if checkbox is not checked
 						document.getElementById('updateAsset').value = '0';
@@ -246,9 +249,18 @@
 		});
 
 		function submitMaintenance(updateAsset) {
+			const submitBtn = document.getElementById('submitMaintenanceBtn');
+			const maintenanceForm = document.getElementById('maintenanceForm');
+			
+			// Show spinner and disable button
+			if (submitBtn) {
+				submitBtn.classList.add('loading');
+				submitBtn.disabled = true;
+			}
+			
 			document.getElementById('updateAsset').value = updateAsset ? '1' : '0';
 			document.getElementById('hardwareChangesModal').style.display = 'none';
-			document.getElementById('maintenanceForm').submit();
+			maintenanceForm.submit();
 		}
 	</script>
 

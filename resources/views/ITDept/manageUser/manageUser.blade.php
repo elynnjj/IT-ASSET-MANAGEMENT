@@ -83,8 +83,15 @@
 
                     {{-- Status message --}}
                     @if (session('status'))
-                        <div class="mb-4 text-green-500 font-medium">
-                            {{ session('status') }}
+                        <div class="mb-4 p-4 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <p class="text-green-700 dark:text-green-300 font-medium">
+                                    {{ session('status') }}
+                                </p>
+                            </div>
                         </div>
                     @endif
 
@@ -96,29 +103,33 @@
 						<table class="table-auto w-full border border-gray-300 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700" id="usersTable">
 							<thead class="bg-gray-100 dark:bg-gray-700">
 								@php($columns = [
-									['key' => 'userID', 'label' => 'Username'],
-									['key' => 'fullName', 'label' => 'Full Name'],
-									['key' => 'email', 'label' => 'Email'],
-									['key' => 'department', 'label' => 'Department'],
+									['key' => 'userID', 'label' => 'Username', 'sortable' => false],
+									['key' => 'fullName', 'label' => 'Full Name', 'sortable' => false],
+									['key' => 'email', 'label' => 'Email', 'sortable' => false],
+									['key' => 'department', 'label' => 'Department', 'sortable' => true],
 								])
 								<tr>
 									@foreach ($columns as $c)
 										<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-											@php($isActive = ($sort ?? null) === $c['key'])
-											<a href="{{ request()->fullUrlWithQuery([
-												'sort' => $c['key'], 
-												'dir' => ($isActive && ($dir ?? 'asc') === 'asc') ? 'desc' : 'asc'
-											]) }}" 
-											class="inline-flex items-center gap-1">
+											@if($c['sortable'] ?? true)
+												@php($isActive = ($sort ?? null) === $c['key'])
+												<a href="{{ request()->fullUrlWithQuery([
+													'sort' => $c['key'], 
+													'dir' => ($isActive && ($dir ?? 'asc') === 'asc') ? 'desc' : 'asc'
+												]) }}" 
+												class="inline-flex items-center gap-1">
+													<span>{{ __($c['label']) }}</span>
+													<span class="text-xs">
+														@if ($isActive)
+															{{ ($dir ?? 'asc') === 'asc' ? '▲' : '▼' }}
+														@else
+															▲▼
+														@endif
+													</span>
+												</a>
+											@else
 												<span>{{ __($c['label']) }}</span>
-												<span class="text-xs">
-													@if ($isActive)
-														{{ ($dir ?? 'asc') === 'asc' ? '▲' : '▼' }}
-													@else
-														▲▼
-													@endif
-												</span>
-											</a>
+											@endif
 										</th>
 									@endforeach
 									@php($statusActive = ($sort ?? null) === 'accStat')

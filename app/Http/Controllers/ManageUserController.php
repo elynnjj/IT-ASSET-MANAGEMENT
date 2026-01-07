@@ -6,12 +6,41 @@ use App\Models\User;
 use App\Notifications\NewUserWelcomeNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\View\View;
 
 class ManageUserController
 {
+	/**
+	 * Generate a secure temporary password that meets requirements:
+	 * - Minimum 8 characters
+	 * - At least one number or symbol
+	 */
+	private function generateSecureTemporaryPassword(): string
+	{
+		$uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$lowercase = 'abcdefghijklmnopqrstuvwxyz';
+		$numbers = '0123456789';
+		$symbols = '!@#$%^&*';
+		
+		// Ensure at least one number or symbol
+		$password = '';
+		$password .= $numbers[random_int(0, strlen($numbers) - 1)]; // At least one number
+		$password .= $lowercase[random_int(0, strlen($lowercase) - 1)]; // Add lowercase for variety
+		
+		// Fill the rest randomly (minimum 8 chars total)
+		$allChars = $uppercase . $lowercase . $numbers . $symbols;
+		$remainingLength = 8 - strlen($password);
+		
+		for ($i = 0; $i < $remainingLength; $i++) {
+			$password .= $allChars[random_int(0, strlen($allChars) - 1)];
+		}
+		
+		// Shuffle to randomize position
+		return str_shuffle($password);
+	}
 
 	public function index(Request $request): View
 	{
@@ -73,8 +102,8 @@ class ManageUserController
 			'role' => ['required', 'in:Employee,HOD'],
 		]);
 
-		// Generate temporary password
-		$temporaryPassword = Str::random(12);
+		// Generate secure temporary password
+		$temporaryPassword = $this->generateSecureTemporaryPassword();
 
 		$payload = $validated;
 		$payload['password'] = $temporaryPassword;
@@ -87,7 +116,7 @@ class ManageUserController
 		$user->notify(new NewUserWelcomeNotification($temporaryPassword));
 
 		return redirect()->route('itdept.manage-users.index', ['role' => $validated['role']])
-			->with('status', 'User created successfully. A welcome email with temporary password has been sent.');
+			->with('status', '1 user successfully added');
 	}
 
 	public function edit(string $userID): View
@@ -103,9 +132,17 @@ class ManageUserController
 		$validated = $request->validate([
 			'fullName' => ['required', 'string', 'max:255'],
 			'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$user->userID.',userID'],
-			'password' => ['nullable', 'string', 'min:8'],
+			'password' => [
+				'nullable',
+				'string',
+				'min:8',
+				'regex:/^(?=.*[0-9!@#$%^&*(),.?":{}|<>]).+$/',
+			],
 			'department' => ['required', 'string', 'max:255'],
 			'role' => ['required', 'in:Employee,HOD'],
+		], [
+			'password.min' => 'The password must be at least 8 characters.',
+			'password.regex' => 'The password must contain at least one number or symbol.',
 		]);
 
 		if (!empty($validated['password'])) {
@@ -119,14 +156,14 @@ class ManageUserController
 		$user->save();
 
 		return redirect()->route('itdept.manage-users.index', ['role' => $validated['role']])
-			->with('status', 'User updated');
+			->with('status', 'User details updated successfully');
 	}
 
 	public function destroy(string $userID): RedirectResponse
 	{
 		$user = User::where('userID', $userID)->firstOrFail();
 		$user->delete();
-		return back()->with('status', 'User deleted');
+		return back()->with('status', 'User account deleted successfully');
 	}
 
 	public function deactivate(string $userID): RedirectResponse
@@ -184,53 +221,104 @@ class ManageUserController
 		$header = array_map('trim', $header);
 
 		$created = 0; $skipped = 0; $errors = 0;
+		$importedRoles = []; // Track which roles were imported
+		$usersToNotify = []; // Store users and passwords for notification after transaction
 
-		while (($row = fgetcsv($handle)) !== false) {
-			$data = array_combine($header, $row);
-			if (!$data) { $skipped++; continue; }
+		// Use database transaction for better performance and data integrity
+		DB::beginTransaction();
+		
+		try {
+			while (($row = fgetcsv($handle)) !== false) {
+				$data = array_combine($header, $row);
+				if (!$data) { $skipped++; continue; }
 
-			// Trim all values
-			$data = array_map('trim', $data);
+				// Trim all values
+				$data = array_map('trim', $data);
 
-			// Basic per-row validation (password no longer required)
-			if (!isset($data['userID'],$data['fullName'],$data['email'],$data['department'],$data['role'])) {
-				$skipped++; continue;
-			}
-			if (!in_array($data['role'], ['Employee','HOD'], true)) { $skipped++; continue; }
-
-			try {
-				// Skip existing users entirely (do not update)
-				if (User::where('userID', $data['userID'])->exists()) {
-					$skipped++;
-					continue;
+				// Basic per-row validation (password no longer required)
+				if (!isset($data['userID'],$data['fullName'],$data['email'],$data['department'],$data['role'])) {
+					$skipped++; continue;
 				}
+				if (!in_array($data['role'], ['Employee','HOD'], true)) { $skipped++; continue; }
 
-				// Generate temporary password
-				$temporaryPassword = Str::random(12);
+				try {
+					// Skip existing users entirely (do not update)
+					if (User::where('userID', $data['userID'])->exists()) {
+						$skipped++;
+						continue;
+					}
 
-				$user = new User();
-				$user->userID = $data['userID'];
-				$user->fullName = $data['fullName'];
-				$user->email = $data['email'];
-				$user->password = $temporaryPassword;
-				$user->department = $data['department'];
-				$user->role = $data['role'];
-				$user->accStat = 'active';
-				$user->firstLogin = true;
-				$user->save();
+					// Generate secure temporary password
+					$temporaryPassword = $this->generateSecureTemporaryPassword();
 
-				// Send welcome email with temporary password
-				$user->notify(new NewUserWelcomeNotification($temporaryPassword));
+					$user = new User();
+					$user->userID = $data['userID'];
+					$user->fullName = $data['fullName'];
+					$user->email = $data['email'];
+					$user->password = $temporaryPassword;
+					$user->department = $data['department'];
+					$user->role = $data['role'];
+					$user->accStat = 'active';
+					$user->firstLogin = true;
+					$user->save();
 
-				$created++;
-			} catch (\Throwable $e) {
-				$errors++;
+					// Store user and password for notification after transaction
+					$usersToNotify[] = ['user' => $user, 'password' => $temporaryPassword];
+
+					$created++;
+					
+					// Track role for redirect
+					if (!in_array($data['role'], $importedRoles)) {
+						$importedRoles[] = $data['role'];
+					}
+				} catch (\Throwable $e) {
+					$errors++;
+				}
 			}
+
+			// Commit transaction if all users were created successfully
+			DB::commit();
+
+			// Send queued email notifications after transaction is committed
+			// This prevents blocking the request and allows emails to be sent asynchronously
+			foreach ($usersToNotify as $notificationData) {
+				$notificationData['user']->notify(new NewUserWelcomeNotification($notificationData['password']));
+			}
+
+		} catch (\Throwable $e) {
+			// Rollback transaction on any error
+			DB::rollBack();
+			fclose($handle);
+			return back()->withErrors(['file' => 'An error occurred during import. No users were added. Please try again.']);
 		}
 
 		fclose($handle);
 
-		return back()->with('status', "Imported: $created created, $skipped skipped (existing), $errors errors. Welcome emails sent to new users.");
+		// Build status message similar to asset import
+		if ($created > 0) {
+			$message = "$created user(s) successfully added";
+			
+			$unsuccessfulMessages = [];
+			if ($skipped > 0) {
+				$unsuccessfulMessages[] = "$skipped already exist";
+			}
+			if ($errors > 0) {
+				$unsuccessfulMessages[] = "$errors unsuccessful";
+			}
+			
+			if (!empty($unsuccessfulMessages)) {
+				$message .= ". " . implode(", ", $unsuccessfulMessages);
+			}
+			
+			// Determine which role to show (prefer first imported role, or default to Employee)
+			$redirectRole = !empty($importedRoles) ? $importedRoles[0] : 'Employee';
+			
+			return redirect()->route('itdept.manage-users.index', ['role' => $redirectRole])
+				->with('status', $message);
+		} else {
+			// No users were created, show error message on add user page
+			return back()->withErrors(['file' => "No users were added. $skipped already exist, $errors errors."]);
+		}
 	}
 }
 

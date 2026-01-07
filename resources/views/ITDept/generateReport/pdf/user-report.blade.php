@@ -82,16 +82,11 @@
 			color: #3b82f6;
 			font-weight: bold;
 		}
-		.footer {
-			margin-top: 20px;
-			padding-top: 10px;
-			border-top: 1px solid #ddd;
-			text-align: center;
-			font-size: 8px;
-			color: #666;
-		}
 		.page-break {
 			page-break-after: always;
+		}
+		@page {
+			margin: 20mm 15mm;
 		}
 	</style>
 </head>
@@ -139,9 +134,5 @@
 			@endforelse
 		</tbody>
 	</table>
-
-	<div class="footer">
-		<p>Page 1</p>
-	</div>
 </body>
 </html>

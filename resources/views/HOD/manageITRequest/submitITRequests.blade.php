@@ -35,7 +35,7 @@
 					@endif
 
 					{{-- Asset Details Section --}}
-					<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+					<div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-md">
 						<h3 class="text-lg font-semibold mb-4">{{ __('Your Assigned Asset') }}</h3>
 						@if($assignedAsset)
 							<div class="grid grid-cols-2 gap-4">
@@ -54,12 +54,40 @@
 					</div>
 
 					{{-- New IT Request Form Section --}}
-					<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+					<div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-md">
 						<h3 class="text-lg font-semibold mb-4">{{ __('Request Details') }}</h3>
-						<form action="{{ route('hod.it-requests.store') }}" method="POST">
+						
+						{{-- Error message for no assigned asset --}}
+						@if ($errors->has('asset'))
+							<div class="mb-4 p-4 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg">
+								<div class="flex items-center">
+									<svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+									</svg>
+									<p class="text-red-700 dark:text-red-300 font-medium">
+										{{ $errors->first('asset') }}
+									</p>
+								</div>
+							</div>
+						@endif
+						
+						@if (!$assignedAsset)
+							<div class="mb-4 p-4 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg">
+								<div class="flex items-center">
+									<svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+									</svg>
+									<p class="text-red-700 dark:text-red-300 font-medium">
+										No assigned asset. You must have an assigned asset to submit an IT request.
+									</p>
+								</div>
+							</div>
+						@endif
+						
+						<form action="{{ route('hod.it-requests.store') }}" method="POST" @if(!$assignedAsset) onsubmit="return false;" @endif>
 							@csrf
 
-							<div class="space-y-4">
+							<div class="space-y-4" @if(!$assignedAsset) style="opacity: 0.5; pointer-events: none;" @endif>
 								{{-- Request Date --}}
 								<div class="input-container">
 									<x-input-label for="requestDate" :value="__('Request Date')" class="text-[15px]" />
@@ -104,7 +132,8 @@
 								</a>
 								<button type="submit" 
 									class="interactive-button interactive-button-primary"
-									style="padding: 10px 16px; font-size: 11px;">
+									style="padding: 10px 16px; font-size: 11px;"
+									@if(!$assignedAsset) disabled @endif>
 									<span class="button-content">
 										<span class="button-text">{{ __('Submit Request') }}</span>
 										<span class="button-spinner"></span>
@@ -359,16 +388,19 @@
 
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
-			// Add loading state to submit button on form submission
-			const form = document.querySelector('form');
-			const submitButton = form?.querySelector('button[type="submit"]');
+			// Add loading state to submit buttons on form submission
+			const forms = document.querySelectorAll('form');
 			
-			if (form && submitButton) {
-				form.addEventListener('submit', function() {
-					submitButton.classList.add('loading');
-					submitButton.disabled = true;
-				});
-			}
+			forms.forEach(form => {
+				const submitButton = form?.querySelector('button[type="submit"]');
+				
+				if (form && submitButton) {
+					form.addEventListener('submit', function() {
+						submitButton.classList.add('loading');
+						submitButton.disabled = true;
+					});
+				}
+			});
 		});
 	</script>
 </x-app-layout>

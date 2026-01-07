@@ -39,81 +39,95 @@
 								</select>
 							</div>
 
-							{{-- Asset Inventory Report Fields (hidden by default) --}}
-							<div id="assetInventoryFields" style="display: none;">
-								{{-- Asset Type --}}
-								<div class="flex items-center">
-									<label for="assetType" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
-										{{ __('Asset Type') }} 
-									</label>
-									<select id="assetType" name="assetType" 
-										class="w-3/4 interactive-select">
-										<option value="">{{ __('Select asset type') }}</option>
-										<option value="all">{{ __('All Asset') }}</option>
-										<option value="Laptop">{{ __('Laptops') }}</option>
-										<option value="Desktop">{{ __('Desktops') }}</option>
-									</select>
+							{{-- Asset Inventory Report Section (hidden by default) --}}
+							<div id="assetInventorySection" style="display: none;" class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+								{{-- Section Header --}}
+								<div class="mb-4">
+									<h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ __('Asset Inventory Report') }}</h3>
 								</div>
+								
+								<div class="space-y-4">
+									{{-- Asset Type --}}
+									<div class="flex items-center">
+										<label for="assetType" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
+											{{ __('Asset Type') }} 
+										</label>
+										<select id="assetType" name="assetType" 
+											class="w-3/4 interactive-select">
+											<option value="">{{ __('Select asset type') }}</option>
+											<option value="all">{{ __('All Asset') }}</option>
+											<option value="Laptop">{{ __('Laptops') }}</option>
+											<option value="Desktop">{{ __('Desktops') }}</option>
+										</select>
+									</div>
 
-								{{-- Asset Status --}}
-								<div class="flex items-center">
-									<label for="assetStatus" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
-										{{ __('Asset Status') }} 
-									</label>
-									<select id="assetStatus" name="assetStatus" 
-										class="w-3/4 interactive-select">
-										<option value="">{{ __('Select asset status') }}</option>
-										<option value="all">{{ __('All Asset') }}</option>
-										<option value="available">{{ __('Available') }}</option>
-										<option value="disposed">{{ __('Disposed') }}</option>
-									</select>
+									{{-- Asset Status --}}
+									<div class="flex items-center">
+										<label for="assetStatus" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
+											{{ __('Asset Status') }} 
+										</label>
+										<select id="assetStatus" name="assetStatus" 
+											class="w-3/4 interactive-select">
+											<option value="">{{ __('Select asset status') }}</option>
+											<option value="all">{{ __('All Asset') }}</option>
+											<option value="available">{{ __('Available') }}</option>
+											<option value="disposed">{{ __('Disposed') }}</option>
+										</select>
+									</div>
 								</div>
 							</div>
 
-							{{-- User Report Fields (hidden by default) --}}
-							<div id="userReportFields" style="display: none;">
-								{{-- Department --}}
-								<div class="flex items-center">
-									<label for="department" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
-										{{ __('Department') }} 
-									</label>
-									<select id="department" name="department" 
-										class="w-3/4 interactive-select">
-										<option value="">{{ __('Select department') }}</option>
-										<option value="all">{{ __('All Department') }}</option>
-										@php($departments = ['HR & Admin','Account','Service','Project','Supply Chain','Sales','Proposal'])
-										@foreach ($departments as $dept)
-											<option value="{{ $dept }}">{{ $dept }}</option>
-										@endforeach
-									</select>
+							{{-- User Report Section (hidden by default) --}}
+							<div id="userReportSection" style="display: none;" class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+								{{-- Section Header --}}
+								<div class="mb-4">
+									<h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ __('User Report') }}</h3>
 								</div>
+								
+								<div class="space-y-4">
+									{{-- Department --}}
+									<div class="flex items-center">
+										<label for="department" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
+											{{ __('Department') }} 
+										</label>
+										<select id="department" name="department" 
+											class="w-3/4 interactive-select">
+											<option value="">{{ __('Select department') }}</option>
+											<option value="all">{{ __('All Department') }}</option>
+											@php($departments = ['HR & Admin','Account','Service','Project','Supply Chain','Sales','Proposal'])
+											@foreach ($departments as $dept)
+												<option value="{{ $dept }}">{{ $dept }}</option>
+											@endforeach
+										</select>
+									</div>
 
-								{{-- User Role --}}
-								<div class="flex items-center">
-									<label for="userRole" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
-										{{ __('User Role') }} 
-									</label>
-									<select id="userRole" name="userRole" 
-										class="w-3/4 interactive-select">
-										<option value="">{{ __('Select user role') }}</option>
-										<option value="all">{{ __('All Roles') }}</option>
-										<option value="HOD">{{ __('HOD') }}</option>
-										<option value="Employee">{{ __('Employee') }}</option>
-									</select>
-								</div>
+									{{-- User Role --}}
+									<div class="flex items-center">
+										<label for="userRole" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
+											{{ __('User Role') }} 
+										</label>
+										<select id="userRole" name="userRole" 
+											class="w-3/4 interactive-select">
+											<option value="">{{ __('Select user role') }}</option>
+											<option value="all">{{ __('All Roles') }}</option>
+											<option value="HOD">{{ __('HOD') }}</option>
+											<option value="Employee">{{ __('Employee') }}</option>
+										</select>
+									</div>
 
-								{{-- Status --}}
-								<div class="flex items-center">
-									<label for="userStatus" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
-										{{ __('Status') }} 
-									</label>
-									<select id="userStatus" name="userStatus" 
-										class="w-3/4 interactive-select">
-										<option value="">{{ __('Select status') }}</option>
-										<option value="all">{{ __('All Status') }}</option>
-										<option value="active">{{ __('Active') }}</option>
-										<option value="inactive">{{ __('Inactive') }}</option>
-									</select>
+									{{-- Status --}}
+									<div class="flex items-center">
+										<label for="userStatus" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
+											{{ __('Status') }} 
+										</label>
+										<select id="userStatus" name="userStatus" 
+											class="w-3/4 interactive-select">
+											<option value="">{{ __('Select status') }}</option>
+											<option value="all">{{ __('All Status') }}</option>
+											<option value="active">{{ __('Active') }}</option>
+											<option value="inactive">{{ __('Inactive') }}</option>
+										</select>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -331,15 +345,15 @@
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
 			const reportTypeSelect = document.getElementById('reportType');
-			const assetInventoryFields = document.getElementById('assetInventoryFields');
-			const userReportFields = document.getElementById('userReportFields');
+			const assetInventorySection = document.getElementById('assetInventorySection');
+			const userReportSection = document.getElementById('userReportSection');
 
 			reportTypeSelect.addEventListener('change', function() {
 				const selectedType = this.value;
 
-				// Hide all conditional fields first
-				assetInventoryFields.style.display = 'none';
-				userReportFields.style.display = 'none';
+				// Hide all conditional sections first
+				assetInventorySection.style.display = 'none';
+				userReportSection.style.display = 'none';
 
 				// Clear required attributes
 				document.getElementById('assetType').removeAttribute('required');
@@ -355,13 +369,13 @@
 				document.getElementById('userRole').value = '';
 				document.getElementById('userStatus').value = '';
 
-				// Show relevant fields based on selection
+				// Show relevant section based on selection
 				if (selectedType === 'asset-inventory') {
-					assetInventoryFields.style.display = 'block';
+					assetInventorySection.style.display = 'block';
 					document.getElementById('assetType').setAttribute('required', 'required');
 					document.getElementById('assetStatus').setAttribute('required', 'required');
 				} else if (selectedType === 'user-report') {
-					userReportFields.style.display = 'block';
+					userReportSection.style.display = 'block';
 					document.getElementById('department').setAttribute('required', 'required');
 					document.getElementById('userRole').setAttribute('required', 'required');
 					document.getElementById('userStatus').setAttribute('required', 'required');

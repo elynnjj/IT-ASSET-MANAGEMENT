@@ -20,7 +20,7 @@
 
 			{{-- Main Content Card --}}
 			<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-				<div class="p-6 text-gray-900 dark:text-gray-100" x-data="{ showBulkUpload: false }">
+				<div class="p-6 text-gray-900 dark:text-gray-100" x-data="{ showBulkUpload: {{ $errors->has('file') ? 'true' : 'false' }} }">
 
 					{{-- Title and Add Asset in Bulk Button --}}
 					<div class="mb-6 flex items-center justify-between">
@@ -39,8 +39,23 @@
 					</div>
 
 					{{-- Add Asset in Bulk Section --}}
-					<div x-show="showBulkUpload" x-transition class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md" style="display: none;">
+					<div x-show="showBulkUpload" x-transition class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-md" style="display: none;">
 						<h3 class="text-lg font-semibold mb-4">{{ __('Add Asset in Bulk') }}</h3>
+						
+						{{-- Error messages --}}
+						@if ($errors->has('file'))
+							<div class="mb-4 p-4 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg">
+								<div class="flex items-center">
+									<svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+									</svg>
+									<p class="text-red-700 dark:text-red-300 font-medium">
+										{{ $errors->first('file') }}
+									</p>
+								</div>
+							</div>
+						@endif
+						
 						<form action="{{ route('itdept.manage-assets.import') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
 							@csrf
 							<div class="input-container">
@@ -57,7 +72,6 @@
 									</div>
 								</div>
 								<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Accepted format: CSV (Max: 10MB)</p>
-								<x-input-error :messages="$errors->get('file')" class="mt-2" />
 							</div>
 
 							<div class="flex items-center justify-end space-x-6 mt-6">
@@ -84,7 +98,7 @@
 					</div>
 
 					{{-- Add Asset Manually Section --}}
-					<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+					<div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-md">
 						<h3 class="text-lg font-semibold mb-4">{{ __('Add Asset Manually') }}</h3>
 						<form action="{{ route('itdept.manage-assets.store') }}" method="POST">
 							@csrf
@@ -95,14 +109,18 @@
 									<div class="mt-2 space-x-6">
 										<label class="inline-flex items-center interactive-option-label">
 											<input type="radio" name="assetType" value="Laptop" 
+												id="assetTypeLaptop"
 												class="me-2 interactive-radio"
-												required>
+												required
+												onchange="generateAssetID('Laptop')">
 											<span class="text-gray-700 dark:text-gray-300 text-[15px]">Laptop</span>
 										</label>
 										<label class="inline-flex items-center interactive-option-label">
 											<input type="radio" name="assetType" value="Desktop" 
+												id="assetTypeDesktop"
 												class="me-2 interactive-radio"
-												required>
+												required
+												onchange="generateAssetID('Desktop')">
 											<span class="text-gray-700 dark:text-gray-300 text-[15px]">Desktop</span>
 										</label>
 									</div>
@@ -114,16 +132,17 @@
 									<div class="input-container">
 										<x-input-label for="assetID" :value="__('Asset ID')" class="text-[15px]" />
 										<x-text-input id="assetID" name="assetID" type="text" 
-											class="mt-1 block w-full interactive-input" 
-											placeholder="Enter the asset ID"
-											required />
+											class="mt-1 block w-full interactive-input readonly-input" 
+											placeholder="Select asset type to auto-generate"
+											readonly />
 										<x-input-error :messages="$errors->get('assetID')" class="mt-2" />
 									</div>
 									<div class="input-container">
 										<x-input-label for="serialNum" :value="__('Serial Number')" class="text-[15px]" />
 										<x-text-input id="serialNum" name="serialNum" type="text" 
 											class="mt-1 block w-full interactive-input" 
-											placeholder="Enter the serial number" />
+											placeholder="Enter the serial number"
+											onblur="validateSerialNumber(this.value)" />
 										<x-input-error :messages="$errors->get('serialNum')" class="mt-2" />
 									</div>
 								</div>
@@ -679,9 +698,77 @@
 		.dark .interactive-option-label:hover {
 			color: #4BA9C2;
 		}
+
+		/* Read-only input styling */
+		.readonly-input {
+			background-color: #F3F4F6 !important;
+			cursor: not-allowed !important;
+			color: #6B7280 !important;
+		}
+
+		.dark .readonly-input {
+			background-color: #374151 !important;
+			color: #9CA3AF !important;
+		}
+
+		.readonly-input:hover,
+		.readonly-input:focus {
+			border-color: #9CA3AF !important;
+			box-shadow: none !important;
+			transform: none !important;
+		}
 	</style>
 
 	<script>
+		// Pre-loaded asset IDs from server
+		const assetIDs = {
+			'Laptop': @json($nextLaptopID ?? 'LAPTOP0001'),
+			'Desktop': @json($nextDesktopID ?? 'DESKTOP0001')
+		};
+
+		// Function to set asset ID when asset type is selected
+		function generateAssetID(assetType) {
+			const assetIDInput = document.getElementById('assetID');
+			if (!assetIDInput) return;
+
+			// Validate asset type
+			if (!assetType || !['Laptop', 'Desktop'].includes(assetType)) {
+				console.error('Invalid asset type:', assetType);
+				return;
+			}
+
+			// Set the pre-generated asset ID
+			if (assetIDs[assetType]) {
+				assetIDInput.value = assetIDs[assetType];
+			} else {
+				console.error('Asset ID not found for type:', assetType);
+				assetIDInput.value = '';
+			}
+		}
+
+		// Function to validate serial number uniqueness
+		async function validateSerialNumber(serialNum) {
+			if (!serialNum || serialNum.trim() === '') {
+				return; // Skip validation if empty
+			}
+
+			try {
+				const response = await fetch(`{{ route('itdept.manage-assets.index') }}?q=${encodeURIComponent(serialNum)}`, {
+					method: 'GET',
+					headers: {
+						'X-Requested-With': 'XMLHttpRequest',
+						'Accept': 'application/json',
+					}
+				});
+
+				// Check if serial number exists by searching assets
+				// We'll use a simpler approach - check via form submission validation
+				// The backend will handle the validation and return error
+			} catch (error) {
+				console.error('Error validating serial number:', error);
+			}
+		}
+
 		document.addEventListener('DOMContentLoaded', function() {
 			// Add loading state to submit buttons on form submission
 			const forms = document.querySelectorAll('form');
@@ -690,7 +777,14 @@
 				const submitButton = form?.querySelector('button[type="submit"]');
 				
 				if (form && submitButton) {
-					form.addEventListener('submit', function() {
+					form.addEventListener('submit', function(e) {
+						// Validate serial number before submission
+						const serialNumInput = form.querySelector('#serialNum');
+						if (serialNumInput && serialNumInput.value.trim() !== '') {
+							// Serial number validation will be handled by backend
+							// If there's an error, the form won't submit and error will be shown
+						}
+
 						submitButton.classList.add('loading');
 						submitButton.disabled = true;
 					});

@@ -26,7 +26,7 @@
                         </a>
                     </div>
 
-                    {{-- Search / Filter / Add --}}
+					{{-- Search / Filter / Add --}}
 					<div class="mb-6">
 						<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 							<form id="filterForm" method="GET" action="{{ route('itdept.manage-assets.index') }}" 
@@ -36,10 +36,22 @@
 								{{-- Search input with auto-submit --}}
 								<div class="input-container flex-1 min-w-[200px]">
 									<input type="text" id="searchInput" name="q" value="{{ $q }}" 
-									placeholder="{{ __('Search asset ID, serial number or model') }}"
+									placeholder="{{ __('Search asset ID, serial number, model or current user') }}"
 										class="interactive-input w-full"
 										style="padding: 8px 12px; font-size: 13px;"
 										autocomplete="off" />
+								</div>
+
+								{{-- Status Filter Dropdown --}}
+								<div class="input-container">
+									<select name="status" id="statusFilter" 
+										class="interactive-input"
+										style="padding: 8px 12px; font-size: 13px; cursor: pointer;"
+										onchange="document.getElementById('filterForm').submit();">
+										<option value="">{{ __('All Status') }}</option>
+										<option value="Available" {{ $filterStatus === 'Available' ? 'selected' : '' }}>{{ __('Available') }}</option>
+										<option value="Checked Out" {{ $filterStatus === 'Checked Out' ? 'selected' : '' }}>{{ __('Checked Out') }}</option>
+									</select>
 								</div>
 
 								{{-- Upload Invoice button --}}
@@ -71,8 +83,15 @@
 
                     {{-- Status message --}}
                     @if (session('status'))
-                        <div class="mb-4 text-green-500 font-medium">
-                            {{ session('status') }}
+                        <div class="mb-4 p-4 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <p class="text-green-700 dark:text-green-300 font-medium">
+                                    {{ session('status') }}
+                                </p>
+                            </div>
                         </div>
                     @endif
 
@@ -83,42 +102,21 @@
 						</div>
 						<table class="table-auto w-full border border-gray-300 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700" id="assetsTable">
 							<thead class="bg-gray-100 dark:bg-gray-700">
-								@php($columns = [
-									['key' => 'assetID', 'label' => 'Asset ID'],
-									['key' => 'serialNum', 'label' => 'Serial Number'],
-									['key' => 'model', 'label' => 'Model'],
-								])
-								<tr>
-									@foreach ($columns as $c)
-										<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-											@php($isActive = ($sort ?? null) === $c['key'])
-											<a href="{{ request()->fullUrlWithQuery([
-												'sort' => $c['key'], 
-												'dir' => ($isActive && ($dir ?? 'asc') === 'asc') ? 'desc' : 'asc'
-											]) }}" 
-											class="inline-flex items-center gap-1">
-												<span>{{ __($c['label']) }}</span>
-												<span class="text-xs">
-													@if ($isActive)
-														{{ ($dir ?? 'asc') === 'asc' ? '▲' : '▼' }}
-													@else
-														▲▼
-													@endif
-												</span>
-											</a>
-										</th>
-									@endforeach
-									<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Current User') }}</th>
-									@php($statusActive = ($sort ?? null) === 'status')
+							@php($columns = [
+								['key' => 'assetID', 'label' => 'Asset ID'],
+							])
+							<tr>
+								@foreach ($columns as $c)
 									<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+										@php($isActive = ($sort ?? null) === $c['key'])
 										<a href="{{ request()->fullUrlWithQuery([
-											'sort' => 'status', 
-											'dir' => ($statusActive && ($dir ?? 'asc') === 'asc') ? 'desc' : 'asc'
+											'sort' => $c['key'], 
+											'dir' => ($isActive && ($dir ?? 'asc') === 'asc') ? 'desc' : 'asc'
 										]) }}" 
 										class="inline-flex items-center gap-1">
-											<span>{{ __('Status') }}</span>
+											<span>{{ __($c['label']) }}</span>
 											<span class="text-xs">
-												@if ($statusActive)
+												@if ($isActive)
 													{{ ($dir ?? 'asc') === 'asc' ? '▲' : '▼' }}
 												@else
 													▲▼
@@ -126,6 +124,11 @@
 											</span>
 										</a>
 									</th>
+								@endforeach
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Serial Number') }}</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Model') }}</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Current User') }}</th>
+								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Status') }}</th>
 									<th class="px-3 py-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 20%;">{{ __('Action') }}</th>
 								</tr>
 							</thead>
@@ -138,7 +141,7 @@
 										<td class="px-4 py-2 text-sm">{{ $asset->model ?? '-' }}</td>
 										<td class="px-4 py-2 text-sm">
 											@if($currentAssignment)
-												{{ $currentAssignment->user->fullName }}
+												{{ $currentAssignment->userFullName ?? ($currentAssignment->user->fullName ?? 'User Deleted') }}
 											@else
 												With IT
 											@endif
@@ -151,38 +154,53 @@
 										<td class="px-3 py-2">
 											<div class="flex items-center justify-center gap-2">
 												<a href="{{ route('itdept.manage-assets.show', $asset->assetID) }}" 
-												   class="interactive-button interactive-button-primary"
+												   class="interactive-button interactive-button-secondary"
 												   style="padding: 6px 12px; font-size: 11px;"
 												   title="{{ __('View') }}">
 													<span class="button-content">
 														{{ __('View') }}
 													</span>
 												</a>
-												<a href="{{ route('itdept.manage-assets.edit', $asset->assetID) }}" 
-												   class="interactive-button interactive-button-secondary"
-												   style="padding: 6px 10px; font-size: 11px;"
-												   title="{{ __('Edit') }}">
-													<span class="button-content">
-													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+												{{-- Check-Out Icon Button --}}
+												@if($asset->status !== 'Checked Out')
+												<a href="{{ route('itdept.manage-assets.checkout', $asset->assetID) }}" 
+												   class="interactive-button-icon-checkout"
+												   title="{{ __('Check-Out') }}">
+													<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+														<path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
 													</svg>
-													</span>
 												</a>
-												<form action="{{ route('itdept.manage-assets.destroy', $asset->assetID) }}" method="POST" class="inline delete-asset-form">
+												@else
+												<button type="button" disabled
+													class="interactive-button-icon-disabled"
+													title="{{ __('Check-Out') }}">
+													<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+														<path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+													</svg>
+												</button>
+												@endif
+												{{-- Check-In Icon Button --}}
+												@if($asset->status === 'Checked Out' && $currentAssignment)
+												<form action="{{ route('itdept.manage-assets.checkin', $asset->assetID) }}" method="POST" class="inline checkin-asset-form">
 													@csrf
-													@method('DELETE')
+													@method('PATCH')
 													<button type="submit" 
-														class="interactive-button interactive-button-delete"
-														style="padding: 6px 10px; font-size: 11px;"
-														title="{{ __('Delete') }}">
-														<span class="button-content">
-															<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-																<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-															</svg>
-															<span class="button-spinner"></span>
-														</span>
+														class="interactive-button-icon-checkin"
+														title="{{ __('Check-In') }}">
+														<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+															<path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+														</svg>
 													</button>
 												</form>
+												@else
+												<button type="button" disabled
+													class="interactive-button-icon-disabled"
+													title="{{ __('Check-In') }}">
+													<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+														<path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+													</svg>
+												</button>
+												@endif
 											</div>
 										</td>
 									</tr>
@@ -349,9 +367,9 @@
         }
 
         .interactive-button-secondary {
-            background: linear-gradient(135deg, #797979 0%, #666666 100%);
+            background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(121, 121, 121, 0.3);
+            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
         }
 
         .interactive-button-secondary::before {
@@ -368,8 +386,8 @@
         }
 
         .interactive-button-secondary:hover {
-            background: linear-gradient(135deg, #666666 0%, #555555 100%);
-            box-shadow: 0 8px 20px rgba(121, 121, 121, 0.5);
+            background: linear-gradient(135deg, #4B5563 0%, #374151 100%);
+            box-shadow: 0 8px 20px rgba(107, 114, 128, 0.5);
             transform: translateY(-2px) scale(1.02);
         }
 
@@ -379,9 +397,9 @@
         }
 
         .interactive-button-secondary:active {
-            background: linear-gradient(135deg, #555555 0%, #444444 100%);
+            background: linear-gradient(135deg, #374151 0%, #1F2937 100%);
             transform: translateY(0) scale(0.98);
-            box-shadow: 0 2px 8px rgba(121, 121, 121, 0.3);
+            box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
         }
 
         .button-content {
@@ -403,11 +421,11 @@
         }
 
         .dark .interactive-button-secondary {
-            box-shadow: 0 4px 12px rgba(121, 121, 121, 0.4);
+            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4);
         }
 
         .dark .interactive-button-secondary:hover {
-            box-shadow: 0 8px 20px rgba(121, 121, 121, 0.6);
+            box-shadow: 0 8px 20px rgba(107, 114, 128, 0.6);
         }
 
         .interactive-button-delete {
@@ -475,9 +493,149 @@
         .dark .interactive-button-delete:hover {
             box-shadow: 0 8px 20px rgba(180, 8, 20, 0.6);
         }
+
+        /* Icon button styling for check-in/check-out */
+        .interactive-button-icon-checkout,
+        .interactive-button-icon-checkin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(75, 169, 194, 0.3);
+        }
+
+        .interactive-button-icon-checkout {
+            background: linear-gradient(135deg, #4BA9C2 0%, #3a8ba5 100%);
+            color: white;
+        }
+
+        .interactive-button-icon-checkin {
+            background: linear-gradient(135deg, #1D9F26 0%, #1A8F22 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(29, 159, 38, 0.3);
+        }
+
+        .interactive-button-icon-checkout::before,
+        .interactive-button-icon-checkin::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .interactive-button-icon-checkout:hover {
+            background: linear-gradient(135deg, #3a8ba5 0%, #2d6b82 100%);
+            box-shadow: 0 4px 12px rgba(75, 169, 194, 0.5);
+            transform: translateY(-2px) scale(1.1);
+        }
+
+        .interactive-button-icon-checkin:hover {
+            background: linear-gradient(135deg, #1A8F22 0%, #167F1A 100%);
+            box-shadow: 0 4px 12px rgba(29, 159, 38, 0.5);
+            transform: translateY(-2px) scale(1.1);
+        }
+
+        .interactive-button-icon-checkout:active::before,
+        .interactive-button-icon-checkin:active::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .interactive-button-icon-checkout:active,
+        .interactive-button-icon-checkin:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .interactive-button-icon-checkout svg,
+        .interactive-button-icon-checkin svg {
+            width: 16px;
+            height: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .interactive-button-icon-disabled {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border: none;
+            border-radius: 6px;
+            cursor: not-allowed;
+            background-color: #B2B2B2;
+            color: white;
+            opacity: 0.5;
+        }
+
+        .interactive-button-icon-disabled svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Dark mode support */
+        .dark .interactive-button-icon-checkout {
+            box-shadow: 0 2px 8px rgba(75, 169, 194, 0.4);
+        }
+
+        .dark .interactive-button-icon-checkout:hover {
+            box-shadow: 0 4px 12px rgba(75, 169, 194, 0.6);
+        }
+
+        .dark .interactive-button-icon-checkin {
+            box-shadow: 0 2px 8px rgba(29, 159, 38, 0.4);
+        }
+
+        .dark .interactive-button-icon-checkin:hover {
+            box-shadow: 0 4px 12px rgba(29, 159, 38, 0.6);
+        }
     </style>
 
     <script>
+        // Function to initialize check-in button handlers
+        function initializeCheckinHandlers() {
+            const checkinForms = document.querySelectorAll('.checkin-asset-form');
+            checkinForms.forEach(form => {
+                // Remove existing listeners to avoid duplicates
+                const newForm = form.cloneNode(true);
+                form.parentNode.replaceChild(newForm, form);
+                
+                const submitButton = newForm.querySelector('button[type="submit"]');
+                if (submitButton) {
+                    newForm.addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        
+                        // Show confirmation dialog
+                        const confirmed = await window.showConfirmation(
+                            'Are you sure you want to check-in this asset?',
+                            'Check-In Asset'
+                        );
+                        
+                        if (confirmed) {
+                            // User confirmed - submit the form
+                            newForm.submit();
+                        }
+                    });
+                }
+            });
+        }
+
         // Function to initialize delete button handlers
         function initializeDeleteHandlers() {
             const deleteForms = document.querySelectorAll('.delete-asset-form');
@@ -509,6 +667,9 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize check-in handlers on page load
+            initializeCheckinHandlers();
+            
             // Initialize delete handlers on page load
             initializeDeleteHandlers();
 
@@ -608,7 +769,8 @@
                             const newUrl = '{{ route("itdept.manage-assets.index") }}?' + searchParams.toString();
                             window.history.pushState({}, '', newUrl);
                             
-                            // Re-initialize delete button handlers for new rows
+                            // Re-initialize check-in and delete button handlers for new rows
+                            initializeCheckinHandlers();
                             initializeDeleteHandlers();
                         }
                     })

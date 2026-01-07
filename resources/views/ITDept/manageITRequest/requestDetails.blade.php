@@ -152,7 +152,7 @@
 
 					{{-- Add Maintenance Form (only if status is Pending IT) --}}
 					@if($itRequest->status === 'Pending IT')
-						<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+						<div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-md">
 							<h3 class="text-lg font-semibold mb-4">{{ __('Add Maintenance Details') }}</h3>
 							<form id="maintenanceForm" action="{{ route('itdept.it-requests.maintenance', $itRequest->requestID) }}" method="POST">
 								@csrf
@@ -227,14 +227,25 @@
 				submitBtn.addEventListener('click', function(e) {
 					e.preventDefault();
 					
+					// Validate form before showing spinner
+					if (!maintenanceForm.checkValidity()) {
+						maintenanceForm.reportValidity();
+						return;
+					}
+					
+					// Show spinner and disable button
+					submitBtn.classList.add('loading');
+					submitBtn.disabled = true;
+					
 					if (hardwareCheckbox.checked) {
 						// Show modal if hardware changes checkbox is checked
 						modal.style.display = 'block';
+						// Re-enable button if modal is shown (user might cancel)
+						submitBtn.classList.remove('loading');
+						submitBtn.disabled = false;
 					} else {
 						// Submit directly if checkbox is not checked
 						document.getElementById('updateAsset').value = '0';
-						submitBtn.classList.add('loading');
-						submitBtn.disabled = true;
 						maintenanceForm.submit();
 					}
 				});
@@ -252,13 +263,17 @@
 
 		function submitMaintenance(updateAsset) {
 			const submitBtn = document.getElementById('submitMaintenanceBtn');
-			document.getElementById('updateAsset').value = updateAsset ? '1' : '0';
-			document.getElementById('hardwareChangesModal').style.display = 'none';
+			const maintenanceForm = document.getElementById('maintenanceForm');
+			
+			// Show spinner and disable button
 			if (submitBtn) {
 				submitBtn.classList.add('loading');
 				submitBtn.disabled = true;
 			}
-			document.getElementById('maintenanceForm').submit();
+			
+			document.getElementById('updateAsset').value = updateAsset ? '1' : '0';
+			document.getElementById('hardwareChangesModal').style.display = 'none';
+			maintenanceForm.submit();
 		}
 	</script>
 

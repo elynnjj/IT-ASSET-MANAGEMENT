@@ -356,6 +356,9 @@
                         <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
                             {{ __('You must change your password before continuing. Please enter your new password below.') }}
                         </div>
+                         <div class="mb-4 text-xs text-gray-600 dark:text-gray-400">
+                             {{ __('Ensure your account is using a long, random password to stay secure (mix 8 characters & at least one number or symbol).') }}
+                         </div>
 
                         <!-- Current Password -->
                         <div class="mb-4">
@@ -409,9 +412,25 @@
                                     </svg>
                                 </span>
                             </div>
-                            @error('password')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                            @enderror
+                             @error('password')
+                                 <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+                                     <p class="font-medium mb-1">{{ $message }}</p>
+                                     <p class="font-medium mb-1 mt-2">Password requirements:</p>
+                                     <ul class="list-disc list-inside space-y-0.5 text-xs">
+                                         <li>Minimum 8 characters</li>
+                                         <li>At least one number (0-9) or symbol (!@#$%^&*...)</li>
+                                     </ul>
+                                 </div>
+                             @enderror
+                             @if(!$errors->has('password'))
+                                 <div class="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                                     <p class="font-medium mb-1">Password requirements:</p>
+                                     <ul class="list-disc list-inside space-y-0.5">
+                                         <li>Minimum 8 characters</li>
+                                         <li>At least one number (0-9) or symbol (!@#$%^&*...)</li>
+                                     </ul>
+                                 </div>
+                             @endif
                         </div>
 
                         <!-- Confirm Password -->

@@ -156,7 +156,16 @@ class ManageLoginController
         $request->validate([
             'token' => ['required'],
             'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[0-9!@#$%^&*(),.?":{}|<>]).+$/',
+            ],
+        ], [
+            'password.min' => 'The password must be at least 8 characters.',
+            'password.regex' => 'The password must contain at least one number or symbol.',
         ]);
 
         // Here we will attempt to reset the user's password. If it is successful we
@@ -213,7 +222,16 @@ class ManageLoginController
 
         $request->validate([
             'current_password' => ['required', 'string', 'current_password'],
-            'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[0-9!@#$%^&*(),.?":{}|<>]).+$/',
+            ],
+        ], [
+            'password.min' => 'The password must be at least 8 characters.',
+            'password.regex' => 'The password must contain at least one number or symbol.',
         ]);
 
         // Update password and clear firstLogin flag

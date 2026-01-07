@@ -14,13 +14,13 @@ class ITRequestStatusNotification extends Notification
     use Queueable;
 
     protected $itRequest;
-    protected $status; // 'approved' or 'rejected'
+    protected $status; // 'approved', 'rejected', or 'completed'
     protected $hodName;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(ITRequest $itRequest, string $status, string $hodName)
+    public function __construct(ITRequest $itRequest, string $status, string $hodName = '')
     {
         $this->itRequest = $itRequest;
         $this->status = $status;
@@ -42,9 +42,11 @@ class ITRequestStatusNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $requestUrl = route('employee.my-requests');
-        $statusText = $this->status === 'approved' ? 'Approved' : 'Rejected';
-        $statusColor = $this->status === 'approved' ? 'green' : 'red';
+        // Determine the correct route based on user role
+        $requester = $this->itRequest->requester;
+        $requestUrl = $requester && $requester->role === 'HOD' 
+            ? route('hod.my-requests') 
+            : route('employee.my-requests');
         
         if ($this->status === 'approved') {
             return (new MailMessage)
@@ -62,6 +64,26 @@ class ITRequestStatusNotification extends Notification
                 })
                 ->line('**Status:** Pending IT')
                 ->line('Your request has been forwarded to the IT Department for processing.')
+                ->action('View Your Requests', $requestUrl)
+                ->line('Regards,')
+                ->line('**IT Department**')
+                ->salutation('');
+        } elseif ($this->status === 'completed') {
+            return (new MailMessage)
+                ->subject('Your IT Request Has Been Completed')
+                ->greeting('Hello ' . $notifiable->fullName . ',')
+                ->line('Your IT request has been **completed** by the IT Department.')
+                ->line('**Request Details:**')
+                ->line('**Request Date:** ' . Carbon::parse($this->itRequest->requestDate)->format('F d, Y'))
+                ->line('**Title:** ' . $this->itRequest->title)
+                ->line('**Description:** ' . $this->itRequest->requestDesc)
+                ->when($this->itRequest->asset, function ($mail) {
+                    return $mail
+                        ->line('**Asset ID:** ' . $this->itRequest->asset->assetID)
+                        ->line('**Asset Model:** ' . ($this->itRequest->asset->model ?? 'N/A'));
+                })
+                ->line('**Status:** Completed')
+                ->line('Your request has been successfully completed. If you have any questions or concerns, please contact the IT Department.')
                 ->action('View Your Requests', $requestUrl)
                 ->line('Regards,')
                 ->line('**IT Department**')

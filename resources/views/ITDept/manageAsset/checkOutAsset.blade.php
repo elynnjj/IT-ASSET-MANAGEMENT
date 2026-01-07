@@ -264,6 +264,28 @@
 				z-index: 1;
 			}
 
+			.button-spinner {
+				display: none;
+				width: 18px;
+				height: 18px;
+				border: 2px solid rgba(255, 255, 255, 0.3);
+				border-top-color: white;
+				border-radius: 50%;
+				animation: spin 0.8s linear infinite;
+			}
+
+			.interactive-button.loading .button-spinner {
+				display: block;
+			}
+
+			.interactive-button.loading .button-text {
+				opacity: 0.7;
+			}
+
+			@keyframes spin {
+				to { transform: rotate(360deg); }
+			}
+
 			/* Dark mode support for buttons */
 			.dark .interactive-button-primary {
 				box-shadow: 0 4px 12px rgba(75, 169, 194, 0.4);
@@ -309,7 +331,7 @@
 					</div>
 
 					{{-- Asset Information --}}
-					<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+					<div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-md">
 						<h3 class="text-lg font-semibold mb-3">{{ __('Asset Information') }}</h3>
 						<div class="grid grid-cols-2 gap-4 text-sm">
 							<div>
@@ -329,13 +351,14 @@
 							users: @js($users->toArray()),
 							userAssignments: @js($userAssignments->mapWithKeys(function($assignment) {
 								return [$assignment->userID => [
-									'fullName' => $assignment->user->fullName,
+									'fullName' => $assignment->userFullName ?? ($assignment->user->fullName ?? 'User Deleted'),
 									'assetID' => $assignment->asset->assetID
 								]];
 							})->toArray()),
 							selectedUserID: '',
 							showNotification: false,
 							notificationMessage: '',
+							isLoading: false,
 							checkUserAssignment(userID) {
 								if (!userID) {
 									this.selectedUserID = '';
@@ -361,6 +384,8 @@
 									event.preventDefault();
 									return false;
 								}
+								// Show loading state
+								this.isLoading = true;
 								// Allow form submission
 								event.target.submit();
 							}
@@ -399,7 +424,7 @@
 						</div>
 
 						{{-- Check-Out Information Section --}}
-						<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+						<div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-md">
 							<h3 class="text-lg font-semibold mb-4">{{ __('Check-Out Asset To:') }}</h3>
 							<div class="space-y-4">
 								<div class="input-container">
@@ -447,9 +472,12 @@
 								</span>
 							</a>
 							<button type="submit" 
-								class="interactive-button interactive-button-primary">
+								class="interactive-button interactive-button-primary"
+								:class="{ 'loading': isLoading }"
+								:disabled="isLoading">
 								<span class="button-content">
 									<span class="button-text">{{ __('Check-Out Asset') }}</span>
+									<span class="button-spinner"></span>
 								</span>
 							</button>
 						</div>

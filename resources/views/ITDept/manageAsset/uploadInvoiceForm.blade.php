@@ -31,7 +31,7 @@
 						@csrf
 
 						{{-- Invoice Information Section --}}
-						<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+						<div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-md">
 							<h3 class="text-lg font-semibold mb-4">{{ __('Invoice Information') }}</h3>
 							<div class="space-y-4">
 								<div class="input-container">
@@ -54,7 +54,7 @@
 						</div>
 
 						{{-- Asset Linking Section --}}
-						<div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md" x-data="{ assetCount: 1 }">
+						<div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-md" x-data="{ assetCount: 1 }">
 							<h3 class="text-lg font-semibold mb-4">{{ __('Link Assets to Invoice') }}</h3>
 							<div class="space-y-4">
 								<div class="input-container">
@@ -675,16 +675,19 @@
 
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
-			// Add loading state to submit button on form submission
-			const form = document.querySelector('form');
-			const submitButton = form?.querySelector('button[type="submit"]');
+			// Add loading state to submit buttons on form submission
+			const forms = document.querySelectorAll('form');
 			
-			if (form && submitButton) {
-				form.addEventListener('submit', function() {
-					submitButton.classList.add('loading');
-					submitButton.disabled = true;
-				});
-			}
+			forms.forEach(form => {
+				const submitButton = form?.querySelector('button[type="submit"]');
+				
+				if (form && submitButton) {
+					form.addEventListener('submit', function() {
+						submitButton.classList.add('loading');
+						submitButton.disabled = true;
+					});
+				}
+			});
 
 			// Handle file input change to display filename
 			const fileInput = document.getElementById('invoiceFile');

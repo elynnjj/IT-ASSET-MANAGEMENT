@@ -149,6 +149,11 @@ class ITRequestsController
 		// Get current assigned asset for the employee
 		$assignedAsset = $user->currentAssignedAsset();
 
+		// Check if user has an assigned asset
+		if (!$assignedAsset) {
+			return back()->withErrors(['asset' => 'No assigned asset. You must have an assigned asset to submit an IT request.'])->withInput();
+		}
+
 		// Determine approver based on department (HOD of the requester's department)
 		$approver = User::where('role', 'HOD')
 			->where('department', $user->department)
@@ -312,8 +317,19 @@ class ITRequestsController
 		$itRequest->status = 'Completed';
 		$itRequest->save();
 
+		// Load relationships for notification
+		$itRequest->load(['requester', 'asset']);
+
+		// Send email notification to the requester (Employee or HOD)
+		if ($itRequest->requester) {
+			$itRequest->requester->notify(new \App\Notifications\ITRequestStatusNotification(
+				$itRequest,
+				'completed'
+			));
+		}
+
 		return redirect()->route('itdept.it-requests.show', $requestID)
-			->with('status', 'IT Request marked as completed successfully');
+			->with('status', 'IT Request marked as completed successfully. Requester has been notified via email.');
 	}
 
 	public function destroy(string $requestID): RedirectResponse
@@ -386,6 +402,11 @@ class ITRequestsController
 
 		// Get current assigned asset for the HOD
 		$assignedAsset = $user->currentAssignedAsset();
+
+		// Check if user has an assigned asset
+		if (!$assignedAsset) {
+			return back()->withErrors(['asset' => 'No assigned asset. You must have an assigned asset to submit an IT request.'])->withInput();
+		}
 
 		// Create the IT request - HOD requests go directly to ITDept (Pending IT status)
 		// approverID is set to null to differentiate HOD requests from Employee requests
@@ -539,6 +560,17 @@ class ITRequestsController
 		$itRequest->status = 'Completed';
 		$itRequest->save();
 
+		// Load relationships for notification
+		$itRequest->load(['requester', 'asset']);
+
+		// Send email notification to the requester (Employee or HOD)
+		if ($itRequest->requester) {
+			$itRequest->requester->notify(new \App\Notifications\ITRequestStatusNotification(
+				$itRequest,
+				'completed'
+			));
+		}
+
 		// Check if user wants to update asset details
 		$updateAsset = $request->input('updateAsset', '0') === '1';
 
@@ -548,7 +580,7 @@ class ITRequestsController
 		}
 
 		return redirect()->route('itdept.it-requests.show', $requestID)
-			->with('status', 'Maintenance details added successfully. Request marked as completed.');
+			->with('status', 'Maintenance details added successfully. Request marked as completed. Requester has been notified via email.');
 	}
 
 	public function repairsAndMaintenance(Request $request): View
@@ -605,6 +637,14 @@ class ITRequestsController
 			'mainDate' => ['required', 'date'],
 			'mainDesc' => ['required', 'string'],
 			'updateAsset' => ['nullable', 'in:0,1'],
+		], [
+			'assetID.required' => 'The asset ID field is required.',
+			'mainDate.required' => 'The maintenance date field is required.',
+			'mainDesc.required' => 'The maintenance description field is required.',
+		], [
+			'assetID' => 'asset ID',
+			'mainDate' => 'maintenance date',
+			'mainDesc' => 'maintenance description',
 		]);
 
 		// Verify asset exists

@@ -104,21 +104,24 @@ class DisposalController
 			'disposalInvoiceFile' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
 		]);
 
-		// Store the disposal invoice file
+		// Get disposal date first (same for all assets in this bulk disposal)
+		$disposalDate = Carbon::now()->toDateString();
+		
+		// Store the disposal invoice file with renamed filename: disposal_disposalDate.extension
 		$file = $request->file('disposalInvoiceFile');
-		$fileName = $file->getClientOriginalName();
+		$originalExtension = $file->getClientOriginalExtension();
+		$baseFileName = 'disposal_' . $disposalDate . '.' . $originalExtension;
 		
 		// Handle filename conflicts by adding a unique suffix if file already exists
-		$storagePath = 'invoices/' . $fileName;
+		$storagePath = 'invoices/' . $baseFileName;
 		$counter = 1;
 		while (Storage::disk('public')->exists($storagePath)) {
-			$pathInfo = pathinfo($fileName);
-			$newFileName = $pathInfo['filename'] . '_' . $counter . '.' . ($pathInfo['extension'] ?? '');
+			$newFileName = 'disposal_' . $disposalDate . '_' . $counter . '.' . $originalExtension;
 			$storagePath = 'invoices/' . $newFileName;
 			$counter++;
 		}
 		
-		// Store file with the final filename
+		// Store file with the renamed filename
 		$file->storeAs('invoices', basename($storagePath), 'public');
 		
 		// Use the final filename (which may have been modified if there was a conflict)
@@ -139,7 +142,7 @@ class DisposalController
 
 			if ($disposal) {
 				$disposal->dispStatus = 'Disposed';
-				$disposal->dispDate = Carbon::now()->toDateString();
+				$disposal->dispDate = $disposalDate;
 				$disposal->invoiceID = $invoice->invoiceID;
 				$disposal->save();
 				$updated++;
@@ -162,11 +165,15 @@ class DisposalController
 			abort(404, 'Disposal invoice file not found');
 		}
 		
-		// Use fileName to locate the file
+		// Use fileName to locate the stored file
 		$filePath = 'invoices/' . $disposal->invoice->fileName;
 		
 		if (Storage::disk('public')->exists($filePath)) {
-			return Storage::disk('public')->download($filePath, $disposal->invoice->fileName);
+			// Generate download filename as disposal_disposalDate.extension
+			$fileExtension = pathinfo($disposal->invoice->fileName, PATHINFO_EXTENSION);
+			$downloadFileName = 'disposal_' . $disposal->dispDate . '.' . $fileExtension;
+			
+			return Storage::disk('public')->download($filePath, $downloadFileName);
 		}
 		
 		abort(404, 'Disposal invoice file not found');
