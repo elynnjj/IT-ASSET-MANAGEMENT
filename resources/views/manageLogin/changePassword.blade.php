@@ -39,7 +39,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
+            padding: 1rem 2rem;
         }
 
         /* Overlay for better readability */
@@ -66,7 +66,7 @@
             backdrop-filter: blur(10px);
             border-radius: 16px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
-            padding: 3rem;
+            padding: 2rem;
             animation: slideInUp 0.6s ease-out;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -329,17 +329,16 @@
                 <div class="reset-form-container">
 
                     <!-- Logo Section -->
-                    <div class="text-center mb-8">
+                    <div class="text-center mb-4">
                         <img src="{{ asset('images/exact2.png') }}" 
                              alt="Exact Logo" 
-                             class="mx-auto mb-6"
-                             style="max-height: 130px; object-fit: contain;">
+                             class="mx-auto mb-3"
+                             style="max-height: 100px; object-fit: contain;">
 
                         <!-- Tagline -->
-                        <p class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide mt-4">
-                            Enhancing Accuracy and Efficiency in IT Asset Management
+                        <p class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide mt-2 mb-4">
+                            Enhancing Accuracy and Efficiency in IT Asset<br>Management
                         </p>
-                        <br><br>
                     </div>
 
                     <!-- Session Status -->
@@ -356,9 +355,6 @@
                         <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
                             {{ __('You must change your password before continuing. Please enter your new password below.') }}
                         </div>
-                         <div class="mb-4 text-xs text-gray-600 dark:text-gray-400">
-                             {{ __('Ensure your account is using a long, random password to stay secure (mix 8 characters & at least one number or symbol).') }}
-                         </div>
 
                         <!-- Current Password -->
                         <div class="mb-4">
@@ -434,7 +430,7 @@
                         </div>
 
                         <!-- Confirm Password -->
-                        <div class="mb-6">
+                        <div class="mb-4">
                             <div class="input-with-icon">
                                 <svg class="input-icon text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 

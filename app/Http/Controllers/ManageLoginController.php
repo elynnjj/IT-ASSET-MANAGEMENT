@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,12 +37,35 @@ class ManageLoginController
 
         $this->ensureIsNotRateLimited($request);
 
-        if (!Auth::attempt($request->only('userID', 'password'), $request->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey($request));
+        try {
+            if (!Auth::attempt($request->only('userID', 'password'), $request->boolean('remember'))) {
+                RateLimiter::hit($this->throttleKey($request));
 
-            throw ValidationException::withMessages([
-                'userID' => trans('auth.failed'),
-            ]);
+                throw ValidationException::withMessages([
+                    'userID' => trans('auth.failed'),
+                ]);
+            }
+        } catch (\RuntimeException $e) {
+            // Handle invalid password hash format (e.g., non-Bcrypt passwords)
+            if (str_contains($e->getMessage(), 'This password does not use the Bcrypt algorithm')) {
+                RateLimiter::hit($this->throttleKey($request));
+                
+                // Try to find the user to check if they exist
+                $user = User::where('userID', $request->userID)->first();
+                
+                if ($user) {
+                    // User exists but has invalid password hash - redirect to password reset
+                    throw ValidationException::withMessages([
+                        'userID' => 'Your password needs to be reset. Please use the "Forgot Password" link to reset your password.',
+                    ]);
+                } else {
+                    throw ValidationException::withMessages([
+                        'userID' => trans('auth.failed'),
+                    ]);
+                }
+            }
+            // Re-throw if it's a different RuntimeException
+            throw $e;
         }
 
         // Check if user is active

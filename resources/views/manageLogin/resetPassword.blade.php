@@ -401,8 +401,8 @@
                              style="max-height: 110px; object-fit: contain;">
 
                         <!-- Tagline -->
-                        <p class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide mt-2">
-                            Enhancing Accuracy and Efficiency in IT Asset Management
+                        <p class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide mt-2 mb-4">
+                            Enhancing Accuracy and Efficiency in IT Asset<br>Management
                         </p>
         </div>
 

@@ -7,6 +7,8 @@ use App\Notifications\NewUserWelcomeNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\View\View;
@@ -106,14 +108,22 @@ class ManageUserController
 		$temporaryPassword = $this->generateSecureTemporaryPassword();
 
 		$payload = $validated;
-		$payload['password'] = $temporaryPassword;
+		$payload['password'] = Hash::make($temporaryPassword);
 		$payload['accStat'] = 'active';
 		$payload['firstLogin'] = true;
 
 		$user = User::create($payload);
 
 		// Send welcome email with temporary password
-		$user->notify(new NewUserWelcomeNotification($temporaryPassword));
+		try {
+			$user->notify(new NewUserWelcomeNotification($temporaryPassword));
+		} catch (\Exception $e) {
+			// Log email error but don't fail user creation
+			Log::error('Failed to send welcome email to user: ' . $user->email, [
+				'error' => $e->getMessage(),
+				'userID' => $user->userID
+			]);
+		}
 
 		return redirect()->route('itdept.manage-users.index', ['role' => $validated['role']])
 			->with('status', '1 user successfully added');
@@ -146,7 +156,7 @@ class ManageUserController
 		]);
 
 		if (!empty($validated['password'])) {
-			$user->password = $validated['password'];
+			$user->password = Hash::make($validated['password']);
 		}
 
 		$user->fullName = $validated['fullName'];
@@ -255,7 +265,7 @@ class ManageUserController
 					$user->userID = $data['userID'];
 					$user->fullName = $data['fullName'];
 					$user->email = $data['email'];
-					$user->password = $temporaryPassword;
+					$user->password = Hash::make($temporaryPassword);
 					$user->department = $data['department'];
 					$user->role = $data['role'];
 					$user->accStat = 'active';
@@ -279,10 +289,18 @@ class ManageUserController
 			// Commit transaction if all users were created successfully
 			DB::commit();
 
-			// Send queued email notifications after transaction is committed
-			// This prevents blocking the request and allows emails to be sent asynchronously
+			// Send email notifications after transaction is committed
+			// Emails are sent synchronously to ensure users receive their temporary passwords
 			foreach ($usersToNotify as $notificationData) {
-				$notificationData['user']->notify(new NewUserWelcomeNotification($notificationData['password']));
+				try {
+					$notificationData['user']->notify(new NewUserWelcomeNotification($notificationData['password']));
+				} catch (\Exception $e) {
+					// Log email error but don't fail user creation
+					Log::error('Failed to send welcome email to user: ' . $notificationData['user']->email, [
+						'error' => $e->getMessage(),
+						'userID' => $notificationData['user']->userID
+					]);
+				}
 			}
 
 		} catch (\Throwable $e) {
