@@ -302,6 +302,16 @@ class ManageAssetController
 			'processor' => ['nullable', 'string', 'max:255'],
 		]);
 
+		// Check for duplicate serial number (excluding current asset)
+		if (!empty($validated['serialNum'])) {
+			$existingAsset = Asset::where('serialNum', $validated['serialNum'])
+				->where('assetID', '!=', $assetID)
+				->first();
+			if ($existingAsset) {
+				return back()->withErrors(['serialNum' => 'Serial number already exists. Each asset must have a unique serial number.'])->withInput();
+			}
+		}
+
 		// Use existing assetType if not provided
 		if (!isset($validated['assetType'])) {
 			$validated['assetType'] = $asset->assetType;

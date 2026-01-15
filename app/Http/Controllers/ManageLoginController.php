@@ -38,12 +38,12 @@ class ManageLoginController
         $this->ensureIsNotRateLimited($request);
 
         try {
-            if (!Auth::attempt($request->only('userID', 'password'), $request->boolean('remember'))) {
-                RateLimiter::hit($this->throttleKey($request));
+        if (!Auth::attempt($request->only('userID', 'password'), $request->boolean('remember'))) {
+            RateLimiter::hit($this->throttleKey($request));
 
-                throw ValidationException::withMessages([
-                    'userID' => trans('auth.failed'),
-                ]);
+            throw ValidationException::withMessages([
+                'userID' => trans('auth.failed'),
+            ]);
             }
         } catch (\RuntimeException $e) {
             // Handle invalid password hash format (e.g., non-Bcrypt passwords)

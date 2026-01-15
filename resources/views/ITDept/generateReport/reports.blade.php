@@ -47,34 +47,34 @@
 								</div>
 								
 								<div class="space-y-4">
-									{{-- Asset Type --}}
-									<div class="flex items-center">
-										<label for="assetType" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
-											{{ __('Asset Type') }} 
-										</label>
-										<select id="assetType" name="assetType" 
-											class="w-3/4 interactive-select">
-											<option value="">{{ __('Select asset type') }}</option>
-											<option value="all">{{ __('All Asset') }}</option>
-											<option value="Laptop">{{ __('Laptops') }}</option>
-											<option value="Desktop">{{ __('Desktops') }}</option>
-										</select>
-									</div>
-
-									{{-- Asset Status --}}
-									<div class="flex items-center">
-										<label for="assetStatus" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
-											{{ __('Asset Status') }} 
-										</label>
-										<select id="assetStatus" name="assetStatus" 
-											class="w-3/4 interactive-select">
-											<option value="">{{ __('Select asset status') }}</option>
-											<option value="all">{{ __('All Asset') }}</option>
-											<option value="available">{{ __('Available') }}</option>
-											<option value="disposed">{{ __('Disposed') }}</option>
-										</select>
-									</div>
+								{{-- Asset Type --}}
+								<div class="flex items-center">
+									<label for="assetType" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
+										{{ __('Asset Type') }} 
+									</label>
+									<select id="assetType" name="assetType" 
+										class="w-3/4 interactive-select">
+										<option value="">{{ __('Select asset type') }}</option>
+										<option value="all">{{ __('All Asset') }}</option>
+										<option value="Laptop">{{ __('Laptops') }}</option>
+										<option value="Desktop">{{ __('Desktops') }}</option>
+									</select>
 								</div>
+
+								{{-- Asset Status --}}
+								<div class="flex items-center">
+									<label for="assetStatus" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
+										{{ __('Asset Status') }} 
+									</label>
+									<select id="assetStatus" name="assetStatus" 
+										class="w-3/4 interactive-select">
+										<option value="">{{ __('Select asset status') }}</option>
+										<option value="all">{{ __('All Asset') }}</option>
+										<option value="available">{{ __('Available') }}</option>
+										<option value="disposed">{{ __('Disposed') }}</option>
+									</select>
+								</div>
+							</div>
 							</div>
 
 							{{-- User Report Section (hidden by default) --}}
@@ -85,48 +85,48 @@
 								</div>
 								
 								<div class="space-y-4">
-									{{-- Department --}}
-									<div class="flex items-center">
-										<label for="department" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
-											{{ __('Department') }} 
-										</label>
-										<select id="department" name="department" 
-											class="w-3/4 interactive-select">
-											<option value="">{{ __('Select department') }}</option>
-											<option value="all">{{ __('All Department') }}</option>
-											@php($departments = ['HR & Admin','Account','Service','Project','Supply Chain','Sales','Proposal'])
-											@foreach ($departments as $dept)
-												<option value="{{ $dept }}">{{ $dept }}</option>
-											@endforeach
-										</select>
-									</div>
+								{{-- Department --}}
+								<div class="flex items-center">
+									<label for="department" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
+										{{ __('Department') }} 
+									</label>
+									<select id="department" name="department" 
+										class="w-3/4 interactive-select">
+										<option value="">{{ __('Select department') }}</option>
+										<option value="all">{{ __('All Department') }}</option>
+										@php($departments = ['HR & Admin','Account','Service','Project','Supply Chain','Sales','Proposal'])
+										@foreach ($departments as $dept)
+											<option value="{{ $dept }}">{{ $dept }}</option>
+										@endforeach
+									</select>
+								</div>
 
-									{{-- User Role --}}
-									<div class="flex items-center">
-										<label for="userRole" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
-											{{ __('User Role') }} 
-										</label>
-										<select id="userRole" name="userRole" 
-											class="w-3/4 interactive-select">
-											<option value="">{{ __('Select user role') }}</option>
-											<option value="all">{{ __('All Roles') }}</option>
-											<option value="HOD">{{ __('HOD') }}</option>
-											<option value="Employee">{{ __('Employee') }}</option>
-										</select>
-									</div>
+								{{-- User Role --}}
+								<div class="flex items-center">
+									<label for="userRole" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
+										{{ __('User Role') }} 
+									</label>
+									<select id="userRole" name="userRole" 
+										class="w-3/4 interactive-select">
+										<option value="">{{ __('Select user role') }}</option>
+										<option value="all">{{ __('All Roles') }}</option>
+										<option value="HOD">{{ __('HOD') }}</option>
+										<option value="Employee">{{ __('Employee') }}</option>
+									</select>
+								</div>
 
-									{{-- Status --}}
-									<div class="flex items-center">
-										<label for="userStatus" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
-											{{ __('Status') }} 
-										</label>
-										<select id="userStatus" name="userStatus" 
-											class="w-3/4 interactive-select">
-											<option value="">{{ __('Select status') }}</option>
-											<option value="all">{{ __('All Status') }}</option>
-											<option value="active">{{ __('Active') }}</option>
-											<option value="inactive">{{ __('Inactive') }}</option>
-										</select>
+								{{-- Status --}}
+								<div class="flex items-center">
+									<label for="userStatus" class="w-1/4 text-sm font-medium text-gray-700 dark:text-gray-300">
+										{{ __('Status') }} 
+									</label>
+									<select id="userStatus" name="userStatus" 
+										class="w-3/4 interactive-select">
+										<option value="">{{ __('Select status') }}</option>
+										<option value="all">{{ __('All Status') }}</option>
+										<option value="active">{{ __('Active') }}</option>
+										<option value="inactive">{{ __('Inactive') }}</option>
+									</select>
 									</div>
 								</div>
 							</div>
@@ -134,15 +134,15 @@
 
 						{{-- Generate Report Button --}}
 						<div class="flex justify-end mt-6">
-							<button type="submit" 
+							<button type="submit" id="generateReportBtn"
 								class="interactive-button interactive-button-primary"
 								style="padding: 10px 16px; font-size: 11px;">
 								<span class="button-content">
-									<svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+									<svg class="w-4 h-4 me-2 button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
 									</svg>
-									<span class="button-text">{{ __('Generate Report') }}</span>
 									<span class="button-spinner"></span>
+									<span class="button-text">{{ __('Generate Report') }}</span>
 								</span>
 							</button>
 						</div>
@@ -332,6 +332,15 @@
 			opacity: 0.7;
 		}
 
+		.interactive-button.loading .button-icon {
+			display: none;
+		}
+
+		.interactive-button.loading {
+			pointer-events: none;
+			opacity: 0.8;
+		}
+
 		@keyframes spin {
 			to { transform: rotate(360deg); }
 		}
@@ -347,6 +356,21 @@
 			const reportTypeSelect = document.getElementById('reportType');
 			const assetInventorySection = document.getElementById('assetInventorySection');
 			const userReportSection = document.getElementById('userReportSection');
+			const generateReportBtn = document.getElementById('generateReportBtn');
+			const reportForm = generateReportBtn.closest('form');
+
+			// Add loading spinner on form submit
+			reportForm.addEventListener('submit', function(e) {
+				// Add loading class to button
+				generateReportBtn.classList.add('loading');
+				generateReportBtn.querySelector('.button-text').textContent = 'Generating...';
+				
+				// Reset button after a timeout (in case PDF opens in new tab)
+				setTimeout(function() {
+					generateReportBtn.classList.remove('loading');
+					generateReportBtn.querySelector('.button-text').textContent = 'Generate Report';
+				}, 5000);
+			});
 
 			reportTypeSelect.addEventListener('change', function() {
 				const selectedType = this.value;

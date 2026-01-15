@@ -20,7 +20,7 @@
                         <h3 class="text-lg font-semibold mb-4">{{ __('Profile Information') }}</h3>
                         <div class="space-y-3">
                             {{-- Row 1: Username and Full Name --}}
-                            <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-4">
                                 <div class="grid gap-0 p-3 bg-white dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700" style="grid-template-columns: 30% 70%;">
                                     <div class="flex items-center">
                                         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Username') }}</label>
@@ -72,11 +72,11 @@
                                 <div class="grid gap-0 p-3 bg-white dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700" style="grid-template-columns: 30% 70%;">
                                     <div class="flex items-center">
                                         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Account Status') }}</label>
-                                    </div>
+                            </div>
                                     <div class="flex items-center border-l border-gray-300 dark:border-gray-600 pl-3">
                                         <p class="text-sm font-bold text-black dark:text-gray-300">{{ auth()->user()->accStat ?? '-' }}</p>
-                                    </div>
-                                </div>
+                            </div>
+                            </div>
                             </div>
                         </div>
                     </div>

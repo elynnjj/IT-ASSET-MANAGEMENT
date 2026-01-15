@@ -116,7 +116,7 @@ class ManageUserController
 
 		// Send welcome email with temporary password
 		try {
-			$user->notify(new NewUserWelcomeNotification($temporaryPassword));
+		$user->notify(new NewUserWelcomeNotification($temporaryPassword));
 		} catch (\Exception $e) {
 			// Log email error but don't fail user creation
 			Log::error('Failed to send welcome email to user: ' . $user->email, [
@@ -172,6 +172,14 @@ class ManageUserController
 	public function destroy(string $userID): RedirectResponse
 	{
 		$user = User::where('userID', $userID)->firstOrFail();
+		
+		// Check if user has any currently assigned assets (not checked in)
+		$hasAssignedAssets = $user->assignedAssets()->whereNull('checkinDate')->exists();
+		
+		if ($hasAssignedAssets) {
+			return back()->withErrors(['delete' => 'Cannot delete user. There are still assets assigned to this user. Please check in all assets first.']);
+		}
+		
 		$user->delete();
 		return back()->with('status', 'User account deleted successfully');
 	}
@@ -236,54 +244,54 @@ class ManageUserController
 
 		// Use database transaction for better performance and data integrity
 		DB::beginTransaction();
-		
+
 		try {
-			while (($row = fgetcsv($handle)) !== false) {
-				$data = array_combine($header, $row);
-				if (!$data) { $skipped++; continue; }
+		while (($row = fgetcsv($handle)) !== false) {
+			$data = array_combine($header, $row);
+			if (!$data) { $skipped++; continue; }
 
-				// Trim all values
-				$data = array_map('trim', $data);
+			// Trim all values
+			$data = array_map('trim', $data);
 
-				// Basic per-row validation (password no longer required)
-				if (!isset($data['userID'],$data['fullName'],$data['email'],$data['department'],$data['role'])) {
-					$skipped++; continue;
+			// Basic per-row validation (password no longer required)
+			if (!isset($data['userID'],$data['fullName'],$data['email'],$data['department'],$data['role'])) {
+				$skipped++; continue;
+			}
+			if (!in_array($data['role'], ['Employee','HOD'], true)) { $skipped++; continue; }
+
+			try {
+				// Skip existing users entirely (do not update)
+				if (User::where('userID', $data['userID'])->exists()) {
+					$skipped++;
+					continue;
 				}
-				if (!in_array($data['role'], ['Employee','HOD'], true)) { $skipped++; continue; }
-
-				try {
-					// Skip existing users entirely (do not update)
-					if (User::where('userID', $data['userID'])->exists()) {
-						$skipped++;
-						continue;
-					}
 
 					// Generate secure temporary password
 					$temporaryPassword = $this->generateSecureTemporaryPassword();
 
-					$user = new User();
-					$user->userID = $data['userID'];
-					$user->fullName = $data['fullName'];
-					$user->email = $data['email'];
+				$user = new User();
+				$user->userID = $data['userID'];
+				$user->fullName = $data['fullName'];
+				$user->email = $data['email'];
 					$user->password = Hash::make($temporaryPassword);
-					$user->department = $data['department'];
-					$user->role = $data['role'];
-					$user->accStat = 'active';
-					$user->firstLogin = true;
-					$user->save();
+				$user->department = $data['department'];
+				$user->role = $data['role'];
+				$user->accStat = 'active';
+				$user->firstLogin = true;
+				$user->save();
 
 					// Store user and password for notification after transaction
 					$usersToNotify[] = ['user' => $user, 'password' => $temporaryPassword];
 
-					$created++;
+				$created++;
 					
 					// Track role for redirect
 					if (!in_array($data['role'], $importedRoles)) {
 						$importedRoles[] = $data['role'];
 					}
-				} catch (\Throwable $e) {
-					$errors++;
-				}
+			} catch (\Throwable $e) {
+				$errors++;
+			}
 			}
 
 			// Commit transaction if all users were created successfully

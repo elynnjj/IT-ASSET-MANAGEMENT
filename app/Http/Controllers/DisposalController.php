@@ -81,6 +81,11 @@ class DisposalController
 			return back()->withErrors(['asset' => 'Asset is already disposed']);
 		}
 
+		// Check if asset is currently checked out
+		if ($asset->status === 'Checked Out') {
+			return back()->withErrors(['asset' => 'Cannot dispose asset. Asset is currently checked out. Please check-in the asset first.']);
+		}
+
 		// Create disposal record
 		Disposal::create([
 			'dispStatus' => 'Pending',

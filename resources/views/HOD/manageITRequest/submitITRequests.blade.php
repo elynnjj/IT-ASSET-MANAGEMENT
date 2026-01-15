@@ -392,14 +392,14 @@
 			const forms = document.querySelectorAll('form');
 			
 			forms.forEach(form => {
-				const submitButton = form?.querySelector('button[type="submit"]');
-				
-				if (form && submitButton) {
-					form.addEventListener('submit', function() {
-						submitButton.classList.add('loading');
-						submitButton.disabled = true;
-					});
-				}
+			const submitButton = form?.querySelector('button[type="submit"]');
+			
+			if (form && submitButton) {
+				form.addEventListener('submit', function() {
+					submitButton.classList.add('loading');
+					submitButton.disabled = true;
+				});
+			}
 			});
 		});
 	</script>

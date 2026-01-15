@@ -408,7 +408,7 @@
                                     </svg>
                                 </span>
                             </div>
-                             @error('password')
+                            @error('password')
                                  <div class="mt-1 text-sm text-red-600 dark:text-red-400">
                                      <p class="font-medium mb-1">{{ $message }}</p>
                                      <p class="font-medium mb-1 mt-2">Password requirements:</p>
@@ -417,7 +417,7 @@
                                          <li>At least one number (0-9) or symbol (!@#$%^&*...)</li>
                                      </ul>
                                  </div>
-                             @enderror
+                            @enderror
                              @if(!$errors->has('password'))
                                  <div class="mt-2 text-xs text-gray-600 dark:text-gray-400">
                                      <p class="font-medium mb-1">Password requirements:</p>

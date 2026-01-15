@@ -125,9 +125,9 @@
 		</thead>
 		<tbody>
 			@forelse($assets as $asset)
-				@php
-					$currentAssignment = $asset->currentAssignment();
-					$currentUser = $currentAssignment ? $currentAssignment->user->fullName : 'With IT';
+			@php
+				$currentAssignment = $asset->currentAssignment();
+				$currentUser = $currentAssignment && $currentAssignment->user ? $currentAssignment->user->fullName : 'With IT';
 					
 					// Determine status display
 					$hasPendingDisposal = $asset->disposals()->where('dispStatus', 'Pending')->exists();

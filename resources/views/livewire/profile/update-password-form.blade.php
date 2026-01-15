@@ -48,16 +48,16 @@ new class extends Component
 }; ?>
 
 <div>
-    <section>
-        <header class="mb-4">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {{ __('Update Password') }}
-            </h3>
+<section>
+    <header class="mb-4">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            {{ __('Update Password') }}
+        </h3>
 
-            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 {{ __('Ensure your account is using a long, random password to stay secure (mix 8 characters & at least one number or symbol).') }}
-            </p>
-        </header>
+        </p>
+    </header>
 
         {{-- Success message --}}
         <div x-data="{ shown: false }"
@@ -81,9 +81,9 @@ new class extends Component
             </div>
         </div>
 
-        <form wire:submit="updatePassword" class="space-y-4">
-            <div class="input-container">
-                <x-input-label for="update_password_current_password" :value="__('Current Password')" class="text-[15px]" />
+    <form wire:submit="updatePassword" class="space-y-4">
+        <div class="input-container">
+            <x-input-label for="update_password_current_password" :value="__('Current Password')" class="text-[15px]" />
                 <div class="relative mt-1">
                     <x-text-input wire:model="current_password" id="update_password_current_password" name="current_password" type="password" class="block w-full interactive-input password-input" autocomplete="current-password" />
                     <span class="password-toggle-profile text-gray-500 dark:text-gray-400" onclick="togglePasswordProfile('update_password_current_password')" style="pointer-events: auto;">
@@ -93,11 +93,11 @@ new class extends Component
                         </svg>
                     </span>
                 </div>
-                <x-input-error :messages="$errors->get('current_password')" class="mt-2" />
-            </div>
+            <x-input-error :messages="$errors->get('current_password')" class="mt-2" />
+        </div>
 
-            <div class="input-container">
-                <x-input-label for="update_password_password" :value="__('New Password')" class="text-[15px]" />
+        <div class="input-container">
+            <x-input-label for="update_password_password" :value="__('New Password')" class="text-[15px]" />
                 <div class="relative mt-1">
                     <x-text-input wire:model="password" id="update_password_password" name="password" type="password" class="block w-full interactive-input password-input" autocomplete="new-password" />
                     <span class="password-toggle-profile text-gray-500 dark:text-gray-400" onclick="togglePasswordProfile('update_password_password')" style="pointer-events: auto;">
@@ -126,10 +126,10 @@ new class extends Component
                         </ul>
                     </div>
                 @endif
-            </div>
+        </div>
 
-            <div class="input-container">
-                <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" class="text-[15px]" />
+        <div class="input-container">
+            <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" class="text-[15px]" />
                 <div class="relative mt-1">
                     <x-text-input wire:model="password_confirmation" id="update_password_password_confirmation" name="password_confirmation" type="password" class="block w-full interactive-input password-input" autocomplete="new-password" />
                     <span class="password-toggle-profile text-gray-500 dark:text-gray-400" onclick="togglePasswordProfile('update_password_password_confirmation')" style="pointer-events: auto;">
@@ -139,21 +139,21 @@ new class extends Component
                         </svg>
                     </span>
                 </div>
-                <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-            </div>
+            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        </div>
 
-            <div class="flex items-center justify-end mt-6">
-                <button type="submit" 
-                    class="interactive-button interactive-button-primary"
-                    style="padding: 10px 16px; font-size: 11px;">
-                    <span class="button-content">
-                        <span class="button-text">{{ __('Save') }}</span>
-                        <span class="button-spinner"></span>
-                    </span>
-                </button>
-            </div>
-        </form>
-    </section>
+        <div class="flex items-center justify-end mt-6">
+            <button type="submit" 
+                class="interactive-button interactive-button-primary"
+                style="padding: 10px 16px; font-size: 11px;">
+                <span class="button-content">
+                    <span class="button-text">{{ __('Save') }}</span>
+                    <span class="button-spinner"></span>
+                </span>
+            </button>
+        </div>
+    </form>
+</section>
 
     <style>
         .password-toggle-profile {

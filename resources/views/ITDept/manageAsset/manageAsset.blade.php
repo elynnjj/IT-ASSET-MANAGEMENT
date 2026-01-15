@@ -26,7 +26,7 @@
                         </a>
                     </div>
 
-					{{-- Search / Filter / Add --}}
+                    {{-- Search / Filter / Add --}}
 					<div class="mb-6">
 						<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 							<form id="filterForm" method="GET" action="{{ route('itdept.manage-assets.index') }}" 
@@ -89,7 +89,7 @@
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                 </svg>
                                 <p class="text-green-700 dark:text-green-300 font-medium">
-                                    {{ session('status') }}
+                            {{ session('status') }}
                                 </p>
                             </div>
                         </div>
@@ -102,32 +102,32 @@
 						</div>
 						<table class="table-auto w-full border border-gray-300 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700" id="assetsTable">
 							<thead class="bg-gray-100 dark:bg-gray-700">
-							@php($columns = [
-								['key' => 'assetID', 'label' => 'Asset ID'],
-							])
-							<tr>
-								@foreach ($columns as $c)
-									<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-										@php($isActive = ($sort ?? null) === $c['key'])
-										<a href="{{ request()->fullUrlWithQuery([
-											'sort' => $c['key'], 
-											'dir' => ($isActive && ($dir ?? 'asc') === 'asc') ? 'desc' : 'asc'
-										]) }}" 
-										class="inline-flex items-center gap-1">
-											<span>{{ __($c['label']) }}</span>
-											<span class="text-xs">
-												@if ($isActive)
-													{{ ($dir ?? 'asc') === 'asc' ? '▲' : '▼' }}
-												@else
-													▲▼
-												@endif
-											</span>
-										</a>
-									</th>
-								@endforeach
+								@php($columns = [
+									['key' => 'assetID', 'label' => 'Asset ID'],
+								])
+								<tr>
+									@foreach ($columns as $c)
+										<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+											@php($isActive = ($sort ?? null) === $c['key'])
+											<a href="{{ request()->fullUrlWithQuery([
+												'sort' => $c['key'], 
+												'dir' => ($isActive && ($dir ?? 'asc') === 'asc') ? 'desc' : 'asc'
+											]) }}" 
+											class="inline-flex items-center gap-1">
+												<span>{{ __($c['label']) }}</span>
+												<span class="text-xs">
+													@if ($isActive)
+														{{ ($dir ?? 'asc') === 'asc' ? '▲' : '▼' }}
+													@else
+														▲▼
+													@endif
+												</span>
+											</a>
+										</th>
+									@endforeach
 								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Serial Number') }}</th>
 								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Model') }}</th>
-								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Current User') }}</th>
+									<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Current User') }}</th>
 								<th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('Status') }}</th>
 									<th class="px-3 py-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-200" style="width: 20%;">{{ __('Action') }}</th>
 								</tr>
