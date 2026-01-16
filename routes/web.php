@@ -8,18 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ITRequestsController;
 use App\Http\Controllers\ReportController;
 
-
 use Illuminate\Support\Facades\Mail;
-
-Route::get('/test-email', function () {
-    Mail::raw('This email is sent using Brevo SMTP from Railway.', function ($message) {
-        $message->to('your_personal_email@gmail.com')
-                ->subject('Brevo Email Test');
-    });
-
-    return 'Email sent successfully!';
-});
-
 
 Route::redirect('/', '/login');
 
@@ -144,4 +133,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/hod/my-requests', [ITRequestsController::class, 'myRequestsForHOD'])->name('hod.my-requests');
     Route::delete('/hod/it-requests/{requestID}', [ITRequestsController::class, 'destroy'])->name('hod.it-requests.destroy');
+});
+
+Route::get('/test-email', function () {
+    Mail::raw('This email is sent using Brevo SMTP from Railway.', function ($message) {
+        $message->to('your_personal_email@gmail.com')
+                ->subject('Brevo Email Test');
+    });
+
+    return 'Email sent successfully!';
 });
