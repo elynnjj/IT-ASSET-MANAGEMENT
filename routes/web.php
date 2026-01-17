@@ -134,3 +134,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/hod/my-requests', [ITRequestsController::class, 'myRequestsForHOD'])->name('hod.my-requests');
     Route::delete('/hod/it-requests/{requestID}', [ITRequestsController::class, 'destroy'])->name('hod.it-requests.destroy');
 });
+
