@@ -81,15 +81,48 @@
 						</div>
 					</div>
 
-                    {{-- Status message --}}
-                    @if (session('status'))
+                    {{-- Progress bar (shown during import) --}}
+                    <div id="importProgressBar" class="mb-4 hidden">
+                        <div class="p-4 rounded-lg" style="background-color: rgba(75, 169, 194, 0.1); border: 1px solid rgba(75, 169, 194, 0.3);">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <svg class="animate-spin h-5 w-5 mr-2" style="color: #4BA9C2;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <p class="font-medium" style="color: #4BA9C2;">
+                                        <span id="progressText">Processing import...</span>
+                                    </p>
+                                </div>
+                                <span id="progressCount" class="font-semibold" style="color: #4BA9C2;">0 / 0</span>
+                            </div>
+                            <div class="w-full rounded-full h-3" style="background-color: rgba(75, 169, 194, 0.2);">
+                                <div id="progressBarFill" class="h-3 rounded-full transition-all duration-300" style="width: 0%; background: linear-gradient(135deg, #4BA9C2 0%, #3a8ba5 100%);"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Status message (shown after import completes) --}}
+                    <div id="importStatusMessage" class="mb-4 hidden">
+                        <div class="p-4 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <p class="text-green-700 dark:text-green-300 font-medium" id="statusMessageText"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Legacy status message (for non-import operations) --}}
+                    @if (session('status') && !request()->has('progressId'))
                         <div class="mb-4 p-4 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg">
                             <div class="flex items-center">
                                 <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                 </svg>
                                 <p class="text-green-700 dark:text-green-300 font-medium">
-                            {{ session('status') }}
+                                    {{ session('status') }}
                                 </p>
                             </div>
                         </div>
@@ -785,6 +818,89 @@
                         if (loadingIndicator) loadingIndicator.classList.add('hidden');
                         currentRequest = null;
                     });
+                }
+            }
+
+            // Import progress polling
+            const progressId = new URLSearchParams(window.location.search).get('progressId');
+            if (progressId) {
+                const progressBar = document.getElementById('importProgressBar');
+                const progressBarFill = document.getElementById('progressBarFill');
+                const progressText = document.getElementById('progressText');
+                const progressCount = document.getElementById('progressCount');
+                const statusMessage = document.getElementById('importStatusMessage');
+                const statusMessageText = document.getElementById('statusMessageText');
+
+                if (progressBar && progressBarFill && progressText && progressCount && statusMessage && statusMessageText) {
+                    progressBar.classList.remove('hidden');
+                    window.importStartTime = Date.now();
+
+                    let pollInterval = setInterval(function() {
+                        fetch('{{ route("itdept.manage-assets.import.progress") }}?progressId=' + progressId)
+                            .then(response => response.json())
+                            .then(data => {
+                                const total = data.total || 0;
+                                const processed = data.processed || 0;
+                                const created = data.created || 0;
+                                const pendingJobs = data.pendingJobs || 0;
+                                const percentage = total > 0 ? Math.round((processed / total) * 100) : 0;
+
+                                // Smooth progress bar update
+                                progressBarFill.style.width = percentage + '%';
+                                
+                                // Update counter with current values (increments one by one)
+                                progressCount.textContent = processed + ' / ' + total;
+                                
+                                // Show more detailed progress info
+                                const remaining = total - processed;
+                                let statusText = 'Processing import... (' + created + ' asset(s) added)';
+                                if (remaining > 0) {
+                                    statusText += ' - ' + remaining + ' remaining';
+                                }
+                                if (pendingJobs > 0) {
+                                    statusText += ' - ' + pendingJobs + ' job(s) pending in queue';
+                                }
+                                progressText.textContent = statusText;
+
+                                // If no progress after 5 seconds and there are pending jobs, show warning
+                                if (processed === 0 && total > 0 && pendingJobs > 0) {
+                                    const elapsed = Date.now() - (window.importStartTime || Date.now());
+                                    if (elapsed > 5000) {
+                                        progressText.textContent = 'Waiting for queue worker to process jobs... (' + pendingJobs + ' pending)';
+                                    }
+                                }
+
+                                if (data.isComplete) {
+                                    clearInterval(pollInterval);
+                                    progressBar.classList.add('hidden');
+
+                                    if (data.message) {
+                                        statusMessageText.textContent = data.message;
+                                        statusMessage.classList.remove('hidden');
+
+                                        // Redirect after 3 seconds if redirectAssetType is provided
+                                        if (data.redirectAssetType) {
+                                            setTimeout(function() {
+                                                const currentUrl = new URL(window.location.href);
+                                                currentUrl.searchParams.delete('progressId');
+                                                currentUrl.searchParams.set('assetType', data.redirectAssetType);
+                                                window.location.href = currentUrl.toString();
+                                            }, 3000);
+                                        } else {
+                                            // Remove progressId from URL after 3 seconds
+                                            setTimeout(function() {
+                                                const currentUrl = new URL(window.location.href);
+                                                currentUrl.searchParams.delete('progressId');
+                                                window.history.replaceState({}, '', currentUrl.toString());
+                                            }, 3000);
+                                        }
+                                    }
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Progress check error:', error);
+                            });
+                    }, 500); // Poll every 500ms for smoother updates
                 }
             }
         });

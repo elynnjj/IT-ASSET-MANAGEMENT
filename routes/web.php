@@ -60,6 +60,7 @@ Route::middleware(['auth', 'verified', 'itdept'])->group(function () {
 		Route::post('/', [ManageUserController::class, 'store'])->name('store');
         Route::get('/template', [ManageUserController::class, 'downloadTemplate'])->name('template');
         Route::post('/import', [ManageUserController::class, 'importCsv'])->name('import');
+        Route::get('/import/progress', [ManageUserController::class, 'checkImportProgress'])->name('import.progress');
 		Route::get('/{userID}/edit', [ManageUserController::class, 'edit'])->name('edit');
 		Route::put('/{userID}', [ManageUserController::class, 'update'])->name('update');
 		Route::delete('/{userID}', [ManageUserController::class, 'destroy'])->name('destroy');
@@ -74,6 +75,7 @@ Route::middleware(['auth', 'verified', 'itdept'])->group(function () {
 		Route::post('/', [ManageAssetController::class, 'store'])->name('store');
         Route::get('/template', [ManageAssetController::class, 'downloadTemplate'])->name('template');
         Route::post('/import', [ManageAssetController::class, 'importCsv'])->name('import');
+        Route::get('/import/progress', [ManageAssetController::class, 'checkImportProgress'])->name('import.progress');
 		Route::get('/upload-invoice', [ManageAssetController::class, 'uploadInvoiceForm'])->name('upload-invoice');
 		Route::post('/upload-invoice', [ManageAssetController::class, 'storeInvoice'])->name('store-invoice');
 		Route::get('/api/assets-by-type', [ManageAssetController::class, 'getAssetsByType'])->name('api.assets-by-type');

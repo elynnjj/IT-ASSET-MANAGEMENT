@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ImportAssetJob;
 use App\Models\Asset;
 use App\Models\AssignAsset;
 use App\Models\Invoice;
@@ -9,8 +10,11 @@ use App\Models\User;
 use App\Notifications\AssetAssignmentNotification;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -367,165 +371,153 @@ class ManageAssetController
 			return back()->withErrors(['file' => 'Empty CSV file']);
 		}
 
-		// Normalize headers (trim whitespace and convert to lowercase for matching)
+		// Normalize headers (trim whitespace)
 		$header = array_map('trim', $header);
-		$headerMap = array_combine(array_map('strtolower', $header), $header);
 
-		$created = 0; 
-		$duplicateSerial = 0; // Track serial numbers that already exist
-		$errors = 0;
-		$importedAssetTypes = []; // Track which asset types were imported
-		$createdByType = ['Laptop' => 0, 'Desktop' => 0]; // Track count per asset type
+		// Generate unique progress ID
+		$progressId = uniqid('asset_import_', true);
 
+		// Read all rows and dispatch jobs
+		$rows = [];
+		$rowIndex = 0;
 		while (($row = fgetcsv($handle)) !== false) {
-			if (count($row) !== count($header)) {
-				$errors++;
-				continue;
-			}
-			
-			$data = [];
-			foreach ($header as $index => $headerName) {
-				$data[$headerName] = isset($row[$index]) ? trim($row[$index]) : '';
-			}
-			
-			if (empty($data)) { 
-				$errors++;
-				continue; 
-			}
-
-			// Basic per-row validation - assetID is no longer required
-			if (!isset($data['assetType'])) {
-				$errors++;
-				continue;
-			}
-			if (!in_array($data['assetType'], ['Laptop', 'Desktop'], true)) {
-				$errors++;
-				continue;
-			}
-			
-			// Validate osVer if provided
-			if (isset($data['osVer']) && !empty($data['osVer']) && !in_array($data['osVer'], ['Windows 10', 'Windows 11'], true)) {
-				$errors++;
-				continue;
-			}
-
-			try {
-				// Check for duplicate serial number
-				if (!empty($data['serialNum'])) {
-					$serialNum = trim($data['serialNum']);
-					if (Asset::where('serialNum', $serialNum)->exists()) {
-						$duplicateSerial++;
-						continue; // Skip this row
-					}
-				}
-
-				// Auto-generate asset ID based on asset type
-				$assetID = $this->generateNextAssetID(trim($data['assetType']));
-
-				$asset = new Asset();
-				$asset->assetID = $assetID;
-				$asset->assetType = trim($data['assetType']);
-				$asset->serialNum = !empty($data['serialNum']) ? trim($data['serialNum']) : null;
-				$asset->model = !empty($data['model']) ? trim($data['model']) : null;
-				$asset->ram = !empty($data['ram']) ? trim($data['ram']) : null;
-				$asset->storage = !empty($data['storage']) ? trim($data['storage']) : null;
-				
-				// Handle purchaseDate - validate format (model casts to date)
-				// If empty, automatically set to current date
-				if (!empty($data['purchaseDate'])) {
-					$date = trim($data['purchaseDate']);
-					try {
-						// Validate and parse date format
-						$parsedDate = Carbon::createFromFormat('Y-m-d', $date);
-						$asset->purchaseDate = $parsedDate->toDateString();
-					} catch (\Exception $e) {
-						// If date parsing fails, set to current date
-						$asset->purchaseDate = Carbon::now()->toDateString();
-					}
-				} else {
-					// If purchaseDate is empty, automatically set to current date
-					$asset->purchaseDate = Carbon::now()->toDateString();
-				}
-				
-				$asset->osVer = !empty($data['osVer']) ? trim($data['osVer']) : null;
-				$asset->processor = !empty($data['processor']) ? trim($data['processor']) : null;
-				$asset->status = 'Available';
-				$asset->save();
-				$created++;
-				
-				// Track asset type for redirect and count
-				$assetType = trim($data['assetType']);
-				if (!in_array($assetType, $importedAssetTypes)) {
-					$importedAssetTypes[] = $assetType;
-				}
-				if (isset($createdByType[$assetType])) {
-					$createdByType[$assetType]++;
-				}
-			} catch (\Throwable $e) {
-				Log::error('Asset import error: ' . $e->getMessage(), ['data' => $data, 'trace' => $e->getTraceAsString()]);
-				$errors++;
+			if (count($row) === count($header)) {
+				$rows[] = $row;
 			}
 		}
-
 		fclose($handle);
 
-		// Build success message
-		if ($created > 0) {
-			// Build message with breakdown by type
-			$typeMessages = [];
-			if ($createdByType['Laptop'] > 0) {
-				$typeMessages[] = $createdByType['Laptop'] . " Laptop(s)";
-			}
-			if ($createdByType['Desktop'] > 0) {
-				$typeMessages[] = $createdByType['Desktop'] . " Desktop(s)";
-			}
-			
-			$message = "Successfully added: " . implode(", ", $typeMessages);
-			
-			// Add unsuccessful messages
-			$unsuccessfulMessages = [];
-			if ($duplicateSerial > 0) {
-				$unsuccessfulMessages[] = "$duplicateSerial asset(s) skipped (duplicate serial number)";
-			}
-			if ($errors > 0) {
-				$unsuccessfulMessages[] = "$errors asset(s) unsuccessful";
-			}
-			
-			if (!empty($unsuccessfulMessages)) {
-				$message .= ". Unsuccessful: " . implode(", ", $unsuccessfulMessages);
-			}
-			
-			// Determine which asset type to show (prefer first imported type, or default to Laptop)
-			$redirectAssetType = !empty($importedAssetTypes) ? $importedAssetTypes[0] : 'Laptop';
-			
-			return redirect()->route('itdept.manage-assets.index', ['assetType' => $redirectAssetType])
-				->with('status', $message);
-		} else {
-			// No assets were created, show error message
-			$unsuccessfulMessages = [];
-			if ($duplicateSerial > 0) {
-				$unsuccessfulMessages[] = "$duplicateSerial asset(s) skipped (duplicate serial number)";
-			}
-			if ($errors > 0) {
-				$unsuccessfulMessages[] = "$errors asset(s) unsuccessful";
-			}
-			
-			if ($duplicateSerial > 0 && $errors == 0) {
-				// All assets were duplicates
-				$message = "No new assets were added. All $duplicateSerial asset(s) already exist in the system (duplicate serial numbers).";
-			} elseif ($duplicateSerial == 0 && $errors > 0) {
-				// All assets had errors
-				$message = "No assets were added. $errors asset(s) had errors.";
-			} elseif ($duplicateSerial > 0 && $errors > 0) {
-				// Mix of duplicates and errors
-				$message = "No assets were added. Unsuccessful: " . implode(", ", $unsuccessfulMessages);
-			} else {
-				// No data processed
-				$message = "No assets were added. Please check your CSV file format.";
-			}
-			
-			return back()->withErrors(['file' => $message])->withInput();
+		$totalRows = count($rows);
+
+		if ($totalRows === 0) {
+			return back()->withErrors(['file' => 'No valid rows found in CSV file']);
 		}
+
+		// Initialize progress tracking
+		Cache::put("import_progress_{$progressId}_total", $totalRows, 3600);
+		Cache::put("import_progress_{$progressId}_processed", 0, 3600);
+		Cache::put("import_progress_{$progressId}_created", 0, 3600);
+		Cache::put("import_progress_{$progressId}_duplicateSerial", 0, 3600);
+		Cache::put("import_progress_{$progressId}_errors", 0, 3600);
+		Cache::put("import_progress_{$progressId}_createdByType_Laptop", 0, 3600);
+		Cache::put("import_progress_{$progressId}_createdByType_Desktop", 0, 3600);
+		Cache::put("import_progress_{$progressId}_importedTypes", [], 3600);
+		Cache::put("import_progress_{$progressId}_status", 'processing', 3600);
+
+		// Dispatch jobs for each row - ensure they're queued, not processed synchronously
+		foreach ($rows as $rowIndex => $row) {
+			ImportAssetJob::dispatch($progressId, $row, $header, $rowIndex, $totalRows)
+				->onQueue('default');
+		}
+
+		// Ensure queue worker is running AFTER all jobs are dispatched
+		\App\Helpers\QueueHelper::ensureQueueWorkerRunning();
+
+		// Redirect with progress ID
+		return redirect()->route('itdept.manage-assets.index', ['progressId' => $progressId]);
+	}
+
+	public function checkImportProgress(Request $request): JsonResponse
+	{
+		$progressId = $request->query('progressId');
+
+		if (!$progressId) {
+			return response()->json(['error' => 'Progress ID required'], 400);
+		}
+
+		$total = Cache::get("import_progress_{$progressId}_total", 0);
+		$processed = Cache::get("import_progress_{$progressId}_processed", 0);
+		$created = Cache::get("import_progress_{$progressId}_created", 0);
+		$duplicateSerial = Cache::get("import_progress_{$progressId}_duplicateSerial", 0);
+		$errors = Cache::get("import_progress_{$progressId}_errors", 0);
+		$createdByTypeLaptop = Cache::get("import_progress_{$progressId}_createdByType_Laptop", 0);
+		$createdByTypeDesktop = Cache::get("import_progress_{$progressId}_createdByType_Desktop", 0);
+		$status = Cache::get("import_progress_{$progressId}_status", 'processing');
+		$importedTypes = Cache::get("import_progress_{$progressId}_importedTypes", []);
+
+		// Check queue status - count pending jobs for this import
+		$pendingJobs = 0;
+		$queueConnection = config('queue.default');
+		try {
+			if ($queueConnection === 'database') {
+				$pendingJobs = DB::table('jobs')
+					->where('payload', 'like', '%' . $progressId . '%')
+					->count();
+			}
+		} catch (\Exception $e) {
+			// Jobs table might not exist or queue might be sync
+			Log::warning('Could not check pending jobs: ' . $e->getMessage());
+		}
+
+		// Check if all jobs are complete (processed equals total)
+		$isComplete = ($processed >= $total) && $total > 0;
+
+		if ($isComplete && $status === 'processing') {
+			// Build success message
+			$message = '';
+			$redirectAssetType = 'Laptop';
+
+			if ($created > 0) {
+				$typeMessages = [];
+				if ($createdByTypeLaptop > 0) {
+					$typeMessages[] = $createdByTypeLaptop . " Laptop(s)";
+				}
+				if ($createdByTypeDesktop > 0) {
+					$typeMessages[] = $createdByTypeDesktop . " Desktop(s)";
+				}
+
+				$message = "Successfully added: " . implode(", ", $typeMessages);
+
+				$unsuccessfulMessages = [];
+				if ($duplicateSerial > 0) {
+					$unsuccessfulMessages[] = "$duplicateSerial asset(s) skipped (duplicate serial number)";
+				}
+				if ($errors > 0) {
+					$unsuccessfulMessages[] = "$errors asset(s) unsuccessful";
+				}
+
+				if (!empty($unsuccessfulMessages)) {
+					$message .= ". Unsuccessful: " . implode(", ", $unsuccessfulMessages);
+				}
+
+				$redirectAssetType = !empty($importedTypes) ? $importedTypes[0] : 'Laptop';
+			} else {
+				$unsuccessfulMessages = [];
+				if ($duplicateSerial > 0) {
+					$unsuccessfulMessages[] = "$duplicateSerial asset(s) skipped (duplicate serial number)";
+				}
+				if ($errors > 0) {
+					$unsuccessfulMessages[] = "$errors asset(s) unsuccessful";
+				}
+
+				if ($duplicateSerial > 0 && $errors == 0) {
+					$message = "No new assets were added. All $duplicateSerial asset(s) already exist in the system (duplicate serial numbers).";
+				} elseif ($duplicateSerial == 0 && $errors > 0) {
+					$message = "No assets were added. $errors asset(s) had errors.";
+				} elseif ($duplicateSerial > 0 && $errors > 0) {
+					$message = "No assets were added. Unsuccessful: " . implode(", ", $unsuccessfulMessages);
+				} else {
+					$message = "No assets were added. Please check your CSV file format.";
+				}
+			}
+
+			Cache::put("import_progress_{$progressId}_status", 'completed', 3600);
+			Cache::put("import_progress_{$progressId}_message", $message, 3600);
+			Cache::put("import_progress_{$progressId}_redirectAssetType", $redirectAssetType, 3600);
+		}
+
+		return response()->json([
+			'total' => $total,
+			'processed' => $processed,
+			'created' => $created,
+			'duplicateSerial' => $duplicateSerial,
+			'errors' => $errors,
+			'isComplete' => $isComplete,
+			'status' => $status,
+			'pendingJobs' => $pendingJobs,
+			'message' => $isComplete ? Cache::get("import_progress_{$progressId}_message", '') : null,
+			'redirectAssetType' => $isComplete ? Cache::get("import_progress_{$progressId}_redirectAssetType", 'Laptop') : null,
+		]);
 	}
 
 	public function uploadInvoiceForm(): View

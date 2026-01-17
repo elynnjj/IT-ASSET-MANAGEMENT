@@ -46,7 +46,7 @@ class NewUserWelcomeNotification extends Notification
             ->line('**Username:** ' . $notifiable->userID)
             ->line('**Temporary Password:** ' . $this->temporaryPassword)
             ->line('**Important:** You must change your password on your first login for security purposes.')
-            ->action('Login to System', route('login'))
+            ->action('Login to System', route('login', [], true))
             ->line('Please keep your login credentials secure and do not share them with anyone.')
             ->salutation('Regards,' . "\n" . 'ExactAsset Team');
     }
